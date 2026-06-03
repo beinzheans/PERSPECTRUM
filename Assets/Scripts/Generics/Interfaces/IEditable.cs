@@ -1,4 +1,7 @@
-public interface IEditable<T> : ISelectable
+using System;
+using System.Linq.Expressions;
+
+public interface IEditable : ISelectable
 {
-    public void OnEdit(T editable);
+    public void OnEdit<TClass, TValue>(Expression<Func<TClass, TValue>> editAction, TValue newValue);
 }

@@ -1,67 +1,48 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class EditorHitbox : EditorDynamicObject<EditorHitbox>, IEquatable<EditorHitbox>
+[Serializable]
+public class EditorHitbox : EditorDynamicObject, IConvertable<VisualHitbox>
 {
-    public EditorHitbox(Vector2 normalizedPosition, int rawPixelSize, HitboxType hitboxType, double renderTime) : base(renderTime)
+    public EditorHitbox(Vector2 normalizedPosition, float normalizedSize, HitboxType hitboxType, double renderTime) : base(renderTime)
     {
         NormalizedPosition = normalizedPosition;
-        RawPixelSize = rawPixelSize;
+        NormalizedSize = normalizedSize;
         HitboxType = hitboxType;
     }
 
     public Vector2 NormalizedPosition { get; protected set; }
-    public int RawPixelSize { get; protected set; }
+    public float NormalizedSize { get; protected set; }
     public HitboxType HitboxType { get; protected set; }
-    public bool Equals(EditorHitbox other)
+
+    public override EditorObject GetCopy()
     {
-        return this.NormalizedPosition == other.NormalizedPosition && this.RenderTime == other.RenderTime && this.RawPixelSize == other.RawPixelSize;
+        return new EditorHitbox(NormalizedPosition, NormalizedSize, HitboxType, RenderTime);
     }
 
-    public override void OnDelete(ref List<EditorHitbox> listToEdit)
+    public override void Mirror(MirrorAxis axis)
     {
-        base.OnDelete(ref listToEdit);
+        Vector2 mirrorVector = new Vector2(axis.HasFlag(MirrorAxis.Vertical) ? 1f - NormalizedPosition.x : NormalizedPosition.x, axis.HasFlag(MirrorAxis.Horizontal) ? 1f - NormalizedPosition.y : NormalizedPosition.y);
+        NormalizedPosition = mirrorVector;
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 
-    public override void OnEdit(EditorHitbox editable)
+    public override bool GetPosition(out Vector2 position)
     {
-        if (editable is not EditorHitbox newHitbox)
-        {
-            return;
-        }
-
-        NormalizedPosition = newHitbox.NormalizedPosition;
-        RenderTime = newHitbox.RenderTime;
-        RawPixelSize = newHitbox.RawPixelSize;
-        HitboxType = newHitbox.HitboxType;
-
-        OnRender(); // re-render the hitbox automatically
+        position = NormalizedPosition;
+        return true;
     }
 
-    public override void OnPlace(ref List<EditorHitbox> listToEdit)
+    public bool Convert(out VisualHitbox converted)
     {
-        base.OnPlace(ref listToEdit);
+        converted = new VisualHitbox(NormalizedPosition, RenderTime, NormalizedSize);
+        return true;
     }
-
-    public override void OnRender()
-    {
-        EditorManager.EditorInstance.InvokeRenderRenderableEvent(this);
-    }
-    public override void OnUnrender()
-    {
-        EditorManager.EditorInstance.InvokeUnrenderRenderableEvent(this);
-    }
-
-    public override void OnSelect()
-    {
-        base.OnSelect();
-    }
-
 }
 
 public enum HitboxType
 {
     A = 0,
-    B = 1
+    B = 1,
+    BOMB = 2
 }

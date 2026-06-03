@@ -1,59 +1,87 @@
-using Mono.Cecil.Cil;
-using System.Collections.Generic;
+using Newtonsoft.Json;
+using System;
+using System.Linq.Expressions;
+using System.Reflection;
 using UnityEngine;
 
-public abstract class EditorDynamicObject<TObject> : IEditable<TObject>, IPlaceDeleteable<TObject>
+/// <summary>
+/// A generic class representing an editor object that is interactable.
+/// </summary>
+public class EditorDynamicObject : EditorObject, IPlaceDeleteable, IEditable
 {
-    protected EditorDynamicObject(double renderTime)
+    protected EditorDynamicObject(double renderTime) : base(renderTime)
     {
         RenderTime = renderTime;
     }
 
-    public double RenderTime { get; protected set; }
+    [JsonIgnore]
     public bool IsSelected { get; protected set; }
 
-    public virtual void OnDelete(ref List<TObject> listToEdit)
+    public virtual void OnDelete()
     {
-        if (this is not TObject deletable)
-        {
-            return;
-        }
-
-        listToEdit.Remove(deletable);
+        EditorManager.EditorInstance.InvokeDeleteEditorObjectEvent(this);
     }
 
-    public abstract void OnEdit(TObject editable);
-
-    public virtual void OnPlace(ref List<TObject> listToEdit)
+    public virtual void OnPlace()
     {
-        if (this is not TObject placeable)
-        {
-            return;
-        }
-
-        if (listToEdit.Contains(placeable))
-        {
-            return;
-        }
-
-        listToEdit.Add(placeable);
+        EditorManager.EditorInstance.InvokePlaceEditorObjectEvent(this);
     }
-
-    public abstract void OnRender();
 
     public virtual void OnSelect()
     {
         if (IsSelected)
         {
-            EditorManager.EditorInstance.InvokeDeselectSelectableEvent(this);
-            IsSelected = false;
+            return;
         }
-        else
-        {
-            EditorManager.EditorInstance.InvokeSelectSelectableEvent(this);
-            IsSelected = true;
-        }
+
+        IsSelected = true;
+        EditorManager.EditorInstance.InvokeSelectSelectableEvent(this);
     }
 
-    public abstract void OnUnrender();
+    public virtual void OnDeselect()
+    {
+        if (!IsSelected)
+        {
+            return;
+        }
+
+        IsSelected = false;
+        EditorManager.EditorInstance.InvokeDeselectSelectableEvent(this);
+    }
+    public override EditorObject GetCopy()
+    {
+        return new EditorDynamicObject(RenderTime);
+    }
+
+    public virtual void Mirror(MirrorAxis axis)
+    {
+        return;
+    }
+
+    public void OnEdit<TClass, TValue>(Expression<Func<TClass, TValue>> editAction, TValue newValue)
+    {
+        if (editAction.Body is not MemberExpression expression)
+        {
+            return;
+        }
+
+        if (expression.Member is not PropertyInfo property)
+        {
+            return;
+        }
+
+        property.SetValue(this, newValue);
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
+    }
+
+    /// <summary>
+    /// Gets the position of the editor object if possible. Returns false if can not define what a position means for this object.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    public virtual bool GetPosition(out Vector2 position)
+    {
+        position = Vector2.zero;
+        return false;
+    }
 }

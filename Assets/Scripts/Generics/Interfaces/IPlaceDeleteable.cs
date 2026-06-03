@@ -1,7 +1,5 @@
-using System.Collections.Generic;
-
-public interface IPlaceDeleteable<T> : IRenderable
+public interface IPlaceDeleteable : ISelectable
 {
-    public void OnPlace(ref List<T> listToEdit);
-    public void OnDelete(ref List<T> listToEdit);
+    public void OnPlace();
+    public void OnDelete();
 }

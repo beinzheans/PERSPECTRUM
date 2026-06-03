@@ -1,35 +1,31 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class EditorPoint : EditorDynamicObject<EditorPoint>, IEquatable<EditorPoint>
+[Serializable]
+public class EditorPoint : EditorDynamicObject
 {
     public EditorPoint(Vector2 normalizedPosition, double renderTime) : base(renderTime)
     {
         this.NormalizedPosition = normalizedPosition;
     }
 
-    public Vector2 NormalizedPosition { get; private set; }
+    public Vector2 NormalizedPosition { get; protected set; }
 
-    public bool Equals(EditorPoint other)
+    public override EditorObject GetCopy()
     {
-        return this.NormalizedPosition == other.NormalizedPosition && this.RenderTime == other.RenderTime;
+        return new EditorPoint(NormalizedPosition, RenderTime);
     }
 
-    public override void OnEdit(EditorPoint editable)
+    public override void Mirror(MirrorAxis axis)
     {
-        this.NormalizedPosition = editable.NormalizedPosition;
-        this.RenderTime = editable.RenderTime;
-
-        OnRender();
+        Vector2 mirrorVector = new Vector2(axis.HasFlag(MirrorAxis.Vertical) ? 1f - NormalizedPosition.x : NormalizedPosition.x, axis.HasFlag(MirrorAxis.Horizontal) ? 1f - NormalizedPosition.y : NormalizedPosition.y);
+        NormalizedPosition = mirrorVector;
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 
-    public override void OnRender()
+    public override bool GetPosition(out Vector2 position)
     {
-
-    }
-
-    public override void OnUnrender()
-    {
+        position = NormalizedPosition;
+        return true;
     }
 }

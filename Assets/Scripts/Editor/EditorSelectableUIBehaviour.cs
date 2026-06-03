@@ -1,28 +1,50 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class EditorSelectableUIBehaviour<T> : EditorRenderableUIBehavior<T> where T : ISelectable
+public abstract class EditorSelectableUIBehaviour<T> : EditorRenderableUIBehavior<T>, ICanvasRaycastFilter, IPointerClickHandler where T : EditorDynamicObject
 {
-    protected Button button;
     protected T currentAssociatedSelectable;
 
     protected override void Awake()
     {
         base.Awake();
-
-        button = GetComponent<Button>();
     }
 
-    public void AssignAssociatedSelectable(T h)
+    public override void AssignAssociatedRenderable(T renderable)
     {
-        AssignAssociatedRenderable(h);
-        button.onClick.AddListener(() => h.OnSelect());
+        base.AssignAssociatedRenderable(renderable);
+        currentAssociatedSelectable = renderable;
     }
 
-    public void UnassignCurrentAssociatedSelectable()
+    public override void UnassignAssociatedRenderable()
     {
-        UnassignAssociatedRenderable();
-        button.onClick.RemoveAllListeners();
+        base.UnassignAssociatedRenderable();
+    }
+
+
+    public abstract bool IsRaycastLocationValid(Vector2 sp, Camera eventCamera);
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+        {
+            return;
+        }
+
+        Action selectAction = () => { currentAssociatedRenderable.OnSelect(); };
+        Action deselectAction = () => { currentAssociatedRenderable.OnDeselect(); };
+
+        EditorCommand command;
+        if (!currentAssociatedSelectable.IsSelected)
+        {
+            command = new EditorCommand(selectAction, deselectAction);
+        }
+        else
+        {
+            command = new EditorCommand(deselectAction, selectAction);
+        }
+
+        EditorManager.EditorInstance.ExecuteEditorCommand(command);
     }
 }

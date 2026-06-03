@@ -96,7 +96,25 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""ScrollEditorTime"",
                     ""type"": ""Value"",
                     ""id"": ""7f57895c-2368-478c-be24-0fb7d3ddb864"",
-                    ""expectedControlType"": ""Axis"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ScrollEditorBeatSubdivision"",
+                    ""type"": ""Value"",
+                    ""id"": ""ee22cd1f-1055-4c56-a778-f09c020b7077"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ScrollEditorTime_BigScroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""e9e94a23-4d9d-48f0-9c2a-06c7586f8feb"",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -120,27 +138,117 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""PlaceHitboxA"",
+                    ""name"": ""PlaceEditorObject"",
                     ""type"": ""Button"",
-                    ""id"": ""73e6bca6-16b4-44aa-82ec-1fbdc9ad585e"",
+                    ""id"": ""11f3b033-b23f-4e6c-9785-57da36b046dd"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""PlaceHitboxB"",
+                    ""name"": ""DeleteSelectedEditorObject"",
                     ""type"": ""Button"",
-                    ""id"": ""7ce45a61-71f0-4f5d-80ab-948d051dd4f5"",
+                    ""id"": ""c026d1ce-542d-4733-8429-e0d193950542"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""DeleteHitbox"",
+                    ""name"": ""SelectAllVisibleEditorObjects"",
                     ""type"": ""Button"",
-                    ""id"": ""8e20921c-0f90-4889-98f6-774d1440b3c1"",
+                    ""id"": ""a15c5429-52f8-4ef7-81dd-1a26234ef4a1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DeselectAllEditorObjects"",
+                    ""type"": ""Button"",
+                    ""id"": ""b1868842-29d0-4c54-95b8-4893d103e39b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CopyObjects"",
+                    ""type"": ""Button"",
+                    ""id"": ""c6f778ee-7510-4e81-83e4-30bd5bad6989"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PasteObjects"",
+                    ""type"": ""Button"",
+                    ""id"": ""488fb48b-acac-40df-84cc-5a30fd6201c1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CutObjects"",
+                    ""type"": ""Button"",
+                    ""id"": ""a1abf309-808d-4c31-814d-c1a4cc7981ef"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MirrorObjects"",
+                    ""type"": ""Button"",
+                    ""id"": ""89f285b0-902c-4b2e-8f35-fcffb757851a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToolPositiveNegativeInput"",
+                    ""type"": ""Value"",
+                    ""id"": ""6cf4950e-8304-46c8-9a42-7ff596e9350d"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""EditorPositiveNegativeInput"",
+                    ""type"": ""Value"",
+                    ""id"": ""5cb6e7e8-40dd-47bc-bd2b-ff49da36419b"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""UndoEditorCommand"",
+                    ""type"": ""Button"",
+                    ""id"": ""913c670a-30c8-4d0f-a232-4cd79022751e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RedoEditorCommand"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e6fbd95-e8f9-4cf3-9f53-91b5fffec19b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EditorStartPlayback"",
+                    ""type"": ""Button"",
+                    ""id"": ""309b94a0-25d4-4f86-bf91-e6bda3c814d8"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -148,39 +256,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": ""1D Axis"",
-                    ""id"": ""6b6e4b11-8d68-4d93-bc28-3b5e3a724827"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ScrollEditorTime"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""7f86da35-8cba-470a-ae1a-6bf2c5b19233"",
-                    ""path"": ""<Mouse>/scroll/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";KB&M"",
-                    ""action"": ""ScrollEditorTime"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""65260754-6098-45e6-a1ba-a0215ec97081"",
-                    ""path"": ""<Mouse>/scroll/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";KB&M"",
-                    ""action"": ""ScrollEditorTime"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
                 {
                     ""name"": ""One Modifier"",
                     ""id"": ""65701ef0-7d10-433d-9375-b2a0f95cef98"",
@@ -195,7 +270,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""modifier"",
                     ""id"": ""b0401b6d-6785-4391-a8e9-75bf45d3f40d"",
-                    ""path"": ""<Keyboard>/ctrl"",
+                    ""path"": ""<Keyboard>/alt"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -228,7 +303,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""modifier"",
                     ""id"": ""a3fcf518-8e77-4fb2-b7d5-6b5823c15edd"",
-                    ""path"": ""<Keyboard>/ctrl"",
+                    ""path"": ""<Keyboard>/alt"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -248,57 +323,431 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
+                    ""name"": """",
+                    ""id"": ""2fd69012-04d5-4a53-89a0-6c53e9ba758a"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""PlaceEditorObject"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""78fdbad8-3547-4180-8016-0a2893f59c28"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""DeleteSelectedEditorObject"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
                     ""name"": ""One Modifier"",
-                    ""id"": ""25a580bf-1747-44c0-a4da-a927ea1e09ba"",
+                    ""id"": ""973e7af1-0e48-4558-8a10-c82a5df1eee9"",
                     ""path"": ""OneModifier"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""PlaceHitboxB"",
+                    ""action"": ""CopyObjects"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": ""modifier"",
-                    ""id"": ""50b89928-b461-48b5-8e86-c6f1a19280c3"",
+                    ""id"": ""29e773ee-e732-452c-8402-cecb8d5e31d7"",
                     ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""PlaceHitboxB"",
+                    ""action"": ""CopyObjects"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""binding"",
-                    ""id"": ""19c630a6-80ad-4c89-8d13-220e7bfd413d"",
-                    ""path"": ""<Mouse>/rightButton"",
+                    ""id"": ""afadd874-069e-4676-8456-a9ded28a6984"",
+                    ""path"": ""<Keyboard>/c"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""PlaceHitboxB"",
+                    ""action"": ""CopyObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""fc670853-2e7c-492e-8097-a56626a01da3"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PasteObjects"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""4c0b6511-6ea0-4aa0-96af-4e7cb352820b"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""PasteObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""e03e49a7-c749-411f-a9be-824f6241c357"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""PasteObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""998cba95-9bd7-49dc-988a-2c7259fa7b9d"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CutObjects"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""28161ae0-3b3e-478c-a645-feee45447692"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""CutObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""b161559e-9a7a-4587-9a7f-229e99eff529"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""CutObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""41f94b64-bf8c-4200-ad07-717e556baf18"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MirrorObjects"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""7fc22349-1069-444c-85cf-a78705f9c773"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""MirrorObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""09aa3e8a-de0a-41c8-8472-7b2beb20289b"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""MirrorObjects"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": """",
-                    ""id"": ""f7620182-3b95-4dbe-8e82-c99e8add9241"",
-                    ""path"": ""<Mouse>/rightButton"",
+                    ""id"": ""d98461a9-b0a3-4ef9-9d5f-b0cd74c2f64c"",
+                    ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""PlaceHitboxA"",
+                    ""action"": ""SelectAllVisibleEditorObjects"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""07d18673-68eb-48a0-bc5a-6ae77ed8b0c9"",
-                    ""path"": ""<Keyboard>/backspace"",
+                    ""name"": ""1D Axis"",
+                    ""id"": ""78c68194-3eba-48b9-a9d2-ff13d084bd3f"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToolPositiveNegativeInput"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""cb8ae5a9-a461-4ba2-abac-1ae280d0bd84"",
+                    ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""DeleteHitbox"",
+                    ""action"": ""ToolPositiveNegativeInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""00e0dfb0-fce7-4ebd-bfa7-927fc1dab2a8"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""ToolPositiveNegativeInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""84e9b3d0-0f80-4758-a54f-05b736254399"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EditorPositiveNegativeInput"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""1ec2519c-face-43d5-b2df-2285495b9bc9"",
+                    ""path"": ""<Keyboard>/alt"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""EditorPositiveNegativeInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""70019f40-9a61-457b-a530-d919b7f3e1bd"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""EditorPositiveNegativeInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ea24acc8-6134-426b-86c2-867694e47a75"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""ScrollEditorTime"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""85e8d262-1908-4583-b946-14d8ca19214e"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ScrollEditorBeatSubdivision"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""dd3d0a4e-5636-4508-bdef-507db23b5098"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""ScrollEditorBeatSubdivision"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""cb35e561-1c20-46d9-9e2e-6e0e1f8be741"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""ScrollEditorBeatSubdivision"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""9c79f88d-50e2-4c78-aa1e-abd5bc87e529"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ScrollEditorTime_BigScroll"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""67552500-c151-4cdb-a6b3-0bb7624f3f85"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""ScrollEditorTime_BigScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""846dff28-ca54-41af-b19d-102db5b959ea"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""ScrollEditorTime_BigScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""fedc1196-f847-490a-b2a7-b316dd280f01"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DeselectAllEditorObjects"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""5c3a646f-dc31-4c02-b7ab-0bfd00d1c65e"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""DeselectAllEditorObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""fd105b2f-4c4b-48cb-a173-d5ddb7a8c4a1"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""DeselectAllEditorObjects"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""fab92501-e768-4a98-9aa3-694fe803ca6c"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UndoEditorCommand"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""900a6cb8-d83e-4059-af3b-a7c1e9e20486"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""UndoEditorCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""e125b6fa-5f08-4154-b099-2cb2b804e22c"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""UndoEditorCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Two Modifiers"",
+                    ""id"": ""374a7532-3fc8-420e-aed1-cbe0662f2149"",
+                    ""path"": ""TwoModifiers"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RedoEditorCommand"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier1"",
+                    ""id"": ""c86806a7-ca6d-4c17-a48f-979b46be2371"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""RedoEditorCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""modifier2"",
+                    ""id"": ""85707839-5d57-47a6-80fc-fd415d6afa7f"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""RedoEditorCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""2849e262-7e33-4b4d-b313-5102f7fe8978"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RedoEditorCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""de123799-1002-44db-9f51-e307199e7587"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""EditorStartPlayback"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -355,11 +804,23 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         // Editor
         m_Editor = asset.FindActionMap("Editor", throwIfNotFound: true);
         m_Editor_ScrollEditorTime = m_Editor.FindAction("ScrollEditorTime", throwIfNotFound: true);
+        m_Editor_ScrollEditorBeatSubdivision = m_Editor.FindAction("ScrollEditorBeatSubdivision", throwIfNotFound: true);
+        m_Editor_ScrollEditorTime_BigScroll = m_Editor.FindAction("ScrollEditorTime_BigScroll", throwIfNotFound: true);
         m_Editor_MouseSnapAlongX = m_Editor.FindAction("MouseSnapAlongX", throwIfNotFound: true);
         m_Editor_MouseSnapAlongY = m_Editor.FindAction("MouseSnapAlongY", throwIfNotFound: true);
-        m_Editor_PlaceHitboxA = m_Editor.FindAction("PlaceHitboxA", throwIfNotFound: true);
-        m_Editor_PlaceHitboxB = m_Editor.FindAction("PlaceHitboxB", throwIfNotFound: true);
-        m_Editor_DeleteHitbox = m_Editor.FindAction("DeleteHitbox", throwIfNotFound: true);
+        m_Editor_PlaceEditorObject = m_Editor.FindAction("PlaceEditorObject", throwIfNotFound: true);
+        m_Editor_DeleteSelectedEditorObject = m_Editor.FindAction("DeleteSelectedEditorObject", throwIfNotFound: true);
+        m_Editor_SelectAllVisibleEditorObjects = m_Editor.FindAction("SelectAllVisibleEditorObjects", throwIfNotFound: true);
+        m_Editor_DeselectAllEditorObjects = m_Editor.FindAction("DeselectAllEditorObjects", throwIfNotFound: true);
+        m_Editor_CopyObjects = m_Editor.FindAction("CopyObjects", throwIfNotFound: true);
+        m_Editor_PasteObjects = m_Editor.FindAction("PasteObjects", throwIfNotFound: true);
+        m_Editor_CutObjects = m_Editor.FindAction("CutObjects", throwIfNotFound: true);
+        m_Editor_MirrorObjects = m_Editor.FindAction("MirrorObjects", throwIfNotFound: true);
+        m_Editor_ToolPositiveNegativeInput = m_Editor.FindAction("ToolPositiveNegativeInput", throwIfNotFound: true);
+        m_Editor_EditorPositiveNegativeInput = m_Editor.FindAction("EditorPositiveNegativeInput", throwIfNotFound: true);
+        m_Editor_UndoEditorCommand = m_Editor.FindAction("UndoEditorCommand", throwIfNotFound: true);
+        m_Editor_RedoEditorCommand = m_Editor.FindAction("RedoEditorCommand", throwIfNotFound: true);
+        m_Editor_EditorStartPlayback = m_Editor.FindAction("EditorStartPlayback", throwIfNotFound: true);
         // Gameplay
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_MousePosition = m_Gameplay.FindAction("MousePosition", throwIfNotFound: true);
@@ -445,11 +906,23 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Editor;
     private List<IEditorActions> m_EditorActionsCallbackInterfaces = new List<IEditorActions>();
     private readonly InputAction m_Editor_ScrollEditorTime;
+    private readonly InputAction m_Editor_ScrollEditorBeatSubdivision;
+    private readonly InputAction m_Editor_ScrollEditorTime_BigScroll;
     private readonly InputAction m_Editor_MouseSnapAlongX;
     private readonly InputAction m_Editor_MouseSnapAlongY;
-    private readonly InputAction m_Editor_PlaceHitboxA;
-    private readonly InputAction m_Editor_PlaceHitboxB;
-    private readonly InputAction m_Editor_DeleteHitbox;
+    private readonly InputAction m_Editor_PlaceEditorObject;
+    private readonly InputAction m_Editor_DeleteSelectedEditorObject;
+    private readonly InputAction m_Editor_SelectAllVisibleEditorObjects;
+    private readonly InputAction m_Editor_DeselectAllEditorObjects;
+    private readonly InputAction m_Editor_CopyObjects;
+    private readonly InputAction m_Editor_PasteObjects;
+    private readonly InputAction m_Editor_CutObjects;
+    private readonly InputAction m_Editor_MirrorObjects;
+    private readonly InputAction m_Editor_ToolPositiveNegativeInput;
+    private readonly InputAction m_Editor_EditorPositiveNegativeInput;
+    private readonly InputAction m_Editor_UndoEditorCommand;
+    private readonly InputAction m_Editor_RedoEditorCommand;
+    private readonly InputAction m_Editor_EditorStartPlayback;
     /// <summary>
     /// Provides access to input actions defined in input action map "Editor".
     /// </summary>
@@ -466,6 +939,14 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @ScrollEditorTime => m_Wrapper.m_Editor_ScrollEditorTime;
         /// <summary>
+        /// Provides access to the underlying input action "Editor/ScrollEditorBeatSubdivision".
+        /// </summary>
+        public InputAction @ScrollEditorBeatSubdivision => m_Wrapper.m_Editor_ScrollEditorBeatSubdivision;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/ScrollEditorTime_BigScroll".
+        /// </summary>
+        public InputAction @ScrollEditorTime_BigScroll => m_Wrapper.m_Editor_ScrollEditorTime_BigScroll;
+        /// <summary>
         /// Provides access to the underlying input action "Editor/MouseSnapAlongX".
         /// </summary>
         public InputAction @MouseSnapAlongX => m_Wrapper.m_Editor_MouseSnapAlongX;
@@ -474,17 +955,57 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @MouseSnapAlongY => m_Wrapper.m_Editor_MouseSnapAlongY;
         /// <summary>
-        /// Provides access to the underlying input action "Editor/PlaceHitboxA".
+        /// Provides access to the underlying input action "Editor/PlaceEditorObject".
         /// </summary>
-        public InputAction @PlaceHitboxA => m_Wrapper.m_Editor_PlaceHitboxA;
+        public InputAction @PlaceEditorObject => m_Wrapper.m_Editor_PlaceEditorObject;
         /// <summary>
-        /// Provides access to the underlying input action "Editor/PlaceHitboxB".
+        /// Provides access to the underlying input action "Editor/DeleteSelectedEditorObject".
         /// </summary>
-        public InputAction @PlaceHitboxB => m_Wrapper.m_Editor_PlaceHitboxB;
+        public InputAction @DeleteSelectedEditorObject => m_Wrapper.m_Editor_DeleteSelectedEditorObject;
         /// <summary>
-        /// Provides access to the underlying input action "Editor/DeleteHitbox".
+        /// Provides access to the underlying input action "Editor/SelectAllVisibleEditorObjects".
         /// </summary>
-        public InputAction @DeleteHitbox => m_Wrapper.m_Editor_DeleteHitbox;
+        public InputAction @SelectAllVisibleEditorObjects => m_Wrapper.m_Editor_SelectAllVisibleEditorObjects;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/DeselectAllEditorObjects".
+        /// </summary>
+        public InputAction @DeselectAllEditorObjects => m_Wrapper.m_Editor_DeselectAllEditorObjects;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/CopyObjects".
+        /// </summary>
+        public InputAction @CopyObjects => m_Wrapper.m_Editor_CopyObjects;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/PasteObjects".
+        /// </summary>
+        public InputAction @PasteObjects => m_Wrapper.m_Editor_PasteObjects;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/CutObjects".
+        /// </summary>
+        public InputAction @CutObjects => m_Wrapper.m_Editor_CutObjects;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/MirrorObjects".
+        /// </summary>
+        public InputAction @MirrorObjects => m_Wrapper.m_Editor_MirrorObjects;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/ToolPositiveNegativeInput".
+        /// </summary>
+        public InputAction @ToolPositiveNegativeInput => m_Wrapper.m_Editor_ToolPositiveNegativeInput;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/EditorPositiveNegativeInput".
+        /// </summary>
+        public InputAction @EditorPositiveNegativeInput => m_Wrapper.m_Editor_EditorPositiveNegativeInput;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/UndoEditorCommand".
+        /// </summary>
+        public InputAction @UndoEditorCommand => m_Wrapper.m_Editor_UndoEditorCommand;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/RedoEditorCommand".
+        /// </summary>
+        public InputAction @RedoEditorCommand => m_Wrapper.m_Editor_RedoEditorCommand;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/EditorStartPlayback".
+        /// </summary>
+        public InputAction @EditorStartPlayback => m_Wrapper.m_Editor_EditorStartPlayback;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -514,21 +1035,57 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ScrollEditorTime.started += instance.OnScrollEditorTime;
             @ScrollEditorTime.performed += instance.OnScrollEditorTime;
             @ScrollEditorTime.canceled += instance.OnScrollEditorTime;
+            @ScrollEditorBeatSubdivision.started += instance.OnScrollEditorBeatSubdivision;
+            @ScrollEditorBeatSubdivision.performed += instance.OnScrollEditorBeatSubdivision;
+            @ScrollEditorBeatSubdivision.canceled += instance.OnScrollEditorBeatSubdivision;
+            @ScrollEditorTime_BigScroll.started += instance.OnScrollEditorTime_BigScroll;
+            @ScrollEditorTime_BigScroll.performed += instance.OnScrollEditorTime_BigScroll;
+            @ScrollEditorTime_BigScroll.canceled += instance.OnScrollEditorTime_BigScroll;
             @MouseSnapAlongX.started += instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.performed += instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.canceled += instance.OnMouseSnapAlongX;
             @MouseSnapAlongY.started += instance.OnMouseSnapAlongY;
             @MouseSnapAlongY.performed += instance.OnMouseSnapAlongY;
             @MouseSnapAlongY.canceled += instance.OnMouseSnapAlongY;
-            @PlaceHitboxA.started += instance.OnPlaceHitboxA;
-            @PlaceHitboxA.performed += instance.OnPlaceHitboxA;
-            @PlaceHitboxA.canceled += instance.OnPlaceHitboxA;
-            @PlaceHitboxB.started += instance.OnPlaceHitboxB;
-            @PlaceHitboxB.performed += instance.OnPlaceHitboxB;
-            @PlaceHitboxB.canceled += instance.OnPlaceHitboxB;
-            @DeleteHitbox.started += instance.OnDeleteHitbox;
-            @DeleteHitbox.performed += instance.OnDeleteHitbox;
-            @DeleteHitbox.canceled += instance.OnDeleteHitbox;
+            @PlaceEditorObject.started += instance.OnPlaceEditorObject;
+            @PlaceEditorObject.performed += instance.OnPlaceEditorObject;
+            @PlaceEditorObject.canceled += instance.OnPlaceEditorObject;
+            @DeleteSelectedEditorObject.started += instance.OnDeleteSelectedEditorObject;
+            @DeleteSelectedEditorObject.performed += instance.OnDeleteSelectedEditorObject;
+            @DeleteSelectedEditorObject.canceled += instance.OnDeleteSelectedEditorObject;
+            @SelectAllVisibleEditorObjects.started += instance.OnSelectAllVisibleEditorObjects;
+            @SelectAllVisibleEditorObjects.performed += instance.OnSelectAllVisibleEditorObjects;
+            @SelectAllVisibleEditorObjects.canceled += instance.OnSelectAllVisibleEditorObjects;
+            @DeselectAllEditorObjects.started += instance.OnDeselectAllEditorObjects;
+            @DeselectAllEditorObjects.performed += instance.OnDeselectAllEditorObjects;
+            @DeselectAllEditorObjects.canceled += instance.OnDeselectAllEditorObjects;
+            @CopyObjects.started += instance.OnCopyObjects;
+            @CopyObjects.performed += instance.OnCopyObjects;
+            @CopyObjects.canceled += instance.OnCopyObjects;
+            @PasteObjects.started += instance.OnPasteObjects;
+            @PasteObjects.performed += instance.OnPasteObjects;
+            @PasteObjects.canceled += instance.OnPasteObjects;
+            @CutObjects.started += instance.OnCutObjects;
+            @CutObjects.performed += instance.OnCutObjects;
+            @CutObjects.canceled += instance.OnCutObjects;
+            @MirrorObjects.started += instance.OnMirrorObjects;
+            @MirrorObjects.performed += instance.OnMirrorObjects;
+            @MirrorObjects.canceled += instance.OnMirrorObjects;
+            @ToolPositiveNegativeInput.started += instance.OnToolPositiveNegativeInput;
+            @ToolPositiveNegativeInput.performed += instance.OnToolPositiveNegativeInput;
+            @ToolPositiveNegativeInput.canceled += instance.OnToolPositiveNegativeInput;
+            @EditorPositiveNegativeInput.started += instance.OnEditorPositiveNegativeInput;
+            @EditorPositiveNegativeInput.performed += instance.OnEditorPositiveNegativeInput;
+            @EditorPositiveNegativeInput.canceled += instance.OnEditorPositiveNegativeInput;
+            @UndoEditorCommand.started += instance.OnUndoEditorCommand;
+            @UndoEditorCommand.performed += instance.OnUndoEditorCommand;
+            @UndoEditorCommand.canceled += instance.OnUndoEditorCommand;
+            @RedoEditorCommand.started += instance.OnRedoEditorCommand;
+            @RedoEditorCommand.performed += instance.OnRedoEditorCommand;
+            @RedoEditorCommand.canceled += instance.OnRedoEditorCommand;
+            @EditorStartPlayback.started += instance.OnEditorStartPlayback;
+            @EditorStartPlayback.performed += instance.OnEditorStartPlayback;
+            @EditorStartPlayback.canceled += instance.OnEditorStartPlayback;
         }
 
         /// <summary>
@@ -543,21 +1100,57 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ScrollEditorTime.started -= instance.OnScrollEditorTime;
             @ScrollEditorTime.performed -= instance.OnScrollEditorTime;
             @ScrollEditorTime.canceled -= instance.OnScrollEditorTime;
+            @ScrollEditorBeatSubdivision.started -= instance.OnScrollEditorBeatSubdivision;
+            @ScrollEditorBeatSubdivision.performed -= instance.OnScrollEditorBeatSubdivision;
+            @ScrollEditorBeatSubdivision.canceled -= instance.OnScrollEditorBeatSubdivision;
+            @ScrollEditorTime_BigScroll.started -= instance.OnScrollEditorTime_BigScroll;
+            @ScrollEditorTime_BigScroll.performed -= instance.OnScrollEditorTime_BigScroll;
+            @ScrollEditorTime_BigScroll.canceled -= instance.OnScrollEditorTime_BigScroll;
             @MouseSnapAlongX.started -= instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.performed -= instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.canceled -= instance.OnMouseSnapAlongX;
             @MouseSnapAlongY.started -= instance.OnMouseSnapAlongY;
             @MouseSnapAlongY.performed -= instance.OnMouseSnapAlongY;
             @MouseSnapAlongY.canceled -= instance.OnMouseSnapAlongY;
-            @PlaceHitboxA.started -= instance.OnPlaceHitboxA;
-            @PlaceHitboxA.performed -= instance.OnPlaceHitboxA;
-            @PlaceHitboxA.canceled -= instance.OnPlaceHitboxA;
-            @PlaceHitboxB.started -= instance.OnPlaceHitboxB;
-            @PlaceHitboxB.performed -= instance.OnPlaceHitboxB;
-            @PlaceHitboxB.canceled -= instance.OnPlaceHitboxB;
-            @DeleteHitbox.started -= instance.OnDeleteHitbox;
-            @DeleteHitbox.performed -= instance.OnDeleteHitbox;
-            @DeleteHitbox.canceled -= instance.OnDeleteHitbox;
+            @PlaceEditorObject.started -= instance.OnPlaceEditorObject;
+            @PlaceEditorObject.performed -= instance.OnPlaceEditorObject;
+            @PlaceEditorObject.canceled -= instance.OnPlaceEditorObject;
+            @DeleteSelectedEditorObject.started -= instance.OnDeleteSelectedEditorObject;
+            @DeleteSelectedEditorObject.performed -= instance.OnDeleteSelectedEditorObject;
+            @DeleteSelectedEditorObject.canceled -= instance.OnDeleteSelectedEditorObject;
+            @SelectAllVisibleEditorObjects.started -= instance.OnSelectAllVisibleEditorObjects;
+            @SelectAllVisibleEditorObjects.performed -= instance.OnSelectAllVisibleEditorObjects;
+            @SelectAllVisibleEditorObjects.canceled -= instance.OnSelectAllVisibleEditorObjects;
+            @DeselectAllEditorObjects.started -= instance.OnDeselectAllEditorObjects;
+            @DeselectAllEditorObjects.performed -= instance.OnDeselectAllEditorObjects;
+            @DeselectAllEditorObjects.canceled -= instance.OnDeselectAllEditorObjects;
+            @CopyObjects.started -= instance.OnCopyObjects;
+            @CopyObjects.performed -= instance.OnCopyObjects;
+            @CopyObjects.canceled -= instance.OnCopyObjects;
+            @PasteObjects.started -= instance.OnPasteObjects;
+            @PasteObjects.performed -= instance.OnPasteObjects;
+            @PasteObjects.canceled -= instance.OnPasteObjects;
+            @CutObjects.started -= instance.OnCutObjects;
+            @CutObjects.performed -= instance.OnCutObjects;
+            @CutObjects.canceled -= instance.OnCutObjects;
+            @MirrorObjects.started -= instance.OnMirrorObjects;
+            @MirrorObjects.performed -= instance.OnMirrorObjects;
+            @MirrorObjects.canceled -= instance.OnMirrorObjects;
+            @ToolPositiveNegativeInput.started -= instance.OnToolPositiveNegativeInput;
+            @ToolPositiveNegativeInput.performed -= instance.OnToolPositiveNegativeInput;
+            @ToolPositiveNegativeInput.canceled -= instance.OnToolPositiveNegativeInput;
+            @EditorPositiveNegativeInput.started -= instance.OnEditorPositiveNegativeInput;
+            @EditorPositiveNegativeInput.performed -= instance.OnEditorPositiveNegativeInput;
+            @EditorPositiveNegativeInput.canceled -= instance.OnEditorPositiveNegativeInput;
+            @UndoEditorCommand.started -= instance.OnUndoEditorCommand;
+            @UndoEditorCommand.performed -= instance.OnUndoEditorCommand;
+            @UndoEditorCommand.canceled -= instance.OnUndoEditorCommand;
+            @RedoEditorCommand.started -= instance.OnRedoEditorCommand;
+            @RedoEditorCommand.performed -= instance.OnRedoEditorCommand;
+            @RedoEditorCommand.canceled -= instance.OnRedoEditorCommand;
+            @EditorStartPlayback.started -= instance.OnEditorStartPlayback;
+            @EditorStartPlayback.performed -= instance.OnEditorStartPlayback;
+            @EditorStartPlayback.canceled -= instance.OnEditorStartPlayback;
         }
 
         /// <summary>
@@ -715,6 +1308,20 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnScrollEditorTime(InputAction.CallbackContext context);
         /// <summary>
+        /// Method invoked when associated input action "ScrollEditorBeatSubdivision" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnScrollEditorBeatSubdivision(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ScrollEditorTime_BigScroll" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnScrollEditorTime_BigScroll(InputAction.CallbackContext context);
+        /// <summary>
         /// Method invoked when associated input action "MouseSnapAlongX" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -729,26 +1336,96 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseSnapAlongY(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "PlaceHitboxA" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "PlaceEditorObject" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPlaceHitboxA(InputAction.CallbackContext context);
+        void OnPlaceEditorObject(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "PlaceHitboxB" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "DeleteSelectedEditorObject" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnPlaceHitboxB(InputAction.CallbackContext context);
+        void OnDeleteSelectedEditorObject(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "DeleteHitbox" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "SelectAllVisibleEditorObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnDeleteHitbox(InputAction.CallbackContext context);
+        void OnSelectAllVisibleEditorObjects(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "DeselectAllEditorObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDeselectAllEditorObjects(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CopyObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCopyObjects(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "PasteObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPasteObjects(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "CutObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCutObjects(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MirrorObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMirrorObjects(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToolPositiveNegativeInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToolPositiveNegativeInput(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EditorPositiveNegativeInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEditorPositiveNegativeInput(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "UndoEditorCommand" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnUndoEditorCommand(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RedoEditorCommand" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRedoEditorCommand(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EditorStartPlayback" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEditorStartPlayback(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Gameplay" which allows adding and removing callbacks.

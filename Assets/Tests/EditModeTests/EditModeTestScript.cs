@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.TestTools;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 [TestFixture]
 public class EditModeTestScript
@@ -27,7 +25,7 @@ public class EditModeTestScript
         yield return new TestCaseData(1, new int[] { }).Returns(new int[] { }).SetName("Only one, not selected");
 
         yield return new TestCaseData(4, new int[] { 0, 1, 2, 3 }).Returns(new int[] { 0, 1, 2, 3 }).SetName("Select all once");
-        yield return new TestCaseData(4, new int[] { } ).Returns(new int[] { }).SetName("Select none");
+        yield return new TestCaseData(4, new int[] { }).Returns(new int[] { }).SetName("Select none");
         yield return new TestCaseData(4, new int[] { 0, 0 }).Returns(new int[] { }).SetName("Repeated select - only 1 repeated");
         yield return new TestCaseData(4, new int[] { 0, 1, 2, 3, 0, 1, 2, 3 }).Returns(new int[] { }).SetName("Repeated select - all repeated");
         yield return new TestCaseData(4, new int[] { 0, 0, 0, 0, 0, 0, 0, 0 }).Returns(new int[] { }).SetName("Repeated select - 8 repeated");
@@ -72,16 +70,16 @@ public class EditModeTestScript
         yield return new TestCaseData(1, new int[] { 0 }, new int[] { 0, 0 }).Returns(new int[] { }).SetName("Only one - place & repeated delete");
         yield return new TestCaseData(1, new int[] { 0, 0 }, new int[] { 0, 0 }).Returns(new int[] { }).SetName("Only one - repeated place & repeated delete");
 
-        yield return new TestCaseData(4, new int[] { }, new int[] {}).Returns(new int[] { }).SetName("Small list - do nothing");
+        yield return new TestCaseData(4, new int[] { }, new int[] { }).Returns(new int[] { }).SetName("Small list - do nothing");
         yield return new TestCaseData(4, new int[] { 0, 1, 2, 3 }, new int[] { }).Returns(new int[] { 0, 1, 2, 3 }).SetName("Small list - place all only");
-        yield return new TestCaseData(4, new int[] { 0, 1, 2, 3 }, new int[] { 0, 1, 2, 3}).Returns(new int[] { }).SetName("Small list - place then delete all");
+        yield return new TestCaseData(4, new int[] { 0, 1, 2, 3 }, new int[] { 0, 1, 2, 3 }).Returns(new int[] { }).SetName("Small list - place then delete all");
         yield return new TestCaseData(4, new int[] { 0, 1, 2, 3 }, new int[] { 1, 3 }).Returns(new int[] { 0, 2 }).SetName("Small list - place all then delete some");
         yield return new TestCaseData(4, new int[] { 0, 1, 2, 3, 3, 3, 3, 3 }, new int[] { 1, 3 }).Returns(new int[] { 0, 2 }).SetName("Small list - repeated place some then delete repeat");
         yield return new TestCaseData(4, new int[] { 0, 1, 2, 3, 3, 3, 3, 3 }, new int[] { 1 }).Returns(new int[] { 0, 2, 3 }).SetName("Small list - repeated place some then delete others");
         yield return new TestCaseData(4, new int[] { 0, 3, }, new int[] { 1, 2 }).Returns(new int[] { 0, 3 }).SetName("Small list -  place some then delete excessively");
 
         yield return new TestCaseData(100, new int[] { 0, 52, 39, 22, 33, 78, 24 }, new int[] { }).Returns(new int[] { 0, 52, 39, 22, 33, 78, 24 }).SetName("Large list - place some only");
-        yield return new TestCaseData(100, new int[] { 0, 52, 39, 22, 33, 78, 24 }, new int[] { 39, 33}).Returns(new int[] { 0, 52, 22, 78, 24 }).SetName("Large list - place some then delete part");
+        yield return new TestCaseData(100, new int[] { 0, 52, 39, 22, 33, 78, 24 }, new int[] { 39, 33 }).Returns(new int[] { 0, 52, 22, 78, 24 }).SetName("Large list - place some then delete part");
         yield return new TestCaseData(100, new int[] { 0, 52, 39, 22, 33, 78, 24 }, new int[] { 39, 33, 99, 98, 97, 96, 55, 21, 12, 54 }).Returns(new int[] { 0, 52, 22, 78, 24 }).SetName("Large list - place some then delete excessive parts");
     }
 
@@ -94,13 +92,13 @@ public class EditModeTestScript
         for (int i = 0; i < placeIndexOrder.Length; i++)
         {
             int index = placeIndexOrder[i];
-            list[index].OnPlace(ref placeDeleteables);
-        } 
+            list[index].OnPlace();
+        }
 
         for (int i = 0; i < deleteIndexOrder.Length; i++)
         {
             int index = deleteIndexOrder[i];
-            list[index].OnDelete(ref placeDeleteables);
+            list[index].OnDelete();
         }
 
         int[] temp = placeDeleteables.Select(x =>

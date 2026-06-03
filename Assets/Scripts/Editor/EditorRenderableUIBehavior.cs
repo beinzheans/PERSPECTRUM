@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EditorRenderableUIBehavior<T> : MonoBehaviour where T : IRenderable
+public class EditorRenderableUIBehavior<T> : MonoBehaviour where T : EditorObject
 {
     protected bool isActive;
     public bool IsActive { get => isActive; }
@@ -9,24 +9,25 @@ public class EditorRenderableUIBehavior<T> : MonoBehaviour where T : IRenderable
     public RawImage RawImage { get => rawImage; }
 
     protected T currentAssociatedRenderable;
-
+    protected RectTransform rectTransform;
     protected virtual void Awake()
     {
         rawImage = GetComponent<RawImage>();
+        rectTransform = GetComponent<RectTransform>();
         isActive = false;
     }
 
-    public void AssignAssociatedRenderable(T renderable)
+    public virtual void AssignAssociatedRenderable(T renderable)
     {
         currentAssociatedRenderable = renderable;
         gameObject.SetActive(true);
         isActive = true;
     }
 
-    public void UnassignAssociatedRenderable()
+    public virtual void UnassignAssociatedRenderable()
     {
         gameObject.SetActive(false);
         isActive = false;
     }
-   
+
 }
