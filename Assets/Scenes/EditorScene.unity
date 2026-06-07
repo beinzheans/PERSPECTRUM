@@ -4354,7 +4354,7 @@ MonoBehaviour:
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
-  m_Dithering: 0
+  m_Dithering: 1
   m_ClearDepth: 1
   m_AllowXRRendering: 1
   m_AllowHDROutput: 1
@@ -6594,6 +6594,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   popupCanvas: {fileID: 757918972}
+  GlobalSettings:
+    GameSettings:
+      GameScrollSpeed: 0
+      GameLookaheadTime: 0
+    EditorSettings:
+      BigScrollTimeInterval: 0
+      EditorLookaheadTime: 0
 --- !u!4 &458964315
 Transform:
   m_ObjectHideFlags: 0

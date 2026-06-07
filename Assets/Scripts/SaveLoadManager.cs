@@ -245,4 +245,41 @@ public static class SaveLoadManager
         archive.Dispose();
         stream.Close();
     }
+
+    public static void SaveGlobalSettingsToFile(GlobalSettings settings)
+    {
+        string path = Path.Combine(Application.persistentDataPath, GameManager.k_PLAYERSETTINGSFILENAME);
+
+        string json = JsonConvert.SerializeObject(settings);
+
+        File.WriteAllText(path, json);
+    }
+
+    public static bool LoadGlobalSettingsFromFile(out GlobalSettings settings)
+    {
+        string path = Path.Combine(Application.persistentDataPath, GameManager.k_PLAYERSETTINGSFILENAME);
+
+        if (!File.Exists(path))
+        {
+            settings = GameManager.DefaultGlobalSettings;
+            return false;
+        }
+
+        string json = File.ReadAllText(path);
+
+        try
+        {
+            settings = JsonConvert.DeserializeObject<GlobalSettings>(json);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Failed to load player settings. Exception: \n" +
+                             $"{e}");
+
+            settings = GameManager.DefaultGlobalSettings;
+            return false;
+        }
+    }
 }

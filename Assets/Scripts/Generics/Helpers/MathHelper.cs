@@ -52,7 +52,6 @@ public static class MathHelper
         Vector2 min = worldCornerBuffer[0];
 
         Vector2 result = new Vector2(normalizedPoint.x * (max.x - min.x) + min.x, normalizedPoint.y * (max.y - min.y) + min.y);
-
         return result;
     }
 
@@ -473,4 +472,15 @@ public static class MathHelper
         }
     }
 
+    /// <summary>
+    /// Whether or not the hitbox type matches with the mouse active type. <br></br>
+    /// This will return false if the hitbox type is a bomb.
+    /// </summary>
+    /// <param name="hitboxType"></param>
+    /// <param name="mouseActiveType"></param>
+    /// <returns></returns>
+    public static bool IsMouseActiveTypeCorrect(HitboxType hitboxType, MouseActiveType mouseActiveType)
+    {
+        return (hitboxType == HitboxType.A && mouseActiveType == MouseActiveType.A) || (hitboxType == HitboxType.B && mouseActiveType == MouseActiveType.B);
+    }
 }

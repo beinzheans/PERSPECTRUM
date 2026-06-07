@@ -765,6 +765,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""SwitchAInput"",
+                    ""type"": ""Button"",
+                    ""id"": ""f4a65e31-db14-48c8-a4e4-5310e840d25e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchBInput"",
+                    ""type"": ""Button"",
+                    ""id"": ""a4f5df83-f252-49d0-be29-4b637d14792a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -776,6 +794,28 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";KB&M"",
                     ""action"": ""MousePosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e7e714ba-658b-4897-99b1-188cf533fd2b"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""SwitchAInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dd9b1de5-9072-46bc-864d-91c898271ece"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""SwitchBInput"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -824,6 +864,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         // Gameplay
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_MousePosition = m_Gameplay.FindAction("MousePosition", throwIfNotFound: true);
+        m_Gameplay_SwitchAInput = m_Gameplay.FindAction("SwitchAInput", throwIfNotFound: true);
+        m_Gameplay_SwitchBInput = m_Gameplay.FindAction("SwitchBInput", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -1189,6 +1231,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Gameplay;
     private List<IGameplayActions> m_GameplayActionsCallbackInterfaces = new List<IGameplayActions>();
     private readonly InputAction m_Gameplay_MousePosition;
+    private readonly InputAction m_Gameplay_SwitchAInput;
+    private readonly InputAction m_Gameplay_SwitchBInput;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -1204,6 +1248,14 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/MousePosition".
         /// </summary>
         public InputAction @MousePosition => m_Wrapper.m_Gameplay_MousePosition;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/SwitchAInput".
+        /// </summary>
+        public InputAction @SwitchAInput => m_Wrapper.m_Gameplay_SwitchAInput;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/SwitchBInput".
+        /// </summary>
+        public InputAction @SwitchBInput => m_Wrapper.m_Gameplay_SwitchBInput;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1233,6 +1285,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @MousePosition.started += instance.OnMousePosition;
             @MousePosition.performed += instance.OnMousePosition;
             @MousePosition.canceled += instance.OnMousePosition;
+            @SwitchAInput.started += instance.OnSwitchAInput;
+            @SwitchAInput.performed += instance.OnSwitchAInput;
+            @SwitchAInput.canceled += instance.OnSwitchAInput;
+            @SwitchBInput.started += instance.OnSwitchBInput;
+            @SwitchBInput.performed += instance.OnSwitchBInput;
+            @SwitchBInput.canceled += instance.OnSwitchBInput;
         }
 
         /// <summary>
@@ -1247,6 +1305,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @MousePosition.started -= instance.OnMousePosition;
             @MousePosition.performed -= instance.OnMousePosition;
             @MousePosition.canceled -= instance.OnMousePosition;
+            @SwitchAInput.started -= instance.OnSwitchAInput;
+            @SwitchAInput.performed -= instance.OnSwitchAInput;
+            @SwitchAInput.canceled -= instance.OnSwitchAInput;
+            @SwitchBInput.started -= instance.OnSwitchBInput;
+            @SwitchBInput.performed -= instance.OnSwitchBInput;
+            @SwitchBInput.canceled -= instance.OnSwitchBInput;
         }
 
         /// <summary>
@@ -1441,5 +1505,19 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMousePosition(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchAInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchAInput(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchBInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchBInput(InputAction.CallbackContext context);
     }
 }

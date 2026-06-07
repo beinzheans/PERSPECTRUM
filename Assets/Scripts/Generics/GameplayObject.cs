@@ -1,4 +1,8 @@
-public abstract class GameplayObject : IRenderable
+using System;
+using Unity.Mathematics;
+using UnityEngine;
+
+public abstract class GameplayObject : IEquatable<GameplayObject>
 {
     public GameplayObject(double renderTime)
     {
@@ -6,17 +10,43 @@ public abstract class GameplayObject : IRenderable
     }
 
     public double RenderTime { get; protected set; }
-
-    public abstract void OnRender();
+    public bool IsRendered = false;
 
     /// <summary>
-    /// Whether or not 
+    /// Whether or not this object is in range of the render time
     /// </summary>
     /// <param name="time"></param>
     /// <returns></returns>
-    public bool IsInRange(double time)
+    public bool IsInRenderRange(double time)
     {
-        return MathHelper.IsTwoDoublesEqualWithEpsilion(time, RenderTime) || MathHelper.IsTwoDoublesEqualWithEpsilion(time, RenderTime + GameplayManager.k_LENIENCYTIMEFRAME) || (time > RenderTime && time < RenderTime + GameplayManager.k_LENIENCYTIMEFRAME);
+        double maxRenderTime = time + GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime + GameplayManager.k_POOLLOOKAHEADTIME;
+        return RenderTime > time && RenderTime < maxRenderTime;
     }
-    public abstract void OnUnrender();
+
+    /// <summary>
+    /// Whether or not this object is in range of the unrender time
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    public bool IsInUnrenderRange(double time)
+    {
+        double minTime = time - GameplayManager.k_POOLUNRENDERTIMETHRESHOLD;
+        return RenderTime < minTime;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return Equals(obj as GameplayObject);
+    }
+
+    public bool Equals(GameplayObject other)
+    {
+        return other is not null &&
+               RenderTime == other.RenderTime;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(RenderTime);
+    }
 }

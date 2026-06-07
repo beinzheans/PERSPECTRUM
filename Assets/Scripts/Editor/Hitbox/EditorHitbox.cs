@@ -35,7 +35,7 @@ public class EditorHitbox : EditorDynamicObject, IConvertable<VisualHitbox>
 
     public bool Convert(out VisualHitbox converted)
     {
-        converted = new VisualHitbox(NormalizedPosition, RenderTime, NormalizedSize);
+        converted = new VisualHitbox(NormalizedPosition, RenderTime, NormalizedSize, HitboxType);
         return true;
     }
 }

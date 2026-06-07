@@ -679,6 +679,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "SwitchAInput",
+                    "type": "Button",
+                    "id": "f4a65e31-db14-48c8-a4e4-5310e840d25e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchBInput",
+                    "type": "Button",
+                    "id": "a4f5df83-f252-49d0-be29-4b637d14792a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -690,6 +708,28 @@
                     "processors": "",
                     "groups": ";KB&M",
                     "action": "MousePosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e7e714ba-658b-4897-99b1-188cf533fd2b",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KB&M",
+                    "action": "SwitchAInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dd9b1de5-9072-46bc-864d-91c898271ece",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KB&M",
+                    "action": "SwitchBInput",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
