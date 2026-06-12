@@ -25,16 +25,23 @@ public class ChartDetailsManager : MonoBehaviour
         DeleteChartButton.onClick.RemoveAllListeners();
 
         chartTitleText.text = obj.associatedMetadata.ChartName;
-        chartMapperText.text = obj.associatedMetadata.ChartMapper;
+        chartMapperText.text = $"Charted by {obj.associatedMetadata.ChartMapper}";
         songCreditText.text = $"{obj.associatedMetadata.SongName} by {obj.associatedMetadata.SongArtist}";
 
-        PlayChartButton.onClick.AddListener(() => GameManager.GameInstance.RequestPlayChartEvent(obj.associatedFullFilePath));
-        DeleteChartButton.onClick.AddListener(() => {
-            ChartChooseManager.ChartChooseInstance.DeleteChartWithPath(obj.associatedFullFilePath);
+        PlayChartButton.onClick.AddListener(() => GameManager.GameInstance.RequestPlayChartEvent(obj.AssociatedFullFilePath));
+        DeleteChartButton.onClick.AddListener(() =>
+        {
+            ChartChooseManager.ChartChooseInstance.DeleteChartWithPath(obj.AssociatedFullFilePath);
             HideSelectedUI();
         });
 
         ShowSelectedUI();
+    }
+
+    private void OnDestroy()
+    {
+        PlayChartButton.onClick.RemoveAllListeners();
+        DeleteChartButton.onClick.RemoveAllListeners();
     }
 
     private void ShowSelectedUI()

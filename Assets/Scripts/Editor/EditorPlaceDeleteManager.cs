@@ -19,6 +19,12 @@ public class EditorPlaceDeleteManager : EditorUIBehavior
         inputActions.Editor.DeleteSelectedEditorObject.performed += DeleteSelectedEditorObject_performed;
     }
 
+    private void OnDestroy()
+    {
+        inputActions.Editor.PlaceEditorObject.performed -= PlaceEditorObject_performed;
+        inputActions.Editor.DeleteSelectedEditorObject.performed -= DeleteSelectedEditorObject_performed;
+    }
+
     private void DeleteSelectedEditorObject_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         List<EditorDynamicObject> selectedObjs = new List<EditorDynamicObject>(editorManager.CurrentSelectedRenderables);

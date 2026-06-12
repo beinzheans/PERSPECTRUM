@@ -2,17 +2,20 @@ using UnityEngine;
 
 public abstract class GameplayObjectRenderBehavior<T> : MonoBehaviour where T : GameplayObject
 {
-    protected MeshRenderer meshRenderer;
     public T AssociatedGameplayObject { get; protected set; }
 
     public MaterialPropertyBlock propertyBlock;
 
     protected virtual void Awake()
     {
-        meshRenderer = GetComponent<MeshRenderer>();
         propertyBlock = new MaterialPropertyBlock();
+        OnAwake();
     }
 
+    /// <summary>
+    /// Custom implementation of events when the object is awake. Use this for <see cref="GameObject.GetComponent{T}()"/>.
+    /// </summary>
+    protected abstract void OnAwake();
     public void OnRender(T associatedGameplayObject)
     {
         this.AssociatedGameplayObject = associatedGameplayObject;

@@ -1,13 +1,11 @@
 using Newtonsoft.Json;
 using SFB;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 using UnityEngine;
 public class EditorChartTool : EditorUIBehavior
 {
     protected override async void UI_OnButtonPress(int index)
     {
-        if (index < (int)ChartOptions.LOAD_AUDIO_FILE || index > (int)ChartOptions.CREATE_NEW_CHART)
+        if (index < (int)ChartOptions.LOAD_AUDIO_FILE || index > (int)ChartOptions.EXITEDITOR)
         {
             return;
         }
@@ -39,11 +37,9 @@ public class EditorChartTool : EditorUIBehavior
                 else
                 {
                     EditorManager.EditorInstance.InvokeAudioClipLoadedEvent(clip, bytes);
-                    GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded audio");
+                    GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded audio", 0.5d);
                 }
 
-                break;
-            case ChartOptions.REMOVE_AUDIO_FILE:
                 break;
             case ChartOptions.SAVE_EDITOR_CHART:
                 EditorManager.EditorInstance.SaveEditorChart();
@@ -51,9 +47,9 @@ public class EditorChartTool : EditorUIBehavior
             case ChartOptions.LOAD_EDITOR_CHART:
                 await EditorManager.EditorInstance.LoadEditorChart();
                 break;
-            case ChartOptions.EXPORT_EDITOR_CHART:
-                break;
-            case ChartOptions.CREATE_NEW_CHART:
+            case ChartOptions.EXITEDITOR:
+                ConfirmAction action = new(() => SceneLoader.LoadSceneAtIndex(0, () => { }), () => { }, "Are you sure you want to exit?");
+                GameManager.GameInstance.InvokeConfirmActionNeeded(action);
                 break;
         }
     }
@@ -64,9 +60,7 @@ public class EditorChartTool : EditorUIBehavior
 public enum ChartOptions
 {
     LOAD_AUDIO_FILE = 0,
-    REMOVE_AUDIO_FILE = 1,
-    SAVE_EDITOR_CHART = 2,
-    LOAD_EDITOR_CHART = 3,
-    EXPORT_EDITOR_CHART = 4,
-    CREATE_NEW_CHART = 5
+    SAVE_EDITOR_CHART = 1,
+    LOAD_EDITOR_CHART = 2,
+    EXITEDITOR = 3
 }

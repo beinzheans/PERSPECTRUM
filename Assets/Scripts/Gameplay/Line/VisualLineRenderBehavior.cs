@@ -3,6 +3,12 @@ using UnityEngine;
 public class VisualLineRenderBehavior : GameplayObjectRenderBehavior<VisualLine>
 {
     private const float k_LINETHICKNESS = 0.01f;
+
+    protected override void OnAwake()
+    {
+        return;
+    }
+
     protected override void OnRenderEvent()
     {
         Vector2 fromScreenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.InitialPosition, GameplayManager.GameplayInstance.GameplayRectTransform);

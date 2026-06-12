@@ -23,6 +23,10 @@ public abstract class EditorToolManager : MonoBehaviour
         GameManager.GameInstance.InputActions.Editor.ToolPositiveNegativeInput.performed += ToolPositiveNegativeInput_performed;
     }
 
+    private void OnDestroy()
+    {
+        GameManager.GameInstance.InputActions.Editor.ToolPositiveNegativeInput.performed -= ToolPositiveNegativeInput_performed;
+    }
     private void ToolPositiveNegativeInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if (!IsActive)

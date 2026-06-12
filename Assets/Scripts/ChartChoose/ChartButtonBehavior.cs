@@ -8,12 +8,12 @@ public class ChartButtonBehavior : MonoBehaviour
 {
     [SerializeField] private TMP_Text buttonText;
     public EditorChartMetadata associatedMetadata;
-    public string associatedFullFilePath { get; private set; }
+    public string AssociatedFullFilePath { get; private set; }
 
     public void AssignChartButtonValues(EditorChartMetadata chartMetadata, string path)
     {
         associatedMetadata = chartMetadata;
-        associatedFullFilePath = path;
+        AssociatedFullFilePath = path;
 
         buttonText.text = $"{chartMetadata.ChartName} by {chartMetadata.ChartMapper}";
     }

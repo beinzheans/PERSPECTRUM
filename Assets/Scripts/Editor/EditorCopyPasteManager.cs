@@ -23,6 +23,13 @@ public class EditorCopyPasteManager : MonoBehaviour
         inputActions.Editor.CutObjects.performed += CutObjects_performed;
     }
 
+    private void OnDestroy()
+    {
+        inputActions.Editor.CopyObjects.performed -= CopyObjects_performed;
+        inputActions.Editor.PasteObjects.performed -= PasteObjects_performed;
+        inputActions.Editor.CutObjects.performed -= CutObjects_performed;
+    }
+
     private void CutObjects_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         List<EditorDynamicObject> previousCopy = currentCopy;

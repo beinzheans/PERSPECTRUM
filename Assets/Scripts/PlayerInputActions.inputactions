@@ -697,6 +697,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "EscapeMenuInput",
+                    "type": "Button",
+                    "id": "3779eda9-f205-4504-9117-02538fef3e39",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -730,6 +739,17 @@
                     "processors": "",
                     "groups": ";KB&M",
                     "action": "SwitchBInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8ccad6dc-1141-4928-a2da-b7959c121886",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EscapeMenuInput",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

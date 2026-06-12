@@ -35,6 +35,10 @@ public class EditorPlaybackManager : EditorUIBehavior
         inputActions.Editor.EditorStartPlayback.performed += EditorStartPlayback_performed;
     }
 
+    private void OnDestroy()
+    {
+        inputActions.Editor.EditorStartPlayback.performed -= EditorStartPlayback_performed;
+    }
     private void EditorStartPlayback_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         playbackState = !playbackState;
@@ -71,7 +75,7 @@ public class EditorPlaybackManager : EditorUIBehavior
         double playbackSpeed = editorManager.PlaybackSpeed;
         Action<double> executeAction = (x) => editorManager.UpdateEditorPreviewTimeByDelta(x * playbackSpeed, false); // local variable so we can't change it while we're playback
         Action endAction = () => { };
-        playbackAction = new TimerStopwatchAction(executeAction, endAction, 0d, double.MaxValue, true);
+        playbackAction = new TimerStopwatchAction(this, executeAction, endAction, 0d, double.MaxValue, true);
 
         editorManager.InvokeEditorStartPlayback();
         DSPTimerEngine.TimerInstance.AddActionToTimer(playbackAction);

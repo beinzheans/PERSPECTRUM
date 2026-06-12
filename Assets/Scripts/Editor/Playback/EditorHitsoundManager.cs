@@ -37,9 +37,8 @@ public class EditorHitsoundManager : MonoBehaviour
         PlayHitsound(0d);
     }
 
-    private const float k_HITSOUNDVOLUME = 0.7f;
     private void PlayHitsound(double offset)
     {
-        AudioEngine.AudioInstance.PlayAudioClip(tick, offset, k_HITSOUNDVOLUME, 1d);
+        AudioEngine.AudioInstance.PlayAudioClip(tick, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
     }
 }

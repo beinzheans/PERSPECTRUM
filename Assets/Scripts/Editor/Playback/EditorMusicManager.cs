@@ -13,11 +13,21 @@ public class EditorMusicManager : MonoBehaviour
     {
         editorManager = EditorManager.EditorInstance;
 
+        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
         editorManager.OnMusicAudioClipLoaded += EditorManager_OnMusicAudioClipLoaded;
         editorManager.OnPlaybackStart += EditorManager_OnPlaybackStart;
         editorManager.OnPlaybackStopped += EditorManager_OnPlaybackStopped;
     }
 
+    private void GameInstance_OnGameSettingsChanged()
+    {
+        musicAudioSource.volume = GameManager.GameInstance.GlobalSettings.SongVolume;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
+    }
     private void EditorManager_OnPlaybackStopped()
     {
         musicAudioSource.Stop();
@@ -31,7 +41,7 @@ public class EditorMusicManager : MonoBehaviour
             return;
         }
 
-        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, 1f, editorManager.EditorPreviewTime, editorManager.PlaybackSpeed);
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, GameManager.GameInstance.GlobalSettings.SongVolume, editorManager.EditorPreviewTime, editorManager.PlaybackSpeed);
     }
 
     private void EditorManager_OnMusicAudioClipLoaded(AudioClip obj)

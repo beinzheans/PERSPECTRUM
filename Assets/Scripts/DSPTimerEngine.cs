@@ -44,20 +44,19 @@ public class DSPTimerEngine : MonoBehaviour
         CurrentDSPTime = AudioSettings.dspTime;
         previousDSPTime = CurrentDSPTime;
 
-        for (int i = 0; i < registeredAudioActions.Count; i++)
-        {
-            TimerAction action = registeredAudioActions[i];
-
-            action.UpdateAction(CurrentDSPTime, k_DSPLookaheadTime);
-        }
-
-        // remove all actions at the end of timer cycle, after we finished updating everything
-        // that way our for loop range doesn't change
+        // remove timers before trying to update
         while (audioActionsToRemove.Count > 0)
         {
             TimerAction remove = audioActionsToRemove.Dequeue();
             remove.OnActionRemoved();
             registeredAudioActions.Remove(remove);
+        }
+
+        for (int i = 0; i < registeredAudioActions.Count; i++)
+        {
+            TimerAction action = registeredAudioActions[i];
+
+            action.UpdateAction(CurrentDSPTime, k_DSPLookaheadTime);
         }
     }
 
@@ -88,11 +87,27 @@ public class DSPTimerEngine : MonoBehaviour
     }
 
     /// <summary>
-    /// Removes an action from the timer engine. Note that removal happen only after one clock cycle
+    /// Removes an action from the timer engine. Note that removal happen only after one clock cycle. <br></br>
+    /// Ignores actions that is not registered.
     /// </summary>
     public void RemoveActionFromTimer(TimerAction action)
     {
+        if (!registeredAudioActions.Contains(action))
+        {
+            Debug.Log($"Ignored");
+            return;
+        }
+
         audioActionsToRemove.Enqueue(action);
+    }
+    public void PauseDSPTimer()
+    {
+        AudioListener.pause = true;
+    }
+
+    public void ResumeDSPTimer()
+    {
+        AudioListener.pause = false;
     }
 }
 
@@ -101,6 +116,10 @@ public class DSPTimerEngine : MonoBehaviour
 /// </summary>
 public abstract class TimerAction
 {
+    /// <summary>
+    /// The object that created this timer
+    /// </summary>
+    protected object TimerCaller;
     protected Action<double> ActionToExecute;
     protected Action OnUnregisterEvent;
     /// <summary>
@@ -113,8 +132,9 @@ public abstract class TimerAction
     /// </summary>
     public double ExecuteTime { get; protected set; }
 
-    public TimerAction(Action<double> actionToExecute, Action onUnregisterEvent, double startOffsetTime)
+    public TimerAction(object timerCaller, Action<double> actionToExecute, Action onUnregisterEvent, double startOffsetTime)
     {
+        TimerCaller = timerCaller;
         ActionToExecute = actionToExecute;
         OnUnregisterEvent = onUnregisterEvent;
         this.startOffsetTime = startOffsetTime;
@@ -153,13 +173,21 @@ public class TimerIntervalAction : TimerAction
     /// </summary>
     private double repeatIntervalTime;
 
-    public TimerIntervalAction(Action<double> actionToExecute, Action unregisterEvent, double startOffsetTime, double repeatIntervalTime) : base(actionToExecute, unregisterEvent, startOffsetTime)
+    public TimerIntervalAction(object timerCaller, Action<double> actionToExecute, Action unregisterEvent, double startOffsetTime, double repeatIntervalTime) : base(timerCaller, actionToExecute, unregisterEvent, startOffsetTime)
     {
         this.repeatIntervalTime = repeatIntervalTime;
     }
 
     public override void UpdateAction(double currentDSPTime, double lookaheadDSPTime)
     {
+        if (TimerCaller == null) // don't update if the caller becomes null
+        {
+            Debug.Log($"Removed timer due to null");
+
+            DSPTimerEngine.TimerInstance.RemoveActionFromTimer(this);
+            return;
+        }
+
         double lookaheadTime = currentDSPTime + lookaheadDSPTime;
 
         while (lookaheadTime > ExecuteTime)
@@ -203,7 +231,14 @@ public class TimerIntervalAction : TimerAction
         repeatIntervalTime = newIntervalTime;
     }
 
-
+    /// <summary>
+    /// Gets the progress in [0, 1] until the next tick.
+    /// </summary>
+    /// <returns></returns>
+    public double GetCurrentNormalizedProgress()
+    {
+        return 1d - (ExecuteTime - AudioSettings.dspTime) / repeatIntervalTime;
+    }
 }
 
 /// <summary>
@@ -219,7 +254,7 @@ public class TimerStopwatchAction : TimerAction
     public bool MeasureDeltaTime { get; private set; }
     private double previousDSPTime;
     private double maxTimeElapsed;
-    public TimerStopwatchAction(Action<double> executeAction, Action unregisterEvent, double startOffsetTime, double maxTimeElapsed, bool measureDeltaTime) : base(executeAction, unregisterEvent, startOffsetTime)
+    public TimerStopwatchAction(object timerCaller, Action<double> executeAction, Action unregisterEvent, double startOffsetTime, double maxTimeElapsed, bool measureDeltaTime) : base(timerCaller, executeAction, unregisterEvent, startOffsetTime)
     {
         TimeElapsed = 0d;
 
@@ -230,6 +265,13 @@ public class TimerStopwatchAction : TimerAction
 
     public override void UpdateAction(double currentDSPTime, double lookaheadDSPTime)
     {
+        if (TimerCaller == null)
+        {
+            Debug.Log($"Removed timer due to null");
+            DSPTimerEngine.TimerInstance.RemoveActionFromTimer(this);
+            return;
+        }
+
         if (currentDSPTime < ExecuteTime)
         {
             return;

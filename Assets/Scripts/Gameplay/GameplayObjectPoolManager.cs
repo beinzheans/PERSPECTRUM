@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -9,14 +8,15 @@ using UnityEngine;
 /// <typeparam name="TBehavior">The object rendering class</typeparam>
 public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBehaviour where TObjectData : GameplayObject where TBehavior : GameplayObjectRenderBehavior<TObjectData>
 {
-    [SerializeField] private TBehavior gameplayObjectPrefab;
+    [SerializeField] protected TBehavior gameplayObjectPrefab;
+    [SerializeField] private Transform parentTransform;
+    protected GameplayManager gameplayManager;
 
-    private GameplayManager gameplayManager;
+    [SerializeField] protected int k_POOLSIZE;
 
-    [SerializeField] private int k_POOLSIZE;
+    protected Queue<TBehavior> objectPool = new();
+    protected Dictionary<TObjectData, TBehavior> currentActiveObjectsMapping = new();
 
-    private Queue<TBehavior> objectPool = new();
-    private Dictionary<TObjectData, TBehavior> currentActiveObjectsMapping = new();
 
     private int minIndex;
 
@@ -30,7 +30,28 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
     {
         gameplayManager = GameplayManager.GameplayInstance;
 
+        OnStartEvent();
+    }
+
+    /// <summary>
+    /// Implementation of events when the script starts. Use this for subscriber events to listeners.
+    /// </summary>
+    protected virtual void OnStartEvent()
+    {
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
+    }
+
+    private void OnDestroy()
+    {
+        OnDestroyEvent();
+    }
+
+    /// <summary>
+    /// Implementation of events when the script is destroyed. Use this for desubscriber events to listeners.
+    /// </summary>
+    protected virtual void OnDestroyEvent()
+    {
+        gameplayManager.OnGameplayTimeUpdated -= GameplayManager_OnGameplayTimeUpdated;
     }
 
     private void GameplayManager_OnGameplayTimeUpdated(double time)
@@ -43,7 +64,7 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
 
             if (gameplayObject.RenderTime > maxTime)
             {
-                break; // early exit
+                break;
             }
 
             if (gameplayObject is not TObjectData obj)
@@ -72,13 +93,22 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
         }
     }
 
-    private void UpdateRenderedObject(TObjectData objectData)
+    protected void UpdateRenderedObject(TObjectData objectData)
     {
-        TBehavior behaviorToUpdate = currentActiveObjectsMapping[objectData];
+        bool result = currentActiveObjectsMapping.TryGetValue(objectData, out TBehavior behaviorToUpdate);
+        if (!result)
+        {
+            return;
+        }
+
         behaviorToUpdate.OnUpdate();
     }
 
-    private void RenderObject_GetFromPool(TObjectData objectData)
+    /// <summary>
+    /// Tries to get a new behavior from the current pool and render the object
+    /// </summary>
+    /// <param name="objectData"></param>
+    protected void RenderObject_GetFromPool(TObjectData objectData)
     {
         bool result = objectPool.TryDequeue(out TBehavior newObjectFromPool);
 
@@ -88,22 +118,38 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
             return;
         }
 
+        if (currentActiveObjectsMapping.ContainsKey(objectData))
+        {
+            Debug.Log($"Hash collision: \n" +
+                      $"{objectData.RenderTime}");
+        }
         currentActiveObjectsMapping.Add(objectData, newObjectFromPool);
         newObjectFromPool.OnRender(objectData);
     }
 
-    private void UnrenderObject_ReturnToPool(TObjectData unrenderObject)
+    /// <summary>
+    /// Returns the behavior from the current pool and unrender the object
+    /// </summary>
+    /// <param name="unrenderObject"></param>
+    protected void UnrenderObject_ReturnToPool(TObjectData unrenderObject)
     {
-        TBehavior behaviorToReturn = currentActiveObjectsMapping[unrenderObject];
+        bool result = currentActiveObjectsMapping.TryGetValue(unrenderObject, out TBehavior behaviorToReturn);
         currentActiveObjectsMapping.Remove(unrenderObject);
+
+        if (!result)
+        {
+            return;
+        }
+
         behaviorToReturn.OnUnrender();
         objectPool.Enqueue(behaviorToReturn);
     }
+
     private void InstaniateObjectPool()
     {
         for (int i = 0; i < k_POOLSIZE; i++)
         {
-            TBehavior newObject = Instantiate(gameplayObjectPrefab, transform, false);
+            TBehavior newObject = Instantiate(gameplayObjectPrefab, parentTransform, false);
             newObject.gameObject.SetActive(false);
             objectPool.Enqueue(newObject);
         }

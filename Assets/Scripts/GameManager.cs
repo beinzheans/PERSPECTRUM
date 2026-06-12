@@ -1,15 +1,26 @@
-using SFB;
+using Newtonsoft.Json;
 using System;
 using UnityEngine;
 public class GameManager : MonoBehaviour
 {
+    public readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
+    {
+        TypeNameHandling = TypeNameHandling.Auto,
+    };
+
+
     [SerializeField] private Canvas popupCanvas;
+    [SerializeField] private Canvas pauseCanvas;
+
     public Canvas PopupCanvas { get => popupCanvas; }
+
+    public Canvas PauseCanvas { get => pauseCanvas; }
     public const string k_METADATAFILENAME = "metadata.json";
     public const string k_CHARTFILENAME = "chart.json";
     public const string k_AUDIOFILENAME = "audio.mp3"; // let's just assume mp3 for now... IDC
     public const string k_FILEEXTENSION = "mychart";
     public const string k_PLAYERSETTINGSFILENAME = "settings.json";
+    public const string k_TUTORIALCHARTNAME = "tutorial";
 
     public static readonly Vector2 aspectRatioConversionScale = new Vector2(0.490261239f, 0.871575537f);
 
@@ -18,8 +29,12 @@ public class GameManager : MonoBehaviour
     public PlayerInputActions InputActions { get; private set; }
 
     public event Action<ConfirmAction> OnConfirmActionNeeded;
-    public event Action<string> OnInformationDisplayNeeded;
+    public event Action<string, double> OnInformationDisplayNeeded;
 
+    public event Action OnPauseMenuEnable;
+    public event Action OnPauseMenuDisable;
+
+    public event Action OnGameSettingsChanged;
     public Mesh NoteMesh { get; private set; }
     public string CurrentVersion { get; private set; }
 
@@ -30,6 +45,7 @@ public class GameManager : MonoBehaviour
     {
         if (GameInstance != null)
         {
+            Destroy(pauseCanvas.gameObject);
             Destroy(popupCanvas.gameObject);
             Destroy(gameObject);
             return;
@@ -39,6 +55,7 @@ public class GameManager : MonoBehaviour
             GameInstance = this;
             DontDestroyOnLoad(gameObject);
             DontDestroyOnLoad(popupCanvas.gameObject);
+            DontDestroyOnLoad(pauseCanvas.gameObject);
         }
 
         InputActions = new();
@@ -47,9 +64,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        JsonSerializerSettings.Converters.Add(new Vector2Serializer());
+
         Application.targetFrameRate = -1;
         CurrentVersion = "1.0.0";
-        if (SaveLoadManager.LoadGlobalSettingsFromFile(out GlobalSettings))
+        if (!SaveLoadManager.LoadGlobalSettingsFromFile(out GlobalSettings))
         {
             InvokeInformationDisplayNeeded("No global settings found");
         }
@@ -57,6 +76,8 @@ public class GameManager : MonoBehaviour
         {
             InvokeInformationDisplayNeeded("Loaded settings");
         }
+
+        SaveLoadManager.ImportTutorialChartToGameStorage();
     }
 
     private void OnApplicationQuit()
@@ -74,10 +95,9 @@ public class GameManager : MonoBehaviour
         OnConfirmActionNeeded?.Invoke(action);
     }
 
-    public void InvokeInformationDisplayNeeded(string infoMessage)
+    public void InvokeInformationDisplayNeeded(string infoMessage, double time = 0.25d)
     {
-        OnInformationDisplayNeeded?.Invoke(infoMessage);
-
+        OnInformationDisplayNeeded?.Invoke(infoMessage, time);
     }
 
     public void RequestPlayChartEvent(string path)
@@ -85,6 +105,23 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Requested to play {path}");
 
         SceneLoader.LoadSceneAtIndex(2, () => GameplayManager.GameplayInstance.InvokeGameplayStartedEvent(path));
+    }
+
+    public void InvokeGamePauseMenuEnable()
+    {
+        DSPTimerEngine.TimerInstance.PauseDSPTimer();
+        OnPauseMenuEnable?.Invoke();
+    }
+
+    public void InvokeGamePauseMenuDisable()
+    {
+        DSPTimerEngine.TimerInstance.ResumeDSPTimer();
+        OnPauseMenuDisable?.Invoke();
+    }
+
+    public void InvokeGameSettingsChanged()
+    {
+        OnGameSettingsChanged?.Invoke();
     }
 }
 

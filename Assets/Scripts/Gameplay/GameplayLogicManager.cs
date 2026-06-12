@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -27,6 +24,17 @@ public class GameplayLogicManager : MonoBehaviour
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
     }
 
+    private void OnDestroy()
+    {
+        inputActions.Gameplay.SwitchAInput.performed -= SwitchAInput_performed;
+        inputActions.Gameplay.SwitchAInput.canceled -= SwitchAInput_canceled;
+
+        inputActions.Gameplay.SwitchBInput.performed -= SwitchBInput_performed;
+        inputActions.Gameplay.SwitchBInput.canceled -= SwitchBInput_canceled;
+
+        gameplayManager.OnGameplayTimeUpdated -= GameplayManager_OnGameplayTimeUpdated;
+
+    }
     private void SwitchBInput_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         currentActiveMouseType = inputActions.Gameplay.SwitchAInput.IsPressed() ? MouseActiveType.A : MouseActiveType.NONE;
@@ -53,9 +61,6 @@ public class GameplayLogicManager : MonoBehaviour
 
     private void GameplayManager_OnGameplayTimeUpdated(double time)
     {
-        int missCount = 0;
-        int bombCount = 0;
-
         double maxInteractTime = time - GameplayManager.k_EARLYTIMEFRAME;
 
         currentActiveHitboxes.RemoveAll(x =>
@@ -64,7 +69,7 @@ public class GameplayLogicManager : MonoBehaviour
             {
                 if (x.HitboxType != HitboxType.BOMB)
                 {
-                    missCount++;
+                    gameplayManager.InvokeHitboxMissEvent(x);
                 }
 
                 return true;
@@ -73,7 +78,7 @@ public class GameplayLogicManager : MonoBehaviour
             {
                 if (x.HitboxType == HitboxType.BOMB)
                 {
-                    bombCount++;
+                    gameplayManager.InvokeHitboxBombHitEvent(x);
                 }
                 else if (MathHelper.IsMouseActiveTypeCorrect(x.HitboxType, currentActiveMouseType))
                 {
@@ -96,19 +101,8 @@ public class GameplayLogicManager : MonoBehaviour
             }
         });
 
-        if (missCount > 0)
-        {
-            gameplayManager.InvokeHitboxMissEvent(missCount);
-        }
-
-        if (bombCount > 0)
-        {
-            gameplayManager.InvokeHitboxBombHitEvent(bombCount);
-        }
-
         UpdateCurrentActiveHitboxList(time);
     }
-
     private void UpdateCurrentActiveHitboxList(double time)
     {
         if (currentObjectIndex >= gameplayManager.CurrentGameplayChart.GameplayObjects.Length)
@@ -117,19 +111,28 @@ public class GameplayLogicManager : MonoBehaviour
         }
 
         double maxInteractTime = time + GameplayManager.k_EARLYTIMEFRAME;
-
+        double minInteractTime = time - GameplayManager.k_LENIENCYTIMEFRAME;
         GameplayObject gameplayObject = gameplayManager.CurrentGameplayChart.GameplayObjects[currentObjectIndex];
 
-        if (gameplayObject is not VisualHitbox hitbox)
+        if (gameplayObject is VisualHitbox hitbox)
         {
-            currentObjectIndex++;
-            return;
+            if (hitbox.RenderTime <= maxInteractTime)
+            {
+                currentObjectIndex++;
+                currentActiveHitboxes.Add(hitbox);
+            }
         }
-
-        if (hitbox.RenderTime <= maxInteractTime)
+        else if (gameplayObject is GameplayMarker marker)
+        {
+            if (marker.RenderTime <= time)
+            {
+                currentObjectIndex++;
+                gameplayManager.InvokeGameplayMarkerUpdate(marker);
+            }
+        }
+        else
         {
             currentObjectIndex++;
-            currentActiveHitboxes.Add(hitbox);
         }
     }
 }

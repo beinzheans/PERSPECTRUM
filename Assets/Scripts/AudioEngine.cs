@@ -1,6 +1,4 @@
-using SFB;
 using System;
-using System.Collections;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
@@ -20,6 +18,7 @@ public class AudioEngine : MonoBehaviour
 
     private AudioSource[] audioSourcePool;
     private int poolIndex = 0;
+
     private void Awake()
     {
         if (AudioInstance == null)
@@ -94,6 +93,11 @@ public class AudioEngine : MonoBehaviour
         source.pitch = (float)playbackSpeed;
         source.volume = volume;
         source.PlayScheduled(AudioSettings.dspTime + DSPTimerEngine.k_DSPLookaheadTime + playOffsetTime);
+    }
+
+    public void EditAudioSource(AudioSource source, float volume)
+    {
+        source.volume = volume;
     }
 
     public async Task<(bool result, AudioClip clip, byte[] bytes)> GetAudioClipFromLocalFile(string fullFilePath)

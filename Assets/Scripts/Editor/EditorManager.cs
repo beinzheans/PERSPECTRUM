@@ -45,12 +45,11 @@ public class EditorManager : MonoBehaviour
     private double autoScrollSensitivity_time;
     [SerializeField] private float userScrollSensitivity_size;
 
-    [SerializeField] private double lookAheadTime;
 
     [SerializeField] private int numberOfBeatSubdivisions;
     public double ScrollSensitivity_Time { get => userScrollSensitivity_time; }
     public float ScrollSensitivity_Size { get => userScrollSensitivity_size; }
-    public double LookAheadTime { get => lookAheadTime; }
+    public double LookAheadTime { get => GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime; }
     public int NumberOfBeatSubdivisions { get => numberOfBeatSubdivisions; }
 
     private Vector2 snappedMouseCoordinate;
@@ -111,6 +110,18 @@ public class EditorManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        inputAction.Editor.ScrollEditorTime.performed -= ScrollEditorTime_performed;
+        inputAction.Editor.ScrollEditorTime_BigScroll.performed -= ScrollEditorTime_BigScroll_performed;
+        inputAction.Editor.ScrollEditorBeatSubdivision.performed -= ScrollEditorBeatSubdivision_performed;
+        inputAction.Editor.MouseSnapAlongX.performed -= MouseSnapAlongX_performed;
+        inputAction.Editor.MouseSnapAlongY.performed -= MouseSnapAlongY_performed;
+        inputAction.Editor.DeselectAllEditorObjects.performed -= DeselectAllEditorObjects_performed;
+        inputAction.Editor.EditorPositiveNegativeInput.performed -= EditorPositiveNegativeInput_performed;
+        inputAction.Editor.SelectAllVisibleEditorObjects.performed -= SelectAllVisibleEditorObjects_performed;
+        inputAction.Editor.UndoEditorCommand.performed -= UndoEditorCommand_performed;
+        inputAction.Editor.RedoEditorCommand.performed -= RedoEditorCommand_performed;
+
+        Cursor.visible = true;
         EditorInstance = null;
     }
     private void Start()
@@ -604,7 +615,7 @@ public class EditorManager : MonoBehaviour
         EditorChartMetadata metadata = OnRequestChartMetadata?.Invoke();
         try
         {
-            chartJson = JsonConvert.SerializeObject(CurrentEditorChart, SaveLoadManager.JsonSerializerSettings);
+            chartJson = JsonConvert.SerializeObject(CurrentEditorChart, GameManager.GameInstance.JsonSerializerSettings);
         }
         catch (Exception e)
         {
@@ -616,7 +627,7 @@ public class EditorManager : MonoBehaviour
 
         try
         {
-            metadataJson = JsonConvert.SerializeObject(metadata, SaveLoadManager.JsonSerializerSettings);
+            metadataJson = JsonConvert.SerializeObject(metadata, GameManager.GameInstance.JsonSerializerSettings);
         }
         catch (Exception e)
         {
@@ -625,7 +636,7 @@ public class EditorManager : MonoBehaviour
         }
 
         SaveLoadManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray);
-        GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved");
+        GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
     }
 
     public async Task LoadEditorChart()
@@ -642,7 +653,7 @@ public class EditorManager : MonoBehaviour
 
         try
         {
-            EditorChart loadedChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, SaveLoadManager.JsonSerializerSettings);
+            EditorChart loadedChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, GameManager.GameInstance.JsonSerializerSettings);
 
             if (string.IsNullOrWhiteSpace(chartJson) || loadedChart == null)
             {
@@ -653,7 +664,7 @@ public class EditorManager : MonoBehaviour
                 CurrentEditorChart = loadedChart;
             }
 
-            EditorChartMetadata metadata = JsonConvert.DeserializeObject<EditorChartMetadata>(metadataJson, SaveLoadManager.JsonSerializerSettings);
+            EditorChartMetadata metadata = JsonConvert.DeserializeObject<EditorChartMetadata>(metadataJson, GameManager.GameInstance.JsonSerializerSettings);
 
             if (string.IsNullOrWhiteSpace(metadataJson) || metadata == null)
             {
@@ -673,7 +684,7 @@ public class EditorManager : MonoBehaviour
             }
 
             InvokeAudioClipLoadedEvent(clip, bytes);
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded");
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded audio", 1d);
         }
         catch (Exception e)
         {

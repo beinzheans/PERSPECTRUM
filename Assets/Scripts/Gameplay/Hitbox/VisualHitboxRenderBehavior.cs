@@ -1,11 +1,16 @@
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHitbox>
 {
+    private MeshRenderer meshRenderer;
     private static readonly int SHADER_HITBOXID = Shader.PropertyToID("_HitboxType_Float");
     private static readonly int SHADER_NORMALIZEDPROGRESSID = Shader.PropertyToID("_NormalizedProgress");
+
+    protected override void OnAwake()
+    {
+        meshRenderer = GetComponent<MeshRenderer>();
+    }
 
     protected override void OnRenderEvent()
     {
@@ -42,7 +47,7 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
     protected override void OnUpdateEvent()
     {
         meshRenderer.GetPropertyBlock(propertyBlock);
-        
+
         propertyBlock.SetFloat(SHADER_NORMALIZEDPROGRESSID, GetNormalizedProgressFloat());
         meshRenderer.SetPropertyBlock(propertyBlock);
     }

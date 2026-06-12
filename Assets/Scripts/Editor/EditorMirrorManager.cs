@@ -16,6 +16,10 @@ public class EditorMirrorManager : EditorUIBehavior
         inputActions.Editor.MirrorObjects.performed += MirrorObjects_performed;
     }
 
+    private void OnDestroy()
+    {
+        inputActions.Editor.MirrorObjects.performed -= MirrorObjects_performed;
+    }
     private void MirrorObjects_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if (mirrorAxis == MirrorAxis.None)

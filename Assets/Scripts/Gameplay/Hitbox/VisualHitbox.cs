@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class VisualHitbox : GameplayObject, IEquatable<VisualHitbox>
@@ -25,9 +24,9 @@ public class VisualHitbox : GameplayObject, IEquatable<VisualHitbox>
     public bool IsInPlayerRange(double time)
     {
         double maxInteractTime = time + GameplayManager.k_EARLYTIMEFRAME;
-        double minInteractTime = HitboxType != HitboxType.BOMB ? time - GameplayManager.k_LENIENCYTIMEFRAME: time;
+        double minInteractTime = HitboxType != HitboxType.BOMB ? time - GameplayManager.k_LENIENCYTIMEFRAME : time;
 
-        return MathHelper.IsTwoDoublesEqualWithEpsilion(RenderTime, minInteractTime) || (RenderTime > minInteractTime && RenderTime < maxInteractTime);
+        return (RenderTime >= minInteractTime && RenderTime < maxInteractTime);
     }
 
     public bool IsPlayerMissed(double time)
@@ -38,9 +37,9 @@ public class VisualHitbox : GameplayObject, IEquatable<VisualHitbox>
 
     public bool IsMousePositionSuccessfullyInside()
     {
-        float scaledSize = HitboxType != HitboxType.BOMB ? NormalizedSize * GameplayManager.k_HITBOXINTERACTSIZEBUFFERSCALE : NormalizedSize;
-        Vector2 max = NormalizedPosition + 0.5f * scaledSize * Vector2.one;
-        Vector2 min = NormalizedPosition - 0.5f * scaledSize * Vector2.one;
+        float scaledSize = HitboxType != HitboxType.BOMB ? NormalizedSize + GameplayManager.k_HITBOXINTERACTSIZEADDDELTA : NormalizedSize;
+        Vector2 max = NormalizedPosition + 0.5f * scaledSize * GameManager.aspectRatioConversionScale;
+        Vector2 min = NormalizedPosition - 0.5f * scaledSize * GameManager.aspectRatioConversionScale;
 
         Vector2 point = GameplayManager.GameplayInstance.GameplayMousePosition;
         return point.x >= min.x && point.x <= max.x && point.y >= min.y && point.y <= max.y;

@@ -1,5 +1,3 @@
-using System;
-
 /// <summary>
 /// A generic class to describe any editor object.
 /// </summary>

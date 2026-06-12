@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using SFB;
 using System;
 using System.Collections.Generic;
@@ -12,8 +11,9 @@ public class ChartChooseManager : MonoBehaviour
     [SerializeField] private RectTransform ChartChooseContentRect;
     [SerializeField] private ChartButtonBehavior chartButtonPrefab;
     [SerializeField] private Button importChartButton;
+    [SerializeField] private Button enterEditorButton;
 
-    public event Action<ChartButtonBehavior> OnChartButtonClicked; 
+    public event Action<ChartButtonBehavior> OnChartButtonClicked;
     public ChartButtonBehavior CurrentSelectedChartButton { get; private set; }
     private List<ChartButtonBehavior> spawnedChartButtonBehaviors = new();
     private void Awake()
@@ -69,10 +69,19 @@ public class ChartChooseManager : MonoBehaviour
         {
             return;
         }
-        
-        SaveLoadManager.ImportEditorChartToGameStorage(paths[0], out string internalChartPath);
+
+        if (!SaveLoadManager.ImportEditorChartToGameStorage(paths[0], out string internalChartPath))
+        {
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Failed to import chart", 1d);
+            return;
+        }
 
         AddChartButton(internalChartPath);
+    }
+
+    public void UI_EnterEditorButtonClicked()
+    {
+        SceneLoader.LoadSceneAtIndex(1, () => { });
     }
 
     public void DeleteChartWithPath(string path)
@@ -81,7 +90,7 @@ public class ChartChooseManager : MonoBehaviour
         int deleteIndex = -1;
         for (int i = 0; i < spawnedChartButtonBehaviors.Count; i++)
         {
-            if (spawnedChartButtonBehaviors[i].associatedFullFilePath != path)
+            if (spawnedChartButtonBehaviors[i].AssociatedFullFilePath != path)
             {
                 continue;
             }

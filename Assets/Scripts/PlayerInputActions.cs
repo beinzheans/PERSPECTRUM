@@ -783,6 +783,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EscapeMenuInput"",
+                    ""type"": ""Button"",
+                    ""id"": ""3779eda9-f205-4504-9117-02538fef3e39"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -816,6 +825,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";KB&M"",
                     ""action"": ""SwitchBInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8ccad6dc-1141-4928-a2da-b7959c121886"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EscapeMenuInput"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -866,6 +886,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Gameplay_MousePosition = m_Gameplay.FindAction("MousePosition", throwIfNotFound: true);
         m_Gameplay_SwitchAInput = m_Gameplay.FindAction("SwitchAInput", throwIfNotFound: true);
         m_Gameplay_SwitchBInput = m_Gameplay.FindAction("SwitchBInput", throwIfNotFound: true);
+        m_Gameplay_EscapeMenuInput = m_Gameplay.FindAction("EscapeMenuInput", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -1233,6 +1254,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_MousePosition;
     private readonly InputAction m_Gameplay_SwitchAInput;
     private readonly InputAction m_Gameplay_SwitchBInput;
+    private readonly InputAction m_Gameplay_EscapeMenuInput;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -1256,6 +1278,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/SwitchBInput".
         /// </summary>
         public InputAction @SwitchBInput => m_Wrapper.m_Gameplay_SwitchBInput;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/EscapeMenuInput".
+        /// </summary>
+        public InputAction @EscapeMenuInput => m_Wrapper.m_Gameplay_EscapeMenuInput;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1291,6 +1317,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SwitchBInput.started += instance.OnSwitchBInput;
             @SwitchBInput.performed += instance.OnSwitchBInput;
             @SwitchBInput.canceled += instance.OnSwitchBInput;
+            @EscapeMenuInput.started += instance.OnEscapeMenuInput;
+            @EscapeMenuInput.performed += instance.OnEscapeMenuInput;
+            @EscapeMenuInput.canceled += instance.OnEscapeMenuInput;
         }
 
         /// <summary>
@@ -1311,6 +1340,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @SwitchBInput.started -= instance.OnSwitchBInput;
             @SwitchBInput.performed -= instance.OnSwitchBInput;
             @SwitchBInput.canceled -= instance.OnSwitchBInput;
+            @EscapeMenuInput.started -= instance.OnEscapeMenuInput;
+            @EscapeMenuInput.performed -= instance.OnEscapeMenuInput;
+            @EscapeMenuInput.canceled -= instance.OnEscapeMenuInput;
         }
 
         /// <summary>
@@ -1519,5 +1551,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSwitchBInput(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EscapeMenuInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEscapeMenuInput(InputAction.CallbackContext context);
     }
 }

@@ -483,4 +483,43 @@ public static class MathHelper
     {
         return (hitboxType == HitboxType.A && mouseActiveType == MouseActiveType.A) || (hitboxType == HitboxType.B && mouseActiveType == MouseActiveType.B);
     }
+
+    public static Dictionary<int, GameplayResultRank> overallScoreThresholdsToRankMapping = new Dictionary<int, GameplayResultRank>()
+    {
+        { 1000000, GameplayResultRank.SS },
+        { 980000 , GameplayResultRank.S },
+        { 950000 , GameplayResultRank.AA},
+        { 900000 , GameplayResultRank.A },
+        { 800000 , GameplayResultRank.B },
+        { 700000 , GameplayResultRank.C },
+        { 0      , GameplayResultRank.D },
+        { int.MinValue, GameplayResultRank.F }
+    };
+
+    public static Dictionary<GameplayResultRank, string> rankToStringMapping = new Dictionary<GameplayResultRank, string>()
+    {
+        { GameplayResultRank.SS, "SS"},
+        { GameplayResultRank.S, "S" },
+        { GameplayResultRank.AA, "AA" },
+        { GameplayResultRank.A, "A" },
+        { GameplayResultRank.B, "B" },
+        { GameplayResultRank.C, "C" },
+        { GameplayResultRank.D, "D" },
+        { GameplayResultRank.F, "F" }
+    };
+    public static GameplayResultRank ConvertOverallScoreToRank(double score)
+    {
+        int checkScore = (int)math.round(score);
+        foreach (int s in overallScoreThresholdsToRankMapping.Keys)
+        {
+            if (checkScore < s)
+            {
+                continue;
+            }
+
+            return overallScoreThresholdsToRankMapping[s];
+        }
+
+        throw new Exception("Invalid rank thresholds");
+    }
 }

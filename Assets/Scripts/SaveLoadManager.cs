@@ -1,21 +1,14 @@
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using UnityEngine;
 
 
 public static class SaveLoadManager
 {
-    public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
-    {
-        TypeNameHandling = TypeNameHandling.Auto
-    };
-
     /// <summary>
     /// Saves a chart file to a file destination given the JSON and audio byte array information 
     /// </summary>
@@ -150,11 +143,11 @@ public static class SaveLoadManager
         }
     }
 
-    public static async Task<(bool, EditorChart, AudioClip)>ConvertFilesToEditorChart(string chartJson, byte[] audioBytes)
+    public static async Task<(bool, EditorChart, AudioClip)> ConvertFilesToEditorChart(string chartJson, byte[] audioBytes)
     {
         try
         {
-            EditorChart editorChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, JsonSerializerSettings);
+            EditorChart editorChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, GameManager.GameInstance.JsonSerializerSettings);
 
             (bool clipResult, AudioClip clip, byte[] _) = await GetAudioClipFromByteArray(audioBytes);
 
@@ -174,18 +167,18 @@ public static class SaveLoadManager
     }
 
     public const string k_GameChartStorageFolderName = "Loaded_Charts";
-    public static void ImportEditorChartToGameStorage(string editorChartPath, out string internalChartPath)
+    public static bool ImportEditorChartToGameStorage(string editorChartPath, out string internalChartPath)
     {
         if (!File.Exists(editorChartPath))
         {
             internalChartPath = "";
-            return;
+            return false;
         }
 
         if (Path.GetExtension(editorChartPath).TrimStart('.') != GameManager.k_FILEEXTENSION)
         {
             internalChartPath = "";
-            return;
+            return false;
         }
 
         string fileName = Path.GetFileNameWithoutExtension(editorChartPath);
@@ -203,6 +196,32 @@ public static class SaveLoadManager
 
         internalChartPath = gamePath;
         File.Copy(editorChartPath, gamePath);
+
+        return true;
+    }
+
+    public static void ImportTutorialChartToGameStorage()
+    {
+        string streamingAssetPath = Path.Combine(Application.streamingAssetsPath, $"{GameManager.k_TUTORIALCHARTNAME}.{GameManager.k_FILEEXTENSION}");
+
+
+        if (!File.Exists(streamingAssetPath))
+        {
+            return;
+        }
+
+        string fileName = Path.GetFileNameWithoutExtension(streamingAssetPath);
+
+        string gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}.{GameManager.k_FILEEXTENSION}");
+
+        if (File.Exists(gamePath)) // do not import again if we already imported the tutorial chart
+        {
+            return;
+        }
+
+        File.Copy(streamingAssetPath, gamePath);
+
+        return;
     }
 
     public static void ReadEditorChartsInGameStorage(out string[] editorChartPaths)
@@ -240,7 +259,7 @@ public static class SaveLoadManager
             metadataReader.Close();
         }
 
-        metadata = JsonConvert.DeserializeObject<EditorChartMetadata>(metadataJson, JsonSerializerSettings);
+        metadata = JsonConvert.DeserializeObject<EditorChartMetadata>(metadataJson, GameManager.GameInstance.JsonSerializerSettings);
 
         archive.Dispose();
         stream.Close();
