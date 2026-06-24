@@ -11,9 +11,11 @@ public class ChartChooseManager : MonoBehaviour
     [SerializeField] private RectTransform ChartChooseContentRect;
     [SerializeField] private ChartButtonBehavior chartButtonPrefab;
     [SerializeField] private Button importChartButton;
-    [SerializeField] private Button enterEditorButton;
+    [SerializeField] private Button returnMainMenuButton;
 
+    public event Action<ChartGameplayRecordButtonBehavior> OnChartRecordButtonClicked;
     public event Action<ChartButtonBehavior> OnChartButtonClicked;
+    public event Action OnChartDeleted;
     public ChartButtonBehavior CurrentSelectedChartButton { get; private set; }
     private List<ChartButtonBehavior> spawnedChartButtonBehaviors = new();
     private void Awake()
@@ -30,11 +32,6 @@ public class ChartChooseManager : MonoBehaviour
     {
         CurrentSelectedChartButton = null;
         CreateChartButtons();
-    }
-
-    private void DeleteChartButtons()
-    {
-
     }
     private void CreateChartButtons()
     {
@@ -79,9 +76,9 @@ public class ChartChooseManager : MonoBehaviour
         AddChartButton(internalChartPath);
     }
 
-    public void UI_EnterEditorButtonClicked()
+    public void UI_ReturnMainMenuButton()
     {
-        SceneLoader.LoadSceneAtIndex(1, () => { });
+        SceneLoader.LoadSceneAtIndex(SceneLoader.k_TITLESCREENINDEX, () => { });
     }
 
     public void DeleteChartWithPath(string path)
@@ -102,17 +99,23 @@ public class ChartChooseManager : MonoBehaviour
         {
             return;
         }
-        Debug.Log($"Going to remove {path} at index {deleteIndex}");
 
         Destroy(spawnedChartButtonBehaviors[deleteIndex].gameObject);
         spawnedChartButtonBehaviors.RemoveAt(deleteIndex);
 
         File.Delete(path);
+
+        OnChartDeleted?.Invoke();
     }
 
     public void InvokeOnChartButtonClickedEvent(ChartButtonBehavior chartButton)
     {
         CurrentSelectedChartButton = chartButton;
         OnChartButtonClicked?.Invoke(CurrentSelectedChartButton);
+    }
+
+    public void InvokeOnChartRecordButtonClickedEvent(ChartGameplayRecordButtonBehavior recordButton)
+    {
+        OnChartRecordButtonClicked?.Invoke(recordButton);
     }
 }

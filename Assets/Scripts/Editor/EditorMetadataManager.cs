@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -42,6 +43,7 @@ public class EditorMetadataManager : MonoBehaviour
         string s_name = string.IsNullOrWhiteSpace(songName.text) ? k_NOSONGNAMESTRING : songName.text;
         string s_artist = string.IsNullOrWhiteSpace(songArtist.text) ? k_NOSONGARTISTSTRING : songArtist.text;
 
-        return new EditorChartMetadata(c_name, c_mapper, s_name, s_artist, GameManager.GameInstance.CurrentVersion);
+        string GUID = Guid.NewGuid().ToString();
+        return new EditorChartMetadata(c_name, c_mapper, s_name, s_artist, GameManager.GameInstance.CurrentVersion, GUID);
     }
 }

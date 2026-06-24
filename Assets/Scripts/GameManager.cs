@@ -1,5 +1,7 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 public class GameManager : MonoBehaviour
 {
@@ -18,7 +20,7 @@ public class GameManager : MonoBehaviour
     public const string k_METADATAFILENAME = "metadata.json";
     public const string k_CHARTFILENAME = "chart.json";
     public const string k_AUDIOFILENAME = "audio.mp3"; // let's just assume mp3 for now... IDC
-    public const string k_FILEEXTENSION = "mychart";
+    public const string k_FILEEXTENSION = "psr";
     public const string k_PLAYERSETTINGSFILENAME = "settings.json";
     public const string k_TUTORIALCHARTNAME = "tutorial";
 
@@ -40,7 +42,16 @@ public class GameManager : MonoBehaviour
 
     public GlobalSettings GlobalSettings;
 
-    public static readonly GlobalSettings DefaultGlobalSettings = new GlobalSettings(0d, 1f, 1f, new GameSettings(1d, 1d), new EditorSettings(1d, 1d));
+    public static readonly GlobalSettings DefaultGlobalSettings = new GlobalSettings(0d, false, 0.5f, 0.5f, new GameSettings(3d, 1d), new EditorSettings(1d, 1d), new GameEvents(false, false));
+    public const double k_HIGHLATENCYTHRESHOLDMS = 100d;
+
+    /// <summary>
+    /// Defines a mapping f: Metadata -> set of records. This is used for determining the relation between charts and the gameplay records.
+    /// </summary>
+    public Dictionary<EditorChartMetadata, List<GameplayStatisticRecord>> ChartMetadataToGameplayRecordMapping { get; private set; }
+
+    public string k_TUTORIALFILEPATHSTRING { get; private set; }
+
     private void Awake()
     {
         if (GameInstance != null)
@@ -65,9 +76,9 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         JsonSerializerSettings.Converters.Add(new Vector2Serializer());
-
+        k_TUTORIALFILEPATHSTRING = Path.Combine(Application.persistentDataPath, SaveLoadManager.k_GameChartStorageFolderName, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
         Application.targetFrameRate = -1;
-        CurrentVersion = "1.0.0";
+        CurrentVersion = Application.version;
         if (!SaveLoadManager.LoadGlobalSettingsFromFile(out GlobalSettings))
         {
             InvokeInformationDisplayNeeded("No global settings found");
@@ -78,6 +89,8 @@ public class GameManager : MonoBehaviour
         }
 
         SaveLoadManager.ImportTutorialChartToGameStorage();
+        SaveLoadManager.CreateMetadataToRecordsMapping(out Dictionary<EditorChartMetadata, List<GameplayStatisticRecord>> mapping);
+        ChartMetadataToGameplayRecordMapping = mapping;
     }
 
     private void OnApplicationQuit()
@@ -102,11 +115,24 @@ public class GameManager : MonoBehaviour
 
     public void RequestPlayChartEvent(string path)
     {
-        Debug.Log($"Requested to play {path}");
+        if (!GlobalSettings.GameEvents.HasPlayedTutorial)
+        {
+            if (path != k_TUTORIALFILEPATHSTRING)
+            {
+                ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayStartedEvent(path)), () => { }, "It is recommended to play the tutorial chart first.\n" +
+                                                                                                                                                                                               "Do you still want to continue?");
+                InvokeConfirmActionNeeded(loadConfirmAction);
+                return;
+            }
+        }
 
-        SceneLoader.LoadSceneAtIndex(2, () => GameplayManager.GameplayInstance.InvokeGameplayStartedEvent(path));
+        SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayStartedEvent(path));
     }
 
+    public void RequestReplayChartEvent(string path, GameplayStatisticRecord gameplayRecord)
+    {
+        SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord));
+    }
     public void InvokeGamePauseMenuEnable()
     {
         DSPTimerEngine.TimerInstance.PauseDSPTimer();
@@ -123,26 +149,35 @@ public class GameManager : MonoBehaviour
     {
         OnGameSettingsChanged?.Invoke();
     }
+
+    public void AddGameplayRecordToMapping(GameplayStatisticRecord record)
+    {
+        SaveLoadManager.UpdateMetadataToRecordsMapping(record, ChartMetadataToGameplayRecordMapping);
+    }
 }
 
 [Serializable]
 public struct GlobalSettings
 {
     public double AudioOffsetMs;
+    public bool UsePrescheduledHitsounds;
     public float SongVolume;
     public float HitsoundVolume;
 
     public GameSettings GameSettings;
     public EditorSettings EditorSettings;
+    public GameEvents GameEvents;
 
     // we are going to trust that the settings file has valid inputs. Lol
-    public GlobalSettings(double audioOffsetMs, float songVolume, float hitsoundVolume, GameSettings gameSettings, EditorSettings editorSettings)
+    public GlobalSettings(double audioOffsetMs, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, GameSettings gameSettings, EditorSettings editorSettings, GameEvents gameEvents)
     {
         AudioOffsetMs = audioOffsetMs;
+        UsePrescheduledHitsounds = usePrescheduledHitsounds;
         SongVolume = songVolume;
         HitsoundVolume = hitsoundVolume;
         GameSettings = gameSettings;
         EditorSettings = editorSettings;
+        GameEvents = gameEvents;
     }
 }
 
@@ -168,5 +203,17 @@ public struct EditorSettings
     {
         BigScrollTimeInterval = bigScrollTimeInterval;
         EditorLookaheadTime = editorLookaheadTime;
+    }
+}
+
+[Serializable]
+public struct GameEvents
+{
+    public bool HasAdjustedOffset;
+    public bool HasPlayedTutorial;
+    public GameEvents(bool hasAdjustedOffset, bool isFirstTimePlayingChart)
+    {
+        this.HasAdjustedOffset = hasAdjustedOffset;
+        this.HasPlayedTutorial = isFirstTimePlayingChart;
     }
 }

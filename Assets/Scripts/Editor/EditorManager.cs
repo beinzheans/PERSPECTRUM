@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -77,9 +78,9 @@ public class EditorManager : MonoBehaviour
     public const float k_SCREENGRIDSIZE_CELL = 1f / (float)k_SCREENGRIDSIZE;
     public Vector2[] RegionGridSizePositions { get; private set; }
 
-    public const int k_MAXIMUMPOOL = 99;
-    private LimitedStack<EditorCommand> executeCommandStack = new LimitedStack<EditorCommand>(k_MAXIMUMPOOL);
-    private LimitedStack<EditorCommand> undoCommandStack = new LimitedStack<EditorCommand>(k_MAXIMUMPOOL);
+    public const int k_MAXIMUMCOMMANDPOOL = 99;
+    private LimitedStack<EditorCommand> executeCommandStack = new LimitedStack<EditorCommand>(k_MAXIMUMCOMMANDPOOL);
+    private LimitedStack<EditorCommand> undoCommandStack = new LimitedStack<EditorCommand>(k_MAXIMUMCOMMANDPOOL);
 
     public event Func<double, double> OnRequestSnap;
 
@@ -331,6 +332,13 @@ public class EditorManager : MonoBehaviour
     private void StartEditor()
     {
         Debug.Log($"Starting editor");
+
+        if (math.abs(GameManager.GameInstance.GlobalSettings.AudioOffsetMs) >= GameManager.k_HIGHLATENCYTHRESHOLDMS)
+        {
+            ConfirmAction confirmAction = new ConfirmAction(() => { }, () => SceneLoader.LoadSceneAtIndex(SceneLoader.k_TITLESCREENINDEX, () => { }), "It is not recommend to chart with a high audio latency.\n" +
+                                                                                                                                                      "Do you still want to continue?");
+            GameManager.GameInstance.InvokeConfirmActionNeeded(confirmAction);
+        }
 
         CurrentEditorChart = new EditorChart(new(), new(), new(), new());
         EditorRenderables = new();
@@ -654,7 +662,10 @@ public class EditorManager : MonoBehaviour
         try
         {
             EditorChart loadedChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, GameManager.GameInstance.JsonSerializerSettings);
-
+            currentSelectedRenderables = new();
+            executeCommandStack = new(k_MAXIMUMCOMMANDPOOL);
+            undoCommandStack = new(k_MAXIMUMCOMMANDPOOL);
+            UpdateEditorPreviewTime(0d, false);
             if (string.IsNullOrWhiteSpace(chartJson) || loadedChart == null)
             {
                 CurrentEditorChart = new(new(), new(), new(), new());
@@ -755,8 +766,12 @@ public class EditorChart : IPlaceDeleteableContainer<EditorHitbox>, IPlaceDelete
     }
 }
 
+/// <summary>
+/// A class to represent all the metadata for the associated chart. <br></br>
+/// It is very unlikely for there to be metadata collision, since we check for both GUID and chart equality.
+/// </summary>
 [Serializable]
-public class EditorChartMetadata
+public class EditorChartMetadata : IEquatable<EditorChartMetadata>
 {
     public string ChartName { get; private set; }
     public string ChartMapper { get; private set; }
@@ -764,7 +779,8 @@ public class EditorChartMetadata
     public string SongArtist { get; private set; }
 
     public string Version { get; private set; }
-    public EditorChartMetadata(string chartName, string chartMapper, string songName, string songArtist, string version)
+    public string GUID { get; private set; }
+    public EditorChartMetadata(string chartName, string chartMapper, string songName, string songArtist, string version, string GUID)
     {
         ChartName = chartName;
         ChartMapper = chartMapper;
@@ -772,6 +788,27 @@ public class EditorChartMetadata
         SongArtist = songArtist;
 
         Version = version;
+        this.GUID = GUID;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return Equals(obj as EditorChartMetadata);
+    }
+
+    public bool Equals(EditorChartMetadata other)
+    {
+        return other is not null &&
+               ChartName == other.ChartName &&
+               ChartMapper == other.ChartMapper &&
+               SongName == other.SongName &&
+               SongArtist == other.SongArtist &&
+               GUID == other.GUID;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ChartName, ChartMapper, SongName, SongArtist); // don't use GUID for hashcode, we only use GUID in the equality checks if there is hash collision
     }
 }
 /// <summary>

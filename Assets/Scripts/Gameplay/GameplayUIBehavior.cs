@@ -15,6 +15,14 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private GameObject gameplayUI;
     [SerializeField] private RawImage cursorRawImage;
     [SerializeField] private TMP_Text comboText;
+    [SerializeField] private TMP_Text gameplay_chartCredit;
+    [SerializeField] private TMP_Text gameplay_songCredit;
+    [SerializeField] private TMP_Text gameplay_matchCount;
+    [SerializeField] private TMP_Text gameplay_mismatchCount;
+    [SerializeField] private TMP_Text gameplay_bombCount;
+    [SerializeField] private TMP_Text gameplay_missCount;
+    [SerializeField] private TMP_Text gameplay_accuracyPercent;
+    [SerializeField] private TMP_Text gameplay_score;
 
     [Header("Endscreen UI")]
     [SerializeField] private GameObject endscreenUI;
@@ -27,7 +35,6 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private TMP_Text bombText;
     [SerializeField] private Slider accuracySlider;
     [SerializeField] private TMP_Text accuracyText;
-
     [SerializeField] private Button ReturnButton;
     [SerializeField] private Button RetryButton;
 
@@ -47,6 +54,10 @@ public class GameplayUIBehavior : MonoBehaviour
     private void GameplayManager_OnHitboxBombHit(VisualHitbox hitbox)
     {
         comboText.text = "0";
+        gameplay_bombCount.text = gameplayManager.BombHitCount.ToString();
+        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
+        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
+
     }
 
     private void OnDestroy()
@@ -63,10 +74,15 @@ public class GameplayUIBehavior : MonoBehaviour
     private void GameplayManager_OnHitboxMismatchedHit(VisualHitbox obj)
     {
         comboText.text = gameplayManager.CurrentCombo.ToString();
+        gameplay_mismatchCount.text = gameplayManager.MismatchHitCount.ToString();
+        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
+        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
+
     }
 
     private void GameplayManager_OnGameplayEnded()
     {
+        Cursor.visible = true;
         gameplayUI.SetActive(false);
         endscreenUI.SetActive(true);
         cursorRawImage.gameObject.SetActive(false);
@@ -92,6 +108,7 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void GameplayManager_OnGameplayStarted()
     {
+        Cursor.visible = false;
         gameplayUI.SetActive(true);
         endscreenUI.SetActive(false);
         SetupGameplayUI();
@@ -100,11 +117,17 @@ public class GameplayUIBehavior : MonoBehaviour
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
     {
         comboText.text = "0";
+        gameplay_missCount.text = gameplayManager.MissCount.ToString();
+        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
+        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
     }
 
     private void GameplayManager_OnHitboxHit(VisualHitbox obj)
     {
         comboText.text = gameplayManager.CurrentCombo.ToString();
+        gameplay_matchCount.text = gameplayManager.MatchHitCount.ToString();
+        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
+        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
     }
 
     private void Update()
@@ -118,6 +141,14 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         cursorRawImage.gameObject.SetActive(true);
         comboText.text = "0";
+        gameplay_chartCredit.text = gameplayManager.CurrentMetadata.ChartName;
+        gameplay_songCredit.text = $"{gameplayManager.CurrentMetadata.SongArtist} - {gameplayManager.CurrentMetadata.SongName}";
+        gameplay_matchCount.text = "0";
+        gameplay_mismatchCount.text = "0";
+        gameplay_bombCount.text = "0";
+        gameplay_missCount.text = "0";
+        gameplay_accuracyPercent.text = "100%";
+        gameplay_score.text = "0";
     }
 
     private void SetupEndscreenUI()
@@ -125,7 +156,7 @@ public class GameplayUIBehavior : MonoBehaviour
         chartName.text = gameplayManager.CurrentMetadata.ChartName;
         scoreText.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
         GameplayResultRank rank = MathHelper.ConvertOverallScoreToRank(gameplayManager.CurrentScore);
-        rankText.text = MathHelper.rankToStringMapping[rank];
+        rankText.text = MathHelper.ConvertRankToString(rank);
 
         matchText.text = $"Matches: {gameplayManager.MatchHitCount}";
         mismatchText.text = $"Mismatches: {gameplayManager.MismatchHitCount}";
@@ -134,9 +165,13 @@ public class GameplayUIBehavior : MonoBehaviour
         accuracyText.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
         accuracySlider.value = (float)gameplayManager.CurrentAccuracy;
     }
-
     public void UI_OnReturnButton()
     {
-        SceneLoader.LoadSceneAtIndex(0, () => { });
+        SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { });
+    }
+
+    public void UI_OnRetryButton()
+    {
+        gameplayManager.InvokeGameplayRestartEvent();
     }
 }

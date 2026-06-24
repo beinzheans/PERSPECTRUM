@@ -59,7 +59,7 @@ public class AudioEngine : MonoBehaviour
         source.pitch = (float)playbackSpeed;
         source.clip = clip;
         source.volume = volume;
-        audioSourcePool[poolIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + DSPTimerEngine.k_DSPLookaheadTime + playOffsetTime);
+        audioSourcePool[poolIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class AudioEngine : MonoBehaviour
         source.timeSamples = seekSamples;
         source.pitch = (float)playbackSpeed;
         source.volume = volume;
-        source.PlayScheduled(AudioSettings.dspTime + DSPTimerEngine.k_DSPLookaheadTime + playOffsetTime);
+        source.PlayScheduled(AudioSettings.dspTime + playOffsetTime);
     }
 
     public void EditAudioSource(AudioSource source, float volume)

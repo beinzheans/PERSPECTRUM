@@ -1,30 +1,52 @@
 using UnityEngine;
 
 /// <summary>
-/// A class to handle metronome pulses during gameplay, accounting for BPM changes.
+/// A class to handle a 4/4 sig. metronome pulses during gameplay, accounting for BPM changes defined by <see cref="GameplayMarker"/>. <br></br>
+/// This class will precompute the times when the metronome will fire at the beginning of the gameplay.
 /// </summary>
 public class GameplayMetronomeManager : MonoBehaviour
 {
     private GameplayManager gameplayManager;
 
     private GameplayMarker initialMarker;
-    private GameplayMarker currentMarker;
+    private GameplayMarker currentMarkerInGameplay;
     int previousSearchIndex = 0;
 
     TimerIntervalAction metronomeTimer;
     private double currentBPM;
+
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
 
+        gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
+        gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
 
     }
 
+    private void GameplayManager_OnGameplayEnded()
+    {
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(metronomeTimer);
+    }
+
+    private void GameplayManager_OnGameplayRestarted()
+    {
+        gameplayManager.IsMetronomeDisabled = false;
+        previousSearchIndex = 0;
+    }
+
     private bool FindInitialMarker()
     {
+        if (gameplayManager.CurrentGameplayChart == null)
+        {
+            return false;
+        }
+
         bool findResult = false;
+
+
         for (int i = 0; i < gameplayManager.CurrentGameplayChart.GameplayObjects.Length; i++)
         {
             GameplayObject gameplayObject = gameplayManager.CurrentGameplayChart.GameplayObjects[i];
@@ -45,13 +67,12 @@ public class GameplayMetronomeManager : MonoBehaviour
     {
         if (!FindInitialMarker())
         {
+            gameplayManager.IsMetronomeDisabled = true;
             Debug.LogWarning($"No initial marker found! Metronome will not be enabled.");
             return;
         }
 
-        currentMarker = initialMarker;
-        gameplayManager.InvokeGameplayMarkerUpdate(currentMarker);
-        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 60d / initialMarker.BPM);
+        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 60d / initialMarker.BPM);
         DSPTimerEngine.TimerInstance.AddActionToTimer(metronomeTimer);
     }
 
@@ -78,14 +99,13 @@ public class GameplayMetronomeManager : MonoBehaviour
                 continue;
             }
 
-            if (currentMarker == marker) // do not assign if we somehow search the same marker. This shouldn't happen since we set the lower bounds
+            if (currentMarkerInGameplay == marker) // do not assign if we somehow search the same marker. This shouldn't happen since we set the lower bounds
             {
                 continue;
             }
 
-            Debug.Log($"Assigned current marker @ t = {marker.RenderTime} & BPM {marker.BPM}");
             assigned = true;
-            currentMarker = marker;
+            currentMarkerInGameplay = marker;
         }
 
         if (!assigned) // nothing to update
@@ -93,32 +113,28 @@ public class GameplayMetronomeManager : MonoBehaviour
             return;
         }
 
-        if (currentMarker == null)
+        if (currentMarkerInGameplay == null)
         {
+            gameplayManager.IsMetronomeDisabled = true;
             return;
         }
 
-        currentBPM = currentMarker.BPM;
+        currentBPM = currentMarkerInGameplay.BPM;
         UpdateMetronomeTimer();
-        gameplayManager.InvokeGameplayMarkerUpdate(currentMarker);
+        gameplayManager.InvokeGameplayMarkerUpdate(currentMarkerInGameplay);
     }
 
     private void UpdateMetronomeTimer()
     {
-        if (currentMarker == null)
+        if (MathHelper.IsTwoDoublesEqualWithEpsilion(currentBPM, 0d))
         {
+            gameplayManager.IsMetronomeDisabled = true;
             return;
         }
 
-        if (currentBPM == 0d || MathHelper.IsTwoDoublesEqualWithEpsilion(currentBPM, 0d))
-        {
-            return;
-        }
-
+        gameplayManager.IsMetronomeDisabled = false;
         double intervalTime = 60d / currentBPM;
 
         metronomeTimer.EditIntervalTime(intervalTime, true);
     }
-
-
 }

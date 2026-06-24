@@ -1,14 +1,18 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
 
 public static class SaveLoadManager
 {
+    public static readonly byte[] audioEncryptionBytes = Encoding.UTF8.GetBytes("PleaseDontCrackThisKey");
+
     /// <summary>
     /// Saves a chart file to a file destination given the JSON and audio byte array information 
     /// </summary>
@@ -17,8 +21,9 @@ public static class SaveLoadManager
     /// <param name="audioByte"></param>
     public static void SaveAsChartFile(string fullFilePath, string chartJson, string metadataJson, byte[] audioByte)
     {
-        FileStream stream = new FileStream(fullFilePath, FileMode.Create); // filemode will automatically override existing file
-        ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Create);
+        MemoryStream memoryStream = new MemoryStream();
+
+        ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create);
 
         ZipArchiveEntry chartJsonEntry = archive.CreateEntry(GameManager.k_CHARTFILENAME);
 
@@ -39,7 +44,23 @@ public static class SaveLoadManager
         audioWriter.Close();
 
         archive.Dispose();
-        stream.Close();
+
+        byte[] archiveBytes = memoryStream.ToArray();
+
+        File.WriteAllBytes(fullFilePath, XorProcesser(archiveBytes));
+        memoryStream.Close();
+    }
+
+    public static byte[] XorProcesser(byte[] bytes)
+    {
+        byte[] result = new byte[bytes.Length];
+
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            result[i] = (byte)(bytes[i] ^ audioEncryptionBytes[i % audioEncryptionBytes.Length]);
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -52,7 +73,17 @@ public static class SaveLoadManager
     /// <returns></returns>
     public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte)
     {
-        FileStream stream = new FileStream(fullFilePath, FileMode.Open);
+        bool isValid = GameVersionConverter.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
+
+        if (!isValid)
+        {
+            chartJson = "";
+            metadataJson = "";
+            audioByte = new byte[0];
+            return;
+        }
+
+        MemoryStream stream = new MemoryStream(archiveBytes);
         ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
         ZipArchiveEntry jsonEntry = archive.GetEntry(GameManager.k_CHARTFILENAME);
@@ -95,7 +126,6 @@ public static class SaveLoadManager
             MemoryStream memoryStream = new MemoryStream();
 
             audioReader.CopyTo(memoryStream);
-
             audioByte = memoryStream.ToArray();
 
             memoryStream.Close();
@@ -104,6 +134,7 @@ public static class SaveLoadManager
 
         archive.Dispose();
         stream.Close();
+
     }
 
     private const string k_TEMPORARYFILENAME = "temporary_cache.mp3";
@@ -211,8 +242,14 @@ public static class SaveLoadManager
         }
 
         string fileName = Path.GetFileNameWithoutExtension(streamingAssetPath);
+        string gameDirectory = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName);
 
-        string gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}.{GameManager.k_FILEEXTENSION}");
+        if (!Directory.Exists(gameDirectory))
+        {
+            Directory.CreateDirectory(gameDirectory);
+        }
+
+        string gamePath = Path.Combine(gameDirectory, $"{fileName}.{GameManager.k_FILEEXTENSION}");
 
         if (File.Exists(gamePath)) // do not import again if we already imported the tutorial chart
         {
@@ -237,7 +274,15 @@ public static class SaveLoadManager
 
     public static void GetMetadataOfEditorChartPath(string fullFilePath, out EditorChartMetadata metadata)
     {
-        FileStream stream = new FileStream(fullFilePath, FileMode.Open);
+        bool isValid = GameVersionConverter.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
+
+        if (!isValid)
+        {
+            metadata = null;
+            return;
+        }
+
+        MemoryStream stream = new MemoryStream(archiveBytes);
         ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
         ZipArchiveEntry metadataEntry = archive.GetEntry(GameManager.k_METADATAFILENAME);
@@ -300,5 +345,120 @@ public static class SaveLoadManager
             settings = GameManager.DefaultGlobalSettings;
             return false;
         }
+    }
+
+    public const string k_GAMEPLAYRECORDSDIRECTORY = "Play_Records";
+    public static void SaveGameplayStatisticRecordToFile(GameplayStatisticRecord gameplay)
+    {
+        string directory = Path.Combine(Application.persistentDataPath, k_GAMEPLAYRECORDSDIRECTORY);
+
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        string fileName = Path.Combine(directory, $"{gameplay.ChartMetadata.ChartMapper}-{gameplay.ChartMetadata.ChartName}-{gameplay.RecordTimestamp}.json"); // timestamp should ensure that no file collision, unless if someone wants to fuck around
+
+        string jsonString = JsonConvert.SerializeObject(gameplay, GameManager.GameInstance.JsonSerializerSettings);
+
+        File.WriteAllText(fileName, jsonString);
+    }
+
+    /// <summary>
+    /// Loads all gameplay records into the game as a list.
+    /// </summary>
+    /// <param name="allRecords"></param>
+    /// <returns></returns>
+    public static void LoadAllGameplayStatisticRecordFile(out List<GameplayStatisticRecord> allRecords)
+    {
+        string directory = Path.Combine(Application.persistentDataPath, k_GAMEPLAYRECORDSDIRECTORY);
+
+        GetAllGameplayStatisticRecordFilePaths(out string[] files);
+
+        allRecords = new List<GameplayStatisticRecord>(files.Length);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            try
+            {
+                string json = File.ReadAllText(files[i]);
+
+                GameplayStatisticRecord record = JsonConvert.DeserializeObject<GameplayStatisticRecord>(json);
+
+                allRecords.Add(record);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to load record at {files[i]}. Exception: \n" +
+                                 $"{e.Message}");
+
+            }
+        }
+    }
+
+    public static void GetAllGameplayStatisticRecordFilePaths(out string[] paths)
+    {
+        string directory = Path.Combine(Application.persistentDataPath, k_GAMEPLAYRECORDSDIRECTORY);
+
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        paths = Directory.EnumerateFiles(directory).Where(x => Path.GetExtension(x).TrimStart('.').ToLowerInvariant() == "json").ToArray(); // note we store our gameplay records as json
+    }
+
+    /// <summary>
+    /// Creates a mapping f: Metadata -> set of records. This should be done at the beginning of the game load. <br></br>
+    /// </summary>
+    /// <param name="mapping"></param>
+    public static void CreateMetadataToRecordsMapping(out Dictionary<EditorChartMetadata, List<GameplayStatisticRecord>> mapping)
+    {
+        mapping = new();
+        LoadAllGameplayStatisticRecordFile(out List<GameplayStatisticRecord> records);
+
+        for (int i = 0; i < records.Count; i++)
+        {
+            UpdateMetadataToRecordsMapping(records[i], mapping);
+        }
+    }
+
+    /// <summary>
+    /// Updates the mapping f: Metadata -> set of records while keeping the descending order for final scores.
+    /// </summary>
+    /// <param name="record"></param>
+    /// <param name="mapping"></param>
+    public static void UpdateMetadataToRecordsMapping(GameplayStatisticRecord record, Dictionary<EditorChartMetadata, List<GameplayStatisticRecord>> mapping)
+    {
+        EditorChartMetadata metadata = record.ChartMetadata;
+
+        if (!mapping.TryGetValue(metadata, out List<GameplayStatisticRecord> recordsList))
+        {
+            recordsList = new List<GameplayStatisticRecord>() { record };
+            mapping.Add(metadata, recordsList);
+            return;
+        }
+
+        recordsList.Add(record);
+        recordsList.Sort((x, y) => SortRecordsComparator(y, x));
+    }
+
+    /// <summary>
+    /// A comparator to sort records by final score. The comparator assumes ascending order, swap the operands for descending order.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private static int SortRecordsComparator(GameplayStatisticRecord x, GameplayStatisticRecord y)
+    {
+        if (x.FinalScore > y.FinalScore)
+        {
+            return 1;
+        }
+        else if (x.FinalScore < y.FinalScore)
+        {
+            return -1;
+        }
+        else return 0;
     }
 }

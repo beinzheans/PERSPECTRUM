@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// A class to handle the behavior of a button in the chart choose screen.
+/// A class to handle the behavior of the chart buttons in the chart choose screen.
 /// </summary>
 public class ChartButtonBehavior : MonoBehaviour
 {

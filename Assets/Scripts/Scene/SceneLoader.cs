@@ -4,6 +4,11 @@ using UnityEngine.SceneManagement;
 public static class SceneLoader
 {
     private static Action callbackOnSceneLoad;
+    public const int k_TITLESCREENINDEX = 0;
+    public const int k_CHARTCHOOSESCREENINDEX = 1;
+    public const int k_EDITORINDEX = 2;
+    public const int k_GAMEPLAYINDEX = 3;
+    public const int k_CALIBRATIONINDEX = 4;
     public static void LoadSceneAtIndex(int index, Action callback)
     {
         callbackOnSceneLoad = callback;

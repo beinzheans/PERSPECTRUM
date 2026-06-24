@@ -166,6 +166,12 @@ public class EditorRegion
         return;
     }
 
+    /// <summary>
+    /// Uses a raycast-based approach to evaluate the interior and exterior of a region. Counts the parity of the number of intersections.
+    /// </summary>
+    /// <param name="normalizedPosition"></param>
+    /// <param name="minX"></param>
+    /// <returns></returns>
     private int GetNumberOfIntersections(Vector2 normalizedPosition, float minX)
     {
         Vector2 rayPosition = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(normalizedPosition.x, normalizedPosition.y), EditorManager.EditorInstance.PreviewUIContainer);
@@ -177,7 +183,7 @@ public class EditorRegion
             Vector2 linePosition = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(boundaryLines[i].FromNormalizedPosition, EditorManager.EditorInstance.PreviewUIContainer);
             Vector2 lineVector = MathHelper.GetPixelFromToVectorFromNormalizedPoints(boundaryLines[i].FromNormalizedPosition, boundaryLines[i].ToNormalizedPosition, EditorManager.EditorInstance.PreviewUIContainer);
 
-            bool result = MathHelper.IsTwoVectorsIntersect(rayPosition, linePosition, rayVector, lineVector, out _, out _); // note in 2D space, lines intersect only once.
+            bool result = MathHelper.IsTwoVectorsIntersect(rayPosition, linePosition, rayVector, lineVector, out _, out _); // note in 2D space, straight lines intersect at most once.
 
             if (!result)
             {

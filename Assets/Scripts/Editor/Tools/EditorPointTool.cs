@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Splines;
 
-// Please add undo for point tool!!!!!! I forgot to add it ??!?!?!?!
 public class EditorPointTool : EditorToolManager
 {
     private const int k_RADIUS = 0;
@@ -10,8 +11,9 @@ public class EditorPointTool : EditorToolManager
     private const int k_FINALANGLE = 2;
     private const int k_NUMBEROFPOINTS = 3;
     private const int k_TIMEOFFSET = 4;
-    private const int k_COMPUTEPOINTS = 5;
-    private const int k_CONVERTPOINTSTOHITBOX = 6;
+    private const int k_COMPUTECIRCLEPOINTS = 5;
+    private const int k_COMPUTEARCPOINTS = 6;
+    private const int k_CONVERTPOINTSTOHITBOX = 7;
     private float radius = 0f;
     private float initialAngle = 0f;
     private float finalAngle = 0f;
@@ -21,8 +23,11 @@ public class EditorPointTool : EditorToolManager
     {
         switch (buttonIndex)
         {
-            case k_COMPUTEPOINTS:
-                ComputeGuidePoints();
+            case k_COMPUTECIRCLEPOINTS:
+                ComputeCirclePoints();
+                break;
+            case k_COMPUTEARCPOINTS:
+                ComputeArcPoints();
                 break;
             case k_CONVERTPOINTSTOHITBOX:
                 ConvertPointsToHitbox();
@@ -138,7 +143,7 @@ public class EditorPointTool : EditorToolManager
         }
     }
 
-    private void ComputeGuidePoints()
+    private void ComputeCirclePoints()
     {
         ParseInputFields();
 
@@ -148,7 +153,7 @@ public class EditorPointTool : EditorToolManager
         }
 
         List<EditorDynamicObject> objects = new List<EditorDynamicObject>(editorInstance.CurrentSelectedRenderables);
-        List<EditorPoint> guidePoints = new List<EditorPoint>();
+        List<EditorPoint> appendPoints = new List<EditorPoint>();
         for (int i = 0; i < objects.Count; i++)
         {
             if (objects[i] is not EditorPoint point)
@@ -156,22 +161,22 @@ public class EditorPointTool : EditorToolManager
                 continue;
             }
 
-            CreateGuidePoints(point, ref guidePoints);
+            CreateCirclePoints(point, ref appendPoints);
         }
 
         Action executeAction = () =>
         {
-            for (int i = 0; i < guidePoints.Count; i++)
+            for (int i = 0; i < appendPoints.Count; i++)
             {
-                guidePoints[i].OnPlace();
+                appendPoints[i].OnPlace();
             }
         };
 
         Action undoAction = () =>
         {
-            for (int i = 0; i < guidePoints.Count; i++)
+            for (int i = 0; i < appendPoints.Count; i++)
             {
-                guidePoints[i].OnDelete();
+                appendPoints[i].OnDelete();
             }
         };
 
@@ -179,7 +184,88 @@ public class EditorPointTool : EditorToolManager
         editorInstance.ExecuteEditorCommand(command);
     }
 
-    private void CreateGuidePoints(EditorPoint point, ref List<EditorPoint> appendList)
+    private void ComputeArcPoints()
+    {
+        ParseInputFields();
+
+        if (numberOfPoints < 2)
+        {
+            return;
+        }
+
+        List<EditorDynamicObject> objects = new List<EditorDynamicObject>(editorInstance.CurrentSelectedRenderables);
+        List<EditorPoint> appendPoints = new List<EditorPoint>();
+        // keep track of the order we select lines
+
+        Queue<EditorLine> lineQueue = new();
+        Queue<EditorPoint> pointQueue = new();
+        for (int i = 0; i < objects.Count; i++)
+        {
+            if (objects[i] is EditorLine line)
+            {
+                lineQueue.Enqueue(line);
+                continue;
+            }
+
+            if (objects[i] is EditorPoint point)
+            {
+                pointQueue.Enqueue(point);
+                continue;
+            }
+        }
+
+        while (lineQueue.Count > 0 && pointQueue.Count > 0)
+        {
+            EditorLine constructLine = lineQueue.Dequeue();
+            EditorPoint constructPoint = pointQueue.Dequeue();
+
+            Spline spline = MathHelper.GenerateSplineFromConstructionLineAndVertexPoint(constructLine, constructPoint);
+            CreateArcPoints(spline, constructLine, ref appendPoints);
+
+        }
+
+        Action executeAction = () =>
+        {
+            for (int i = 0; i < appendPoints.Count; i++)
+            {
+                appendPoints[i].OnPlace();
+            }
+        };
+
+        Action undoAction = () =>
+        {
+            for (int i = 0; i < appendPoints.Count; i++)
+            {
+                appendPoints[i].OnDelete();
+            }
+        };
+
+        EditorCommand command = new EditorCommand(executeAction, undoAction);
+        editorInstance.ExecuteEditorCommand(command);
+    }
+
+    private void CreateArcPoints(Spline spline, EditorLine line, ref List<EditorPoint> appendList)
+    {
+        if (numberOfPoints < 2)
+        {
+            return;
+        }
+
+        float dt = 1f / (numberOfPoints - 1);
+
+        for (int i = 1; i < numberOfPoints - 1; i++)
+        {
+            float t = dt * (float)i;
+
+            float3 position = spline.EvaluatePosition(t);
+            double time = line.EvaluateTimeAtProgress(t);
+            EditorPoint point = new EditorPoint(new Vector2(position.x, position.y), time);
+
+            appendList.Add(point);
+        }
+    }
+
+    private void CreateCirclePoints(EditorPoint point, ref List<EditorPoint> appendList)
     {
         float angle_i = initialAngle * Mathf.Deg2Rad;
         float angle_f = finalAngle * Mathf.Deg2Rad;

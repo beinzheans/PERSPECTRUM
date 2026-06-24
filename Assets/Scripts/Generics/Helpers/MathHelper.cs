@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public static class MathHelper
 {
     /// <summary>
-    /// Get a normalized point w.r.t to a reference rect given a screen point, where the bottom-left corner is (0, 0). <br></br>
+    /// Get a normalized point w.r.t toPoint a reference rect given a screen point, where the bottom-left corner is (0, 0). <br></br>
     /// Gracefully handles division by zero (where the reference has size 0). Returns true if conversion result is successful.
     /// </summary>
     /// <param name="rawPoint"></param>
@@ -38,9 +40,24 @@ public static class MathHelper
         return true;
     }
 
+    /// <summary>
+    /// Performs clamp operations on each component of a vector
+    /// </summary>
+    /// <param name="rawVector"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Vector2 ClampVectorByComponent(Vector2 rawVector, float min, float max)
+    {
+        float x = Mathf.Clamp(rawVector.x, min, max);
+        float y = Mathf.Clamp(rawVector.y, min, max);
+
+        return new Vector2(x, y);
+    }
+
     private static Vector3[] worldCornerBuffer = new Vector3[4];
     /// <summary>
-    /// Get the screen point (pixel position) given a normalized point w.r.t to a reference rect. Assumes normalized point uses (0, 0) for bottom-left corner.
+    /// Get the screen point (pixel position) given a normalized point w.r.t toPoint a reference rect. Assumes normalized point uses (0, 0) for bottom-left corner.
     /// </summary>
     /// <param name="normalizedPoint"></param>
     /// <param name="referenceRect"></param>
@@ -61,8 +78,8 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Get the from to vector in raw pixel coordinates, given normalized from to points w.r.t to a reference rect. <br></br>
-    /// This is necessary because the from to vector calculated from normalized vector is NOT the same as the raw pixel from to vector.
+    /// Get the fromPoint toPoint vector in raw pixel coordinates, given normalized fromPoint toPoint points w.r.t toPoint a reference rect. <br></br>
+    /// This is necessary because the fromPoint toPoint vector calculated fromPoint normalized vector is NOT the same as the raw pixel fromPoint toPoint vector.
     /// </summary>
     /// <param name="from"></param>
     /// <param name="to"></param>
@@ -102,7 +119,7 @@ public static class MathHelper
     public static bool IsTwoUnitVectorsIntersect(Vector2 aPosition, Vector2 bPosition, Vector2 aUnitDir, Vector2 bUnitDir, out float aScaler, out float bScaler)
     {
         float crossProduct_result = aUnitDir.x * bUnitDir.y - aUnitDir.y * bUnitDir.x;
-        if (Mathf.Abs(crossProduct_result) <= k_FLOATCOMPAREEPSILION) // cross product approx. 0, consider it parallel.
+        if (IsTwoVectorsParallel(aUnitDir, bUnitDir))
         {
             aScaler = 0f;
             bScaler = 0f;
@@ -128,7 +145,7 @@ public static class MathHelper
     public static bool IsTwoVectorsIntersect(Vector2 aPosition, Vector2 bPosition, Vector2 aVector, Vector2 bVector, out float aScaler, out float bScaler)
     {
         float crossProduct_result = aVector.x * bVector.y - aVector.y * bVector.x;
-        if (Mathf.Abs(crossProduct_result) <= k_FLOATCOMPAREEPSILION) // cross product approx. 0, consider it parallel.
+        if (IsTwoVectorsParallel(aVector, bVector))
         {
             aScaler = 0f;
             bScaler = 0f;
@@ -141,10 +158,38 @@ public static class MathHelper
         return aScaler >= 0f && aScaler <= 1f && bScaler >= 0f && bScaler <= 1f;
     }
 
+    /// <summary>
+    /// Whether or not two vectors are parallel. Note pointing exact opposite direction is considered as parallel
+    /// </summary>
+    /// <param name="aVector"></param>
+    /// <param name="bVector"></param>
+    /// <returns></returns>
+    public static bool IsTwoVectorsParallel(Vector2 aVector, Vector2 bVector)
+    {
+        float crossProduct_result = aVector.x * bVector.y - aVector.y * bVector.x;
+        return IsTwoFloatsEqualWithEpsilion(crossProduct_result, 0f); // cross product approx. 0 means we consider it toPoint be in same direction.
+    }
+
+    /// <summary>
+    /// Whether or not three points are collinear.
+    /// </summary>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
+    /// <param name="p3"></param>
+    /// <returns></returns>
+    public static bool IsPointsCollinear(Vector2 p1, Vector2 p2, Vector2 p3)
+    {
+        Vector2 v1 = p2 - p1;
+        Vector2 v2 = p3 - p2;
+        Vector2 v3 = p3 - p1;
+
+        return IsTwoVectorsParallel(v2, v1) && IsTwoVectorsParallel(v3, v1); // this is sufficient to prove collinear, v1 is the shared point.
+    }
+
     public const double k_DOUBLECOMPAREEPSILION = 1e-9d;
     /// <summary>
-    /// Computes the floor of a value, accounting for potential rounding errors that lead to false results <br></br>
-    /// Eg. if we evaluate 2.99999993 instead of 3 due to representation error, it will return 3 instead of 2, hence the "common sense" floor.
+    /// Computes the floor of a value, accounting for potential rounding errors that lead toPoint false results <br></br>
+    /// Eg. if we evaluate 2.99999993 instead of 3 due toPoint representation error, it will return 3 instead of 2, hence the "common sense" floor.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -154,8 +199,8 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Computes the ceil of a value, accounting for potential rounding errors that lead to false results <br></br>
-    /// Eg. if we evaluate 3.0000001 instead of 3 due to representation error, it will return 3 instead of 4, hence the "common sense" ceil.
+    /// Computes the ceil of a value, accounting for potential rounding errors that lead toPoint false results <br></br>
+    /// Eg. if we evaluate 3.0000001 instead of 3 due toPoint representation error, it will return 3 instead of 4, hence the "common sense" ceil.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -166,7 +211,7 @@ public static class MathHelper
 
     /// <summary>
     /// Compares two double representation of values with a pre-defined epsilion <see cref="k_DOUBLECOMPAREEPSILION"/>. <br></br>
-    /// Returns true if x and y are sufficiently close to each other
+    /// Returns true if x and y are sufficiently close toPoint each other
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -178,7 +223,7 @@ public static class MathHelper
 
     /// <summary>
     /// Compares two float representation of values with a pre-defined epsilion <see cref="k_FLOATCOMPAREEPSILION"/>. <br></br>
-    /// Returns true if x and y are sufficiently close to each other
+    /// Returns true if x and y are sufficiently close toPoint each other
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -429,7 +474,7 @@ public static class MathHelper
 
     /// <summary>
     /// Applies conversion operation on every element on the original array and returns the converted types as a list. <br></br>
-    /// Modifies an pre-existing list to prevent garbage generation within this method
+    /// Modifies an pre-existing list toPoint prevent garbage generation within this method
     /// </summary>
     /// <typeparam name="T1"></typeparam>
     /// <typeparam name="T2"></typeparam>
@@ -451,7 +496,7 @@ public static class MathHelper
     }
     /// <summary>
     /// Applies conversion operation on every element on the original array and returns the converted types as an array. <br></br>
-    /// Modifies an pre-existing array to prevent garbage generation within this method
+    /// Modifies an pre-existing array toPoint prevent garbage generation within this method
     /// </summary>
     /// <typeparam name="T1"></typeparam>
     /// <typeparam name="T2"></typeparam>
@@ -484,7 +529,7 @@ public static class MathHelper
         return (hitboxType == HitboxType.A && mouseActiveType == MouseActiveType.A) || (hitboxType == HitboxType.B && mouseActiveType == MouseActiveType.B);
     }
 
-    public static Dictionary<int, GameplayResultRank> overallScoreThresholdsToRankMapping = new Dictionary<int, GameplayResultRank>()
+    private static Dictionary<int, GameplayResultRank> overallScoreThresholdsToRankMapping = new Dictionary<int, GameplayResultRank>()
     {
         { 1000000, GameplayResultRank.SS },
         { 980000 , GameplayResultRank.S },
@@ -496,7 +541,7 @@ public static class MathHelper
         { int.MinValue, GameplayResultRank.F }
     };
 
-    public static Dictionary<GameplayResultRank, string> rankToStringMapping = new Dictionary<GameplayResultRank, string>()
+    private static Dictionary<GameplayResultRank, string> rankToStringMapping = new Dictionary<GameplayResultRank, string>()
     {
         { GameplayResultRank.SS, "SS"},
         { GameplayResultRank.S, "S" },
@@ -521,5 +566,63 @@ public static class MathHelper
         }
 
         throw new Exception("Invalid rank thresholds");
+    }
+
+    public static string ConvertRankToString(GameplayResultRank rank)
+    {
+        return rankToStringMapping.GetValueOrDefault(rank, "N.A.");
+    }
+    public static Spline GenerateSplineFromConstructionLineAndVertexPoint(EditorLine line, EditorPoint point)
+    {
+        float3[] knots = new float3[3];
+        knots[0] = new float3(line.FromNormalizedPosition, 0f);
+        knots[1] = new float3(point.NormalizedPosition, 0f);
+        knots[2] = new float3(line.ToNormalizedPosition, 0f);
+
+        Spline result = new(knots, TangentMode.AutoSmooth, false);
+        return result;
+    }
+
+    public const string k_TIMESTAMPINTERNALFORMAT = "yyyyMMdd_HHmmss";
+    /// <summary>
+    /// Converts a timestamp in <see cref="k_TIMESTAMPINTERNALFORMAT"/> format to human readable time. Returns empty string if can not parse.
+    /// </summary>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
+    public static string ConvertTimestampToHumanReadableTime(string timestamp)
+    {
+        if (!DateTime.TryParseExact(timestamp, k_TIMESTAMPINTERNALFORMAT, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
+        {
+            return "";
+        }
+
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// Perform lerp between two mouse buffers. We assume that the instanteous velocity between buffers is a constant velocity which is sufficient for small <see cref="GameplayStatisticRecorder.k_MOUSERECORDINTERVAL"/>.
+    /// </summary>
+    /// <param name="current"></param>
+    /// <param name="next"></param>
+    /// <param name="time"></param>
+    /// <param name="newPosition"></param>
+    /// <param name="newMouseType"></param>
+    public static void LerpMouseBuffers(ReplayMouseInfo current, ReplayMouseInfo next, double time, out Vector2 newPosition, out MouseActiveType newMouseType)
+    {
+        double dt = time - current.ReplayTime;
+        double progress = dt / (next.ReplayTime - current.ReplayTime);
+
+        Vector2 pos = Vector2.Lerp(current.NormalizedPosition, next.NormalizedPosition, (float)progress);
+
+        newPosition = pos;
+
+        if (current.MouseType == next.MouseType)
+        {
+            newMouseType = current.MouseType;
+        }
+        else
+        {
+            newMouseType = progress <= 0.5f ? current.MouseType : next.MouseType;
+        }
     }
 }

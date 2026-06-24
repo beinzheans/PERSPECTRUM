@@ -7,8 +7,9 @@ public class EditorTimelineMarkerTool : EditorToolManager
 {
     private const int k_MARKERNAMEINDEX = 0;
     private const int k_MARKERBPMINDEX = 1;
-    private const int k_DELETECURRENTMARKERINDEX = 2;
-
+    private const int k_MARKERMESSAGEINDEX = 2;
+    private const int k_MARKERDISPLAYMESSAGETIMEINDEX = 3;
+    private const int k_DELETECURRENTMARKERINDEX = 4;
     protected override void Start()
     {
         base.Start();
@@ -36,6 +37,7 @@ public class EditorTimelineMarkerTool : EditorToolManager
 
 
         string inputFieldLabel = editorInstance.InputFields[k_MARKERNAMEINDEX].text;
+        string message = editorInstance.InputFields[k_MARKERMESSAGEINDEX].text;
         bool bpmParseResult = double.TryParse(editorInstance.InputFields[k_MARKERBPMINDEX].text, out double bpm);
         if (!bpmParseResult)
         {
@@ -44,7 +46,9 @@ public class EditorTimelineMarkerTool : EditorToolManager
             return;
         }
 
-        marker.AssignMarkerValues(string.IsNullOrWhiteSpace(inputFieldLabel) ? "Unnamed Section" : inputFieldLabel, bpm);
+        bool displayTimeParseResult = double.TryParse(editorInstance.InputFields[k_MARKERDISPLAYMESSAGETIMEINDEX].text, out double displayTime);
+
+        marker.AssignMarkerValues(string.IsNullOrWhiteSpace(inputFieldLabel) ? "Unnamed Section" : inputFieldLabel, bpm, message, displayTimeParseResult ? displayTime : -1d);
 
         Action placeAction = () =>
         {

@@ -5,8 +5,8 @@ using UnityEngine;
 /// </summary>
 public class EditorHitsoundManager : MonoBehaviour
 {
-    [SerializeField] private AudioClip tick;
-
+    [SerializeField] private AudioClip hitsound_A;
+    [SerializeField] private AudioClip hitsound_B;
     private EditorManager editorInstance;
 
     private void Start()
@@ -34,11 +34,18 @@ public class EditorHitsoundManager : MonoBehaviour
             return;
         }
 
-        PlayHitsound(0d);
+        PlayHitsound(hitbox.HitboxType, 0d);
     }
 
-    private void PlayHitsound(double offset)
+    private void PlayHitsound(HitboxType hitboxType, double offset)
     {
-        AudioEngine.AudioInstance.PlayAudioClip(tick, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+        if (hitboxType == HitboxType.A)
+        {
+            AudioEngine.AudioInstance.PlayAudioClip(hitsound_A, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+        }
+        else
+        {
+            AudioEngine.AudioInstance.PlayAudioClip(hitsound_B, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+        }
     }
 }

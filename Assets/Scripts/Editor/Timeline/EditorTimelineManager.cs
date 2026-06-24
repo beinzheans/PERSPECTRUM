@@ -136,7 +136,6 @@ public class EditorTimelineManager : MonoBehaviour
 
         if (minIndex == -1)
         {
-            Debug.LogWarning($"Can not find initial marker");
             return null;
         }
 
@@ -365,7 +364,7 @@ public class EditorTimelineManager : MonoBehaviour
 }
 
 /// <summary>
-/// A class to describe a marker on the timeline for BPM changes with a label. <br></br>
+/// A class to describe a marker on the timeline for BPM changes with a label with an option to display text. <br></br>
 /// </summary>
 /// 
 [Serializable]
@@ -376,26 +375,32 @@ public class TimelineMarker : EditorDynamicObject, IConvertable<GameplayMarker>
     }
 
     [JsonConstructor]
-    public TimelineMarker(double markerTime, string markerLabel, double BPM) : base(markerTime)
+    public TimelineMarker(double markerTime, string markerLabel, double BPM, string displayMessage, double displayTime) : base(markerTime)
     {
         MarkerLabel = markerLabel;
         this.BPM = BPM;
+        DisplayMessage = displayMessage;
+        DisplayTime = displayTime;
     }
 
-    public void AssignMarkerValues(string label, double BPM)
+    public void AssignMarkerValues(string label, double BPM, string displayMessage, double displayTime)
     {
         MarkerLabel = label;
         this.BPM = BPM;
+        DisplayMessage = displayMessage;
+        DisplayTime = displayTime;
     }
 
     public bool Convert(out GameplayMarker converted)
     {
-        converted = new GameplayMarker(RenderTime, BPM);
+        converted = new GameplayMarker(RenderTime, BPM, DisplayMessage, DisplayTime);
         return true;
     }
 
     public string MarkerLabel { get; private set; }
     public double BPM { get; private set; }
+    public string DisplayMessage { get; private set; }
+    public double DisplayTime { get; private set; }
 }
 
 /// <summary>

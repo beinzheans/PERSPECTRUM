@@ -33,11 +33,28 @@ public class EditorPlaybackManager : EditorUIBehavior
         inputActions = GameManager.GameInstance.InputActions;
 
         inputActions.Editor.EditorStartPlayback.performed += EditorStartPlayback_performed;
+        editorManager.OnTimelineMarkerActive += EditorManager_OnTimelineMarkerActive;
+    }
+
+    private void EditorManager_OnTimelineMarkerActive(TimelineMarker obj)
+    {
+        if (!playbackState)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(obj.DisplayMessage) || obj.DisplayTime <= 0d)
+        {
+            return;
+        }
+
+        GameManager.GameInstance.InvokeInformationDisplayNeeded(obj.DisplayMessage, obj.DisplayTime);
     }
 
     private void OnDestroy()
     {
         inputActions.Editor.EditorStartPlayback.performed -= EditorStartPlayback_performed;
+        editorManager.OnTimelineMarkerActive += EditorManager_OnTimelineMarkerActive;
     }
     private void EditorStartPlayback_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {

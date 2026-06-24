@@ -45,11 +45,15 @@ public class EditorChartTool : EditorUIBehavior
                 EditorManager.EditorInstance.SaveEditorChart();
                 break;
             case ChartOptions.LOAD_EDITOR_CHART:
-                await EditorManager.EditorInstance.LoadEditorChart();
+                ConfirmAction loadAction = new(async () => await EditorManager.EditorInstance.LoadEditorChart(), () => { }, "Are you sure you want to load a new chart?\n" +
+                                                                                                                            "All unsaved progress will be lost.");
+
+                GameManager.GameInstance.InvokeConfirmActionNeeded(loadAction);
                 break;
             case ChartOptions.EXITEDITOR:
-                ConfirmAction action = new(() => SceneLoader.LoadSceneAtIndex(0, () => { }), () => { }, "Are you sure you want to exit?");
-                GameManager.GameInstance.InvokeConfirmActionNeeded(action);
+                ConfirmAction exitAction = new(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_TITLESCREENINDEX, () => { }), () => { }, "Are you sure you want to exit?\n" +
+                                                                                                                                               "All unsaved progress will be lost.");
+                GameManager.GameInstance.InvokeConfirmActionNeeded(exitAction);
                 break;
         }
     }

@@ -119,7 +119,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _PulseInterval: 0
-    - _PulseProgress: 0
+    - _PulseProgress: 1
     - _PulseTrigger: 0
     - _QueueControl: 0
     - _QueueOffset: 0

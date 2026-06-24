@@ -14,6 +14,8 @@ public class GameplayManager : MonoBehaviour
     public event Action<AudioClip, EditorChartMetadata> OnGameplayChartLoaded;
     public event Action OnGameplayStarted;
     public event Action OnGameplayEnded;
+    public event Action OnGameplayRestarted;
+    public event Action<GameplayStatisticRecord> OnGameplayReplayLoaded;
 
     public MouseActiveType MouseActiveType { get; private set; }
 
@@ -33,9 +35,9 @@ public class GameplayManager : MonoBehaviour
     /// How much extra delta size the hitbox interact size is compared to the actual hitbox size. <br></br>
     /// This is to make the game FEEL more fair.
     /// </summary>
-    public const float k_HITBOXINTERACTSIZEADDDELTA = 0.05f;
+    public const float k_HITBOXINTERACTSIZEADDDELTA = 0.025f;
     /// <summary>
-    /// How long the pool looks ahead to spawn objects. This is added on top of the player's lookahead metronomeFireDSPTime.
+    /// How long the pool looks ahead to spawn objects. This is added on top of the player's lookahead DSP time.
     /// </summary>
     public const double k_POOLLOOKAHEADTIME = 1d;
 
@@ -45,13 +47,14 @@ public class GameplayManager : MonoBehaviour
     public const double k_POOLUNRENDERTIMETHRESHOLD = 0.01d;
 
     /// <summary>
-    /// The depth away from camera depicting the current metronomeFireDSPTime. This affects the extent of perspective distortion
+    /// The depth away from camera depicting the current DSP time. This affects the extent of perspective distortion
     /// </summary>
     public const float k_HITPLANEDEPTH = 1f;
     public GameplayChart CurrentGameplayChart { get; private set; }
     public EditorChartMetadata CurrentMetadata { get; private set; }
     public string CurrentPath { get; private set; }
     public event Action<double> OnGameplayTimeUpdated;
+    public event Action<VisualHitbox> OnHitboxBecomeActive;
     public event Action<VisualHitbox> OnHitboxMatchedHit;
     public event Action<VisualHitbox> OnHitboxMismatchedHit;
     public event Action<VisualHitbox> OnHitboxMiss;
@@ -78,6 +81,10 @@ public class GameplayManager : MonoBehaviour
     /// </summary>
     public Vector2 WorldToScreenSizeRatioOfPreview { get; private set; }
 
+    /// <summary>
+    /// The vanishing point of the gameplay camera local to the camera, ie. the local coordinates of the center of the screen at the far clip plane w.r.t. the camera
+    /// </summary>
+    public Vector3 GameplayCameraVanishingLocalPoint { get; private set; }
     public int MaxHitboxCount { get; private set; }
     public int CurrentCombo { get; private set; }
     public int MissCount { get; private set; }
@@ -100,9 +107,10 @@ public class GameplayManager : MonoBehaviour
     public event Action<MouseActiveType> OnMouseActiveTypeChanged;
 
     /// <summary>
-    /// Accuracy will be a measurement of how many hitboxes we miss, ignores the hitbox types weights
+    /// Accuracy will be a measurement of how many hitboxes we miss, ignores the hitbox types weights, ie. a pure measurement of hits vs misses
     /// </summary>
     public double CurrentAccuracy { get; private set; } = 1d;
+
     public const double k_MAXIMUMSCORE = 1000000d;
     private double scorePerNote = 0d;
 
@@ -111,6 +119,11 @@ public class GameplayManager : MonoBehaviour
     /// </summary>
     public double CurrentScore { get; private set; } = 0d;
 
+    public bool IsInReplayMode { get; private set; } = false;
+    public GameplayStatisticRecord? CurrentGameplayRecord { get; private set; }
+
+    public bool IsMetronomeDisabled;
+    public double EndTime { get; private set; }
     private void Awake()
     {
         GameplayInstance = this;
@@ -120,6 +133,7 @@ public class GameplayManager : MonoBehaviour
     private TimerIntervalAction gameplayMetronome;
     public event Action<GameplayMarker> OnGameplayMarkerUpdated;
     public event Action<double> OnGameplayMetronomeFired;
+    private const float k_NEARCLIPPLANESCALE = 0.9f;
 
     private void Start()
     {
@@ -135,6 +149,11 @@ public class GameplayManager : MonoBehaviour
         WorldToScreenSizeRatioOfPreview = WorldSizeOfPreview / ScreenSizeOfPreview * GameManager.aspectRatioConversionScale;
 
         CurrentActiveGameplayMarker = null;
+
+        gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
+        gameplayCamera.farClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+
+        GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
     }
 
@@ -145,6 +164,7 @@ public class GameplayManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        Cursor.visible = true;
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
         GameplayInstance = null;
@@ -152,12 +172,17 @@ public class GameplayManager : MonoBehaviour
 
     private void Update()
     {
+        if (IsInReplayMode)
+        {
+            return;
+        }
+
         MathHelper.GetNormalizedPointInsideReferenceUI(GameManager.GameInstance.MousePosition, gameplayRectTransform, out Vector2 normalizedPoint);
 
-        GameplayMousePosition = normalizedPoint;
+        GameplayMousePosition = MathHelper.ClampVectorByComponent(normalizedPoint, 0f, 1f);
     }
 
-    public const double k_TIMEOFFSET = 1d; // this allows for offset for the chart to be earlier than the metronomeFireDSPTime
+    public const double k_TIMEOFFSET = 1d; // this allows for offset for the chart to be earlier than the dsp time
 
     private void UpdateGameplayTimeByDeltatime(double dt)
     {
@@ -166,7 +191,6 @@ public class GameplayManager : MonoBehaviour
         OnGameplayTimeUpdated?.Invoke(CurrentGameplayTime);
     }
 
-    private const float k_NEARCLIPPLANESCALE = 0.5f;
     private void StartGameplay()
     {
         if (CurrentGameplayChart == null)
@@ -174,10 +198,6 @@ public class GameplayManager : MonoBehaviour
             Debug.LogWarning($"No gameplay chart assigned");
             return;
         }
-
-        gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
-        gameplayCamera.farClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
-
         MaxHitboxCount = CurrentGameplayChart.GameplayObjects.Count(x =>
         {
             if (x is not VisualHitbox hitbox)
@@ -187,6 +207,18 @@ public class GameplayManager : MonoBehaviour
 
             return hitbox.HitboxType != HitboxType.BOMB;
         });
+
+        if (IsInReplayMode)
+        {
+            if (!((GameplayStatisticRecord)CurrentGameplayRecord).ChartMetadata.Equals(CurrentMetadata))
+            {
+                Debug.LogWarning($"The replay metadata does not match the loaded chart metadata.\n" +
+                                 $"The replay will play, but the visuals may have discrepancy.");
+                GameManager.GameInstance.InvokeInformationDisplayNeeded("Metadata conflict, visuals will be wrong.", 1d);
+            }
+
+            OnGameplayReplayLoaded?.Invoke((GameplayStatisticRecord)CurrentGameplayRecord);
+        }
 
         CurrentAccuracy = 1d;
 
@@ -201,31 +233,48 @@ public class GameplayManager : MonoBehaviour
 
         MissCount = 0;
         MatchHitCount = 0;
+        MismatchHitCount = 0;
         CurrentCombo = 0;
         BombHitCount = 0;
-        Cursor.visible = false;
+        CurrentScore = 0d;
 
         StartChart();
+    }
+
+    private Vector3 GetCameraVanishingPoint()
+    {
+        Vector2 screenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(0.5f, 0.5f), gameplayRectTransform);
+        return gameplayCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, gameplayCamera.farClipPlane));
     }
 
     private TimerStopwatchAction stopwatchAction;
     private void StartChart()
     {
-        double endTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime; // note it is sorted
-
+        EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime; // note it is sorted
         Action<double> timerElaspedAction = (x) => UpdateGameplayTimeByDeltatime(x);
         Action timerEndAction = () => { InvokeGameplayEndedEvent(); };
 
-        stopwatchAction = new TimerStopwatchAction(this, timerElaspedAction, timerEndAction, k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, endTime + k_TIMEOFFSET, true);
+        stopwatchAction = new TimerStopwatchAction(this, timerElaspedAction, timerEndAction, k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, EndTime + k_TIMEOFFSET, true);
         DSPTimerEngine.TimerInstance.AddActionToTimer(stopwatchAction);
     }
 
     private void GetAccuracy()
     {
         int totalHits = MatchHitCount + MismatchHitCount - BombHitCount;
-        CurrentAccuracy = (double)(totalHits) / (totalHits + MissCount);
+        if (totalHits + MissCount == 0)
+        {
+            CurrentAccuracy = 1d;
+        }
+        else
+        {
+            CurrentAccuracy = (double)(totalHits) / (totalHits + MissCount);
+        }
     }
 
+    /// <summary>
+    /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
+    /// </summary>
+    /// <param name="path"></param>
     public async void InvokeGameplayStartedEvent(string path)
     {
         CurrentPath = path;
@@ -248,6 +297,20 @@ public class GameplayManager : MonoBehaviour
         OnGameplayStarted?.Invoke();
     }
 
+    /// <summary>
+    /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
+    /// </summary>
+    /// <param name="path"></param>
+    public void InvokeGameplayReplayStartedEvent(string path, GameplayStatisticRecord record)
+    {
+        IsInReplayMode = true;
+        CurrentGameplayRecord = record;
+        InvokeGameplayStartedEvent(path);
+    }
+    public void InvokeHitboxActiveEvent(VisualHitbox hitbox)
+    {
+        OnHitboxBecomeActive?.Invoke(hitbox);
+    }
     public void InvokeHitboxMatchHitEvent(VisualHitbox hitbox)
     {
         CurrentCombo++;
@@ -267,11 +330,13 @@ public class GameplayManager : MonoBehaviour
         CurrentScore += scorePerNote * k_MISMATCHSCOREWEIGHT;
         OnHitboxMismatchedHit?.Invoke(hitbox);
     }
+
     public void InvokeHitboxMissEvent(VisualHitbox hitbox)
     {
         MissCount++;
         CurrentCombo = 0;
         GetAccuracy();
+
         OnHitboxMiss?.Invoke(hitbox);
     }
 
@@ -287,10 +352,21 @@ public class GameplayManager : MonoBehaviour
 
     public void InvokeGameplayEndedEvent()
     {
-        CurrentGameplayChart = null;
-        OnGameplayEnded?.Invoke();
+        if (MatchHitCount + MismatchHitCount + MissCount == MaxHitboxCount && CurrentPath == GameManager.GameInstance.k_TUTORIALFILEPATHSTRING)
+        {
+            GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial = true;
+        }
 
-        Cursor.visible = true;
+        OnGameplayEnded?.Invoke();
+    }
+
+    public void InvokeGameplayRestartEvent()
+    {
+        CurrentGameplayTime = 0d;
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
+        OnGameplayRestarted?.Invoke();
+        StartGameplay();
+        OnGameplayStarted?.Invoke();
     }
 
     public void InvokeMouseActiveTypeChanged(MouseActiveType newActiveType)
@@ -307,11 +383,23 @@ public class GameplayManager : MonoBehaviour
     public void InvokeGameplayMarkerUpdate(GameplayMarker newMarker)
     {
         CurrentActiveGameplayMarker = newMarker;
+        if (string.IsNullOrWhiteSpace(newMarker.DisplayMessage) || newMarker.DisplayTime <= 0d)
+        {
+            return;
+        }
+
+        GameManager.GameInstance.InvokeInformationDisplayNeeded(newMarker.DisplayMessage, newMarker.DisplayTime);
     }
 
-    public void InvokeGameplayMetronomeFired(double metronomeFireTime)
+    public void InvokeGameplayMetronomeFired(double fireTime)
     {
-        OnGameplayMetronomeFired?.Invoke(metronomeFireTime);
+        OnGameplayMetronomeFired?.Invoke(fireTime);
+    }
+
+    public void SetGameMouseState(Vector2 position, MouseActiveType mouseType)
+    {
+        GameplayMousePosition = position;
+        InvokeMouseActiveTypeChanged(mouseType);
     }
 }
 

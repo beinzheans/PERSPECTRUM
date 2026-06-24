@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A class to handle the logic during gameplay
+/// A class to handle the hitbox logic during gameplay.
 /// </summary>
 public class GameplayLogicManager : MonoBehaviour
 {
@@ -15,24 +15,44 @@ public class GameplayLogicManager : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
         inputActions = GameManager.GameInstance.InputActions;
+        gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
+        gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
+
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
 
         inputActions.Gameplay.SwitchAInput.performed += SwitchAInput_performed;
         inputActions.Gameplay.SwitchAInput.canceled += SwitchAInput_canceled;
 
         inputActions.Gameplay.SwitchBInput.performed += SwitchBInput_performed;
         inputActions.Gameplay.SwitchBInput.canceled += SwitchBInput_canceled;
-        gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
+
+
+    }
+
+    private void GameplayManager_OnGameplayRestarted()
+    {
+        currentActiveHitboxes = new();
+        currentObjectIndex = 0;
     }
 
     private void OnDestroy()
     {
+        gameplayManager.OnGameplayTimeUpdated -= GameplayManager_OnGameplayTimeUpdated;
+        gameplayManager.OnGameplayRestarted -= GameplayManager_OnGameplayRestarted;
+
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
         inputActions.Gameplay.SwitchAInput.performed -= SwitchAInput_performed;
         inputActions.Gameplay.SwitchAInput.canceled -= SwitchAInput_canceled;
 
         inputActions.Gameplay.SwitchBInput.performed -= SwitchBInput_performed;
         inputActions.Gameplay.SwitchBInput.canceled -= SwitchBInput_canceled;
 
-        gameplayManager.OnGameplayTimeUpdated -= GameplayManager_OnGameplayTimeUpdated;
 
     }
     private void SwitchBInput_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -61,85 +81,89 @@ public class GameplayLogicManager : MonoBehaviour
 
     private void GameplayManager_OnGameplayTimeUpdated(double time)
     {
-        double maxInteractTime = time - GameplayManager.k_EARLYTIMEFRAME;
+        double maxInteractTime = time + GameplayManager.k_EARLYTIMEFRAME;
 
-        currentActiveHitboxes.RemoveAll(x =>
+        if (!gameplayManager.IsInReplayMode)
         {
-            if (x.IsPlayerMissed(time))
+            currentActiveHitboxes.RemoveAll(x =>
             {
-                if (x.HitboxType != HitboxType.BOMB)
+                if (x.IsPlayerMissed(time))
                 {
-                    gameplayManager.InvokeHitboxMissEvent(x);
-                }
+                    if (x.HitboxType != HitboxType.BOMB)
+                    {
+                        gameplayManager.InvokeHitboxMissEvent(x);
+                    }
 
-                return true;
-            }
-            else if (x.IsMousePositionSuccessfullyInside())
-            {
-                if (x.HitboxType == HitboxType.BOMB)
-                {
-                    gameplayManager.InvokeHitboxBombHitEvent(x);
+                    return true;
                 }
-                else if (MathHelper.IsMouseActiveTypeCorrect(x.HitboxType, currentActiveMouseType))
+                else if (x.RenderTime > maxInteractTime)
                 {
-                    gameplayManager.InvokeHitboxMatchHitEvent(x);
+                    return false;
                 }
-                else if (x.RenderTime <= time) // only make it a "mismatch" after the early buffer.
+                else if (x.IsMousePositionSuccessfullyInside())
                 {
-                    gameplayManager.InvokeHitboxMismatchHitEvent(x);
+                    if (x.HitboxType == HitboxType.BOMB)
+                    {
+                        gameplayManager.InvokeHitboxBombHitEvent(x);
+                    }
+                    else if (MathHelper.IsMouseActiveTypeCorrect(x.HitboxType, gameplayManager.MouseActiveType))
+                    {
+                        gameplayManager.InvokeHitboxMatchHitEvent(x);
+                    }
+                    else if (x.RenderTime <= time) // only make it a "mismatch" after the early buffer.
+                    {
+                        gameplayManager.InvokeHitboxMismatchHitEvent(x);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                    return true;
                 }
                 else
                 {
                     return false;
                 }
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        });
+            });
+        }
 
         UpdateCurrentActiveHitboxList(time);
     }
     private void UpdateCurrentActiveHitboxList(double time)
     {
-        if (currentObjectIndex >= gameplayManager.CurrentGameplayChart.GameplayObjects.Length)
-        {
-            return;
-        }
+        double maxInteractTime = time + GameplayManager.k_EARLYTIMEFRAME + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d; // add on top of offset so predictive hitsounds will work
 
-        double maxInteractTime = time + GameplayManager.k_EARLYTIMEFRAME;
-        double minInteractTime = time - GameplayManager.k_LENIENCYTIMEFRAME;
-        GameplayObject gameplayObject = gameplayManager.CurrentGameplayChart.GameplayObjects[currentObjectIndex];
+        while (true)
+        {
+            if (currentObjectIndex >= gameplayManager.CurrentGameplayChart.GameplayObjects.Length)
+            {
+                break;
+            }
 
-        if (gameplayObject is VisualHitbox hitbox)
-        {
-            if (hitbox.RenderTime <= maxInteractTime)
+            GameplayObject gameplayObject = gameplayManager.CurrentGameplayChart.GameplayObjects[currentObjectIndex];
+
+            if (gameplayObject.RenderTime > maxInteractTime)
             {
-                currentObjectIndex++;
-                currentActiveHitboxes.Add(hitbox);
+                break;
             }
-        }
-        else if (gameplayObject is GameplayMarker marker)
-        {
-            if (marker.RenderTime <= time)
+
+            if (gameplayObject is VisualHitbox hitbox)
             {
-                currentObjectIndex++;
-                gameplayManager.InvokeGameplayMarkerUpdate(marker);
+                if (hitbox.RenderTime <= maxInteractTime)
+                {
+                    gameplayManager.InvokeHitboxActiveEvent(hitbox);
+                    currentActiveHitboxes.Add(hitbox);
+                }
             }
-        }
-        else
-        {
+
             currentObjectIndex++;
         }
     }
 }
-
 public enum MouseActiveType
 {
     NONE = 0,
     A = 1,
-    B = 2
+    B = 2,
 }

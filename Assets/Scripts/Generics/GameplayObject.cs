@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 
 public abstract class GameplayObject : IEquatable<GameplayObject>
@@ -7,7 +8,10 @@ public abstract class GameplayObject : IEquatable<GameplayObject>
         RenderTime = renderTime;
     }
 
+    [JsonProperty("rTime")]
     public double RenderTime { get; protected set; }
+
+    [NonSerialized]
     public bool IsRendered = false;
 
     /// <summary>

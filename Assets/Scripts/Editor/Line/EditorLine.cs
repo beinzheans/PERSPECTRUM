@@ -29,7 +29,7 @@ public class EditorLine : EditorDynamicObject, IConvertable<VisualLine>
     /// Typically lines should not be in -t direction.
     /// </summary>
     /// <returns></returns>
-    public double GetTimeLengthDirection()
+    public double GetTimeVector()
     {
         return ToTime - FromTime;
     }
@@ -37,7 +37,7 @@ public class EditorLine : EditorDynamicObject, IConvertable<VisualLine>
     public EditorPoint EvaluatePositionAtProgress(float progress)
     {
         Vector2 dir = GetFromToVector();
-        double time = GetTimeLengthDirection();
+        double time = GetTimeVector();
 
         Vector2 newPosition = FromNormalizedPosition + dir * progress;
         double newTime = FromTime + time * progress;
@@ -45,16 +45,20 @@ public class EditorLine : EditorDynamicObject, IConvertable<VisualLine>
         return new EditorPoint(newPosition, newTime);
     }
 
+    public double EvaluateTimeAtProgress(float progress)
+    {
+        return FromTime + GetTimeVector() * progress;
+    }
     public EditorPoint EvaluatePositionAtTime(double time)
     {
-        float progress = (float)((time - FromTime) / GetTimeLengthDirection());
+        float progress = (float)((time - FromTime) / GetTimeVector());
         return EvaluatePositionAtProgress(progress);
     }
 
     public void EvaluateLineAtProgress(float progress, out Vector2 position, out double time)
     {
         Vector2 dir = GetFromToVector();
-        double timeDir = GetTimeLengthDirection();
+        double timeDir = GetTimeVector();
 
         Vector2 newPosition = FromNormalizedPosition + dir * progress;
         double newTime = FromTime + timeDir * progress;

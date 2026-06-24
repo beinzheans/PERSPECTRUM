@@ -1,6 +1,8 @@
+using Newtonsoft.Json;
 using System;
 using UnityEngine;
 
+[Serializable]
 public class VisualHitbox : GameplayObject, IEquatable<VisualHitbox>
 {
     public VisualHitbox(Vector2 normalizedPosition, double renderTime, float normalizedSize, HitboxType hitboxType) : base(renderTime)
@@ -10,10 +12,14 @@ public class VisualHitbox : GameplayObject, IEquatable<VisualHitbox>
         HitboxType = hitboxType;
     }
 
+    [JsonProperty("pos")]
     public Vector2 NormalizedPosition { get; protected set; }
+    [JsonProperty("size")]
     public float NormalizedSize { get; protected set; }
 
+    [NonSerialized]
     public bool IsInteracted;
+    [JsonProperty("type")]
 
     public HitboxType HitboxType;
     /// <summary>
@@ -38,10 +44,11 @@ public class VisualHitbox : GameplayObject, IEquatable<VisualHitbox>
     public bool IsMousePositionSuccessfullyInside()
     {
         float scaledSize = HitboxType != HitboxType.BOMB ? NormalizedSize + GameplayManager.k_HITBOXINTERACTSIZEADDDELTA : NormalizedSize;
-        Vector2 max = NormalizedPosition + 0.5f * scaledSize * GameManager.aspectRatioConversionScale;
-        Vector2 min = NormalizedPosition - 0.5f * scaledSize * GameManager.aspectRatioConversionScale;
+        Vector2 max = NormalizedPosition + 0.5f * scaledSize * Vector2.one;
+        Vector2 min = NormalizedPosition - 0.5f * scaledSize * Vector2.one;
 
         Vector2 point = GameplayManager.GameplayInstance.GameplayMousePosition;
+
         return point.x >= min.x && point.x <= max.x && point.y >= min.y && point.y <= max.y;
     }
 
