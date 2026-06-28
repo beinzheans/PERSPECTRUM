@@ -1,4 +1,0 @@
-repository "Rhythm-Game-v2/Rhythm-Game-v2@1374889752248@cloud"
-  path "/"
-    br "/main"
-    co "/main"
