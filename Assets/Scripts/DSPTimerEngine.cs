@@ -78,18 +78,28 @@ public class DSPTimerEngine : MonoBehaviour
     }
 
     /// <summary>
-    /// Adds a new <see cref="TimerIntervalAction"/> to the timer engine to execute
+    /// Adds a new non-null <see cref="TimerAction"/> to the timer engine to execute
     /// </summary>
     public void AddActionToTimer(TimerAction action)
     {
+        if (action == null)
+        {
+            return;
+        }
+
         registeredAudioActions.Add(action);
     }
 
     /// <summary>
-    /// Removes an action from the timer engine if it is registered.
+    /// Removes a non-null <see cref="TimerAction"/> from the timer engine if it is registered.
     /// </summary>
     public void RemoveActionFromTimer(TimerAction action)
     {
+        if (action == null)
+        {
+            return;
+        }
+
         if (!registeredAudioActions.Contains(action))
         {
             return;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A general class to handle object pool to render the gameplay objects.
+/// A general class to handle object pool to render the gameplay objects. By default, it uses time as the render/unrender logic but it can be overriden.
 /// </summary>
 /// <typeparam name="TObjectData">The object data</typeparam>
 /// <typeparam name="TBehavior">The object rendering class</typeparam>
@@ -44,7 +44,7 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
     }
 
     /// <summary>
-    /// Implementation of events when the script starts. Use this for subscriber events to listeners.
+    /// Implementation of events when the script starts. Use this for subscriber events to listeners. Override if you are not using time as the rendering/unrendering logic.
     /// </summary>
     protected virtual void OnStartEvent()
     {
@@ -58,7 +58,7 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
     }
 
     /// <summary>
-    /// Implementation of events when the script is destroyed. Use this for desubscriber events to listeners.
+    /// Implementation of events when the script is destroyed. Use this for desubscriber events to listeners. Override if you are not using time as the rendering/unrendering logic.
     /// </summary>
     protected virtual void OnDestroyEvent()
     {

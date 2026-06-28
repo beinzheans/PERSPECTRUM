@@ -33,11 +33,26 @@ public class GameplayHitboxPoolManager : GameplayObjectPoolManager<VisualHitbox,
 
     private void UnrenderVisualHitbox(VisualHitbox hitbox)
     {
-        if (!hitbox.IsRendered)
+        for (int i = 0; i < gameplayManager.CurrentGameplayChart.GameplayObjects.Length; i++)
         {
-            return;
-        }
+            GameplayObject gameplayObject = gameplayManager.CurrentGameplayChart.GameplayObjects[i];
 
-        UnrenderObject_ReturnToPool(hitbox);
+            if (gameplayObject is not VisualHitbox hit)
+            {
+                continue;
+            }
+
+            if (hit.Equals(hitbox))
+            {
+                if (!hit.IsRendered)
+                {
+                    return;
+                }
+
+                UnrenderObject_ReturnToPool(hit);
+
+                return;
+            }
+        }
     }
 }

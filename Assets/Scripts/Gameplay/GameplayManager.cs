@@ -47,13 +47,18 @@ public class GameplayManager : MonoBehaviour
     public const double k_POOLUNRENDERTIMETHRESHOLD = 0.01d;
 
     /// <summary>
-    /// The depth away from camera depicting the current DSP time. This affects the extent of perspective distortion
+    /// The depth away from camera depicting the current DSP time. This affects the extent of perspective distortion.
     /// </summary>
     public const float k_HITPLANEDEPTH = 1f;
+
+    public float GameplayFarClipPlane { get; private set; }
     public GameplayChart CurrentGameplayChart { get; private set; }
     public EditorChartMetadata CurrentMetadata { get; private set; }
     public string CurrentPath { get; private set; }
     public event Action<double> OnGameplayTimeUpdated;
+    public event Action<GameplayObject> OnGameplayObjectRendered;
+    public event Action<GameplayObject> OnGameplayObjectUnrendered;
+
     public event Action<VisualHitbox> OnHitboxBecomeActive;
     public event Action<VisualHitbox> OnHitboxMatchedHit;
     public event Action<VisualHitbox> OnHitboxMismatchedHit;
@@ -124,6 +129,8 @@ public class GameplayManager : MonoBehaviour
 
     public bool IsMetronomeDisabled;
     public double EndTime { get; private set; }
+
+    public Mesh PlayAreaBorderMesh { get; private set; }
     private void Awake()
     {
         GameplayInstance = this;
@@ -134,6 +141,11 @@ public class GameplayManager : MonoBehaviour
     public event Action<GameplayMarker> OnGameplayMarkerUpdated;
     public event Action<double> OnGameplayMetronomeFired;
     private const float k_NEARCLIPPLANESCALE = 0.9f;
+    private const float k_FARCLIPPLANESCALE = 1.25f;
+    public Vector3 CurrentPlayAreaBorderScale { get; private set; }
+    public Vector3 CurrentPlayAreaDisplacement { get; private set; }
+    public Quaternion CurrentPlayAreaRotation { get; private set; }
+    public Vector3[] LocalBorderCorners { get; private set; } = new Vector3[4]; // 0 is bottom-left corner, increment clockwise
 
     private void Start()
     {
@@ -151,15 +163,102 @@ public class GameplayManager : MonoBehaviour
         CurrentActiveGameplayMarker = null;
 
         gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
-        gameplayCamera.farClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+        gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
 
         GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+
+        GeneratePlayAreaMesh();
     }
 
+    private const float k_BORDERINSETTHICKNESS = 0.025f;
+    private const int k_NUMBEROFVERTICES = 8;
+    private const int k_NUMBEROFTRIANGLES = 8;
+    private const float k_DiagonalDisplacementComponent = 0.707106781f; // precomputes the unit vector of (1,1) and stores the component (sqrt(2) / 2)
+
+
+    /// <summary>
+    /// Generates a mesh with a defined inset thickness at the preview borders. Refer to the border schematic to better understand this code.
+    /// </summary>
+    private void GeneratePlayAreaMesh()
+    {
+        if (k_BORDERINSETTHICKNESS * 2 > WorldSizeOfPreview.x || k_BORDERINSETTHICKNESS * 2 > WorldSizeOfPreview.y) // invalid inset
+        {
+            return;
+        }
+
+        Mesh mesh = new Mesh();
+
+        Vector3 worldMin = new Vector3(WorldPositionOfPreviewMin.x, WorldPositionOfPreviewMin.y, 0f);
+        Vector3 worldMax = new Vector3(WorldPositionOfPreviewMax.x, WorldPositionOfPreviewMax.y, 0f);
+
+        Vector3 min = worldMin - k_BORDERINSETTHICKNESS * new Vector3(k_DiagonalDisplacementComponent, k_DiagonalDisplacementComponent, 0f);
+        Vector3 max = worldMax - k_BORDERINSETTHICKNESS * new Vector3(-k_DiagonalDisplacementComponent, -k_DiagonalDisplacementComponent, 0f);
+        // outer verts is from 0 to 3, with 0 bottom left and increment clockwise
+        // inner verts is from 4 to 7, with 4 bottom left and increment clockwise. we want the inner verts to be where the border is too, hence min and max has a displacement vector
+
+        Vector3[] verts = new Vector3[k_NUMBEROFVERTICES];
+        verts[0] = min;
+        verts[1] = new Vector3(min.x, max.y, 0f);
+        verts[2] = max;
+        verts[3] = new Vector3(max.x, min.y, 0f);
+
+        verts[4] = verts[0] + k_BORDERINSETTHICKNESS * new Vector3(k_DiagonalDisplacementComponent, k_DiagonalDisplacementComponent, 0f);
+        verts[5] = verts[1] + k_BORDERINSETTHICKNESS * new Vector3(k_DiagonalDisplacementComponent, -k_DiagonalDisplacementComponent, 0f);
+        verts[6] = verts[2] + k_BORDERINSETTHICKNESS * new Vector3(-k_DiagonalDisplacementComponent, -k_DiagonalDisplacementComponent, 0f);
+        verts[7] = verts[3] + k_BORDERINSETTHICKNESS * new Vector3(-k_DiagonalDisplacementComponent, k_DiagonalDisplacementComponent, 0f);
+
+        LocalBorderCorners[0] = verts[4];
+        LocalBorderCorners[1] = verts[5];
+        LocalBorderCorners[2] = verts[6];
+        LocalBorderCorners[3] = verts[7];
+
+        int[] tris = new int[k_NUMBEROFTRIANGLES * 3];
+
+        // refer to schematic
+        for (int i = 0; i < k_NUMBEROFTRIANGLES / 2; i++)
+        {
+            int offset = 6 * i; // generate 2 triangles for each cycle
+
+            tris[offset] = i;
+            tris[offset + 1] = (i + 1) % 4;
+            tris[offset + 2] = (i + 1) % 4 + 4;
+
+            tris[offset + 3] = i;
+            tris[offset + 4] = (i + 1) % 4 + 4;
+            tris[offset + 5] = i + 4;
+        }
+
+
+        Vector2[] uvs = new Vector2[k_NUMBEROFVERTICES];
+
+        Vector2 thicknessRelative = (Vector2.one * k_BORDERINSETTHICKNESS) / WorldSizeOfPreview; // how large the inset thickness relative to whole object scale. Note object scale is 16:9 ratio
+
+        uvs[0] = Vector2.zero;
+        uvs[1] = new Vector2(0, 1);
+        uvs[2] = Vector2.one;
+        uvs[3] = new Vector2(1, 0);
+
+        uvs[4] = uvs[0] + thicknessRelative;
+        uvs[5] = uvs[1] + new Vector2(thicknessRelative.x, -thicknessRelative.y);
+        uvs[6] = uvs[2] + (-1f * thicknessRelative);
+        uvs[7] = uvs[3] + new Vector2(-thicknessRelative.x, thicknessRelative.y);
+
+        mesh.vertices = verts;
+        mesh.triangles = tris;
+        mesh.uv = uvs;
+
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+        mesh.RecalculateBounds();
+
+        PlayAreaBorderMesh = mesh;
+    }
     private void GameInstance_OnGameSettingsChanged()
     {
-        gameplayCamera.farClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+        gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
     }
 
     private void OnDestroy()
@@ -244,7 +343,7 @@ public class GameplayManager : MonoBehaviour
     private Vector3 GetCameraVanishingPoint()
     {
         Vector2 screenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(0.5f, 0.5f), gameplayRectTransform);
-        return gameplayCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, gameplayCamera.farClipPlane));
+        return gameplayCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, GameplayFarClipPlane));
     }
 
     private TimerStopwatchAction stopwatchAction;
@@ -306,6 +405,16 @@ public class GameplayManager : MonoBehaviour
         IsInReplayMode = true;
         CurrentGameplayRecord = record;
         InvokeGameplayStartedEvent(path);
+    }
+
+    public void InvokeGameplayObjectRendered(GameplayObject obj)
+    {
+        OnGameplayObjectRendered?.Invoke(obj);
+    }
+
+    public void InvokeGameplayObjectUnrendered(GameplayObject obj)
+    {
+        OnGameplayObjectUnrendered?.Invoke(obj);
     }
     public void InvokeHitboxActiveEvent(VisualHitbox hitbox)
     {
@@ -400,6 +509,22 @@ public class GameplayManager : MonoBehaviour
     {
         GameplayMousePosition = position;
         InvokeMouseActiveTypeChanged(mouseType);
+    }
+
+    public void AssignGameplayBorderMesh(Mesh mesh)
+    {
+        PlayAreaBorderMesh = mesh;
+    }
+
+    public void AssignGameplayBorderScale(Vector3 scale)
+    {
+        CurrentPlayAreaBorderScale = scale;
+    }
+
+    public void AssignGameplayDisplacementRotation(Vector3 displacement, Quaternion rotation)
+    {
+        CurrentPlayAreaDisplacement = displacement;
+        CurrentPlayAreaRotation = rotation;
     }
 }
 

@@ -26,18 +26,20 @@ public class AudioCalibrationManager : MonoBehaviour
         gameplayManager = GameplayManager.GameplayInstance;
         predictiveHitsoundStorage = GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds;
         GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds = true;
-        string filePath = Path.Combine(Application.streamingAssetsPath, $"{k_CALIBRATIONCHARTNAME}.{GameManager.k_FILEEXTENSION}");
+        string chartFilePath = Path.Combine(Application.streamingAssetsPath, $"{k_CALIBRATIONCHARTNAME}.{GameManager.k_FILEEXTENSION}");
 
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
         offsetSlider.value = (float)(GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
         offsetSlider.onValueChanged.AddListener((x) => { GameManager.GameInstance.GlobalSettings.AudioOffsetMs = (double)(1000f * x); UpdateOffsetText(); });
 
-        TimerIntervalAction startAction = new TimerIntervalAction(this, x => gameplayManager.InvokeGameplayStartedEvent(filePath), () => { }, k_CALIBRATIONWAITTIME, -1d);
+        TimerIntervalAction startAction = new TimerIntervalAction(this, x => gameplayManager.InvokeGameplayStartedEvent(chartFilePath), () => { }, k_CALIBRATIONWAITTIME, -1d);
         DSPTimerEngine.TimerInstance.AddActionToTimer(startAction);
 
         UpdateOffsetText();
     }
+
+
 
     private void GameplayManager_OnGameplayStarted()
     {

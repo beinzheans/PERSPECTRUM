@@ -381,10 +381,7 @@ public static class SaveLoadManager
         {
             try
             {
-                string json = File.ReadAllText(files[i]);
-
-                GameplayStatisticRecord record = JsonConvert.DeserializeObject<GameplayStatisticRecord>(json);
-
+                LoadSpecificGameplayStatisticRecordFile(files[i], out GameplayStatisticRecord record);
                 allRecords.Add(record);
             }
             catch (Exception e)
@@ -393,6 +390,22 @@ public static class SaveLoadManager
                                  $"{e.Message}");
 
             }
+        }
+    }
+
+    public static void LoadSpecificGameplayStatisticRecordFile(string path, out GameplayStatisticRecord specificRecord)
+    {
+        try
+        {
+            string json = File.ReadAllText(path);
+
+            specificRecord = JsonConvert.DeserializeObject<GameplayStatisticRecord>(json, GameManager.GameInstance.JsonSerializerSettings);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Failed to load record at {path}. Exception: \n" +
+                             $"{e.Message}");
+            specificRecord = new();
         }
     }
 

@@ -20,8 +20,9 @@ public abstract class GameplayObjectRenderBehavior<T> : MonoBehaviour where T : 
     {
         this.AssociatedGameplayObject = associatedGameplayObject;
         gameObject.SetActive(true);
-
         OnRenderEvent();
+
+        GameplayManager.GameplayInstance.InvokeGameplayObjectRendered(associatedGameplayObject);
     }
 
     public void OnUpdate()
@@ -35,6 +36,8 @@ public abstract class GameplayObjectRenderBehavior<T> : MonoBehaviour where T : 
     protected abstract void OnRenderEvent();
     public void OnUnrender()
     {
+        GameplayManager.GameplayInstance.InvokeGameplayObjectUnrendered(this.AssociatedGameplayObject);
+
         this.AssociatedGameplayObject = null;
         gameObject.SetActive(false);
 

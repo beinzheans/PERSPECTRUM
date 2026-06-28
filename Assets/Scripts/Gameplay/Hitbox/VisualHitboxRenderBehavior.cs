@@ -4,12 +4,15 @@ using UnityEngine;
 public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHitbox>
 {
     private MeshRenderer meshRenderer;
+
     private static readonly int SHADER_HITBOXID = Shader.PropertyToID("_HitboxType_Float");
     private static readonly int SHADER_NORMALIZEDPROGRESSID = Shader.PropertyToID("_NormalizedProgress");
 
     protected override void OnAwake()
     {
         meshRenderer = GetComponent<MeshRenderer>();
+
+        meshRenderer.GetPropertyBlock(propertyBlock);
     }
 
     protected override void OnRenderEvent()
@@ -24,9 +27,6 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
 
         transform.position = spawnPoint + new Vector3(0f, 0f, zTimeDisplacement);
         transform.localScale = worldSize + new Vector3(0f, 0f, 1f);
-
-        meshRenderer.GetPropertyBlock(propertyBlock);
-
         float hitboxIDFloat;
 
         if (AssociatedGameplayObject.HitboxType == HitboxType.A) hitboxIDFloat = 0f;
@@ -46,8 +46,6 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
 
     protected override void OnUpdateEvent()
     {
-        meshRenderer.GetPropertyBlock(propertyBlock);
-
         propertyBlock.SetFloat(SHADER_NORMALIZEDPROGRESSID, GetNormalizedProgressFloat());
         meshRenderer.SetPropertyBlock(propertyBlock);
     }

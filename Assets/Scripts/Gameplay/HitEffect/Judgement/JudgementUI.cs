@@ -14,7 +14,7 @@ public class JudgementUI : BaseMeshEffect
 
         int vertexCount = vh.currentVertCount;
 
-        float judgement = 0f;
+        float judgement;
 
         if (MathHelper.IsTwoFloatsEqualWithEpsilion(JudgementType_Float, 0f)) judgement = 0f;
         else if (MathHelper.IsTwoFloatsEqualWithEpsilion(JudgementType_Float, 1f)) judgement = 0.5f;

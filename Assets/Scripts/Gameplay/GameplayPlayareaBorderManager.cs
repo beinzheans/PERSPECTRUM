@@ -7,35 +7,41 @@ using UnityEngine;
 public class GameplayPlayareaBorderManager : MonoBehaviour
 {
     private readonly int k_SHADERPULSEPROGRESSID = Shader.PropertyToID("_PulseProgress");
-    private MaterialPropertyBlock propertyBlock;
+    private MaterialPropertyBlock pulsePropertyBlock;
+
     private MeshRenderer playareaBorderMeshRenderer_front;
     private MeshRenderer playareaBorderMeshRenderer_back;
+    private MeshRenderer playareaBorderMeshRenderer_earlyHitPlane;
 
     [SerializeField] private MeshFilter playareaBorderMeshFilter_Front;
+    [SerializeField] private MeshFilter playareaBorderMeshFilter_earlyHitPlane;
     [SerializeField] private MeshFilter playareaBorderMeshFilter_Back;
 
     private GameplayManager gameplayManager;
-    private const float k_BORDERINSETTHICKNESS = 0.025f;
 
     private double previousPulseTime;
     private double pulseInterval;
 
     [SerializeField] private GameObject[] perspectiveLineGameObjects = new GameObject[4]; // 0 is bottom-left corner, increment clockwise.
-    private Vector3[] localBorderCorners = new Vector3[4]; // 0 is bottom-left corner, increment clockwise
 
-    private const float k_BACKSCALEFROMFARPLANE = 0.9f; // how much we scale the far clip plane to place the back mesh filter
+
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
-        propertyBlock = new MaterialPropertyBlock();
+        pulsePropertyBlock = new MaterialPropertyBlock();
 
         playareaBorderMeshRenderer_front = playareaBorderMeshFilter_Front.GetComponent<MeshRenderer>();
         playareaBorderMeshRenderer_back = playareaBorderMeshFilter_Back.GetComponent<MeshRenderer>();
+        playareaBorderMeshRenderer_earlyHitPlane = playareaBorderMeshFilter_earlyHitPlane.GetComponent<MeshRenderer>();
 
         playareaBorderMeshFilter_Front.transform.localPosition = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH);
-        playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayCamera.farClipPlane * k_BACKSCALEFROMFARPLANE);
+        playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
+        playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
 
-        GeneratePlayAreaMesh();
+        playareaBorderMeshFilter_Back.mesh = playareaBorderMeshFilter_earlyHitPlane.mesh = playareaBorderMeshFilter_Front.mesh = gameplayManager.PlayAreaBorderMesh;
+
+        gameplayManager.AssignGameplayBorderScale(Vector3.one);
+        gameplayManager.AssignGameplayDisplacementRotation(Vector3.zero, Quaternion.identity);
 
         gameplayManager.OnHitboxMatchedHit += GameplayManager_OnHitboxMatchedHit;
         gameplayManager.OnHitboxMismatchedHit += GameplayManager_OnHitboxMismatchedHit;
@@ -44,10 +50,17 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
     }
-
     private void GameplayManager_OnGameplayRestarted()
     {
         previousPulseTime = 0d;
+
+        pulsePropertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, 1f);
+
+        playareaBorderMeshRenderer_front.SetPropertyBlock(pulsePropertyBlock);
+        playareaBorderMeshRenderer_earlyHitPlane.SetPropertyBlock(pulsePropertyBlock);
+        playareaBorderMeshRenderer_back.SetPropertyBlock(pulsePropertyBlock);
+
+        return;
     }
 
     // we bounce the border when we hit, shrink the border when miss, ignore if hit bomb
@@ -76,7 +89,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         Action<double> bounceAction = (x) =>
         {
             Vector3 scale = Vector3.Lerp(k_BOUNCEMAXSIZE, Vector3.one, (float)(x / pulseInterval));
-            playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
+            gameplayManager.AssignGameplayBorderScale(scale);
+            playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_earlyHitPlane.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
         };
 
 
@@ -89,7 +103,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         Action<double> shrinkAction = (x) =>
         {
             Vector3 scale = Vector3.Lerp(k_SHRINKMINSIZE, Vector3.one, (float)(x / pulseInterval));
-            playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
+            gameplayManager.AssignGameplayBorderScale(scale);
+            playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_earlyHitPlane.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
         };
 
 
@@ -106,18 +121,22 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
 
         if (gameplayManager.IsMetronomeDisabled)
         {
-            propertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, 1f);
-            playareaBorderMeshRenderer_front.SetPropertyBlock(propertyBlock);
-            playareaBorderMeshRenderer_back.SetPropertyBlock(propertyBlock);
+            pulsePropertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, 1f);
+
+            playareaBorderMeshRenderer_front.SetPropertyBlock(pulsePropertyBlock);
+            playareaBorderMeshRenderer_earlyHitPlane.SetPropertyBlock(pulsePropertyBlock);
+            playareaBorderMeshRenderer_back.SetPropertyBlock(pulsePropertyBlock);
 
             return;
         }
 
         if (MathHelper.IsTwoDoublesEqualWithEpsilion(pulseInterval, 0d))
         {
-            propertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, 1f);
-            playareaBorderMeshRenderer_front.SetPropertyBlock(propertyBlock);
-            playareaBorderMeshRenderer_back.SetPropertyBlock(propertyBlock);
+            pulsePropertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, 1f);
+
+            playareaBorderMeshRenderer_front.SetPropertyBlock(pulsePropertyBlock);
+            playareaBorderMeshRenderer_earlyHitPlane.SetPropertyBlock(pulsePropertyBlock);
+            playareaBorderMeshRenderer_back.SetPropertyBlock(pulsePropertyBlock);
 
             return;
         }
@@ -127,12 +146,13 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
 
     private void UpdatePlayareaBorderShaders(double time)
     {
-        double progress = (time - previousPulseTime) / pulseInterval;
+        double pulseProgress = (time - previousPulseTime) / pulseInterval;
 
-        propertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, (float)progress);
+        pulsePropertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, (float)pulseProgress);
+        playareaBorderMeshRenderer_front.SetPropertyBlock(pulsePropertyBlock);
+        playareaBorderMeshRenderer_earlyHitPlane.SetPropertyBlock(pulsePropertyBlock);
+        playareaBorderMeshRenderer_back.SetPropertyBlock(pulsePropertyBlock);
 
-        playareaBorderMeshRenderer_front.SetPropertyBlock(propertyBlock);
-        playareaBorderMeshRenderer_back.SetPropertyBlock(propertyBlock);
     }
 
     private void GameplayManager_OnGameplayMetronomeFired(double fireTime)
@@ -148,88 +168,6 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
 
     }
 
-    private const int k_NUMBEROFVERTICES = 8;
-    private const int k_NUMBEROFTRIANGLES = 8;
-    private const float k_DiagonalDisplacementComponent = 0.707106781f; // precomputes the unit vector of (1,1) and stores the component (sqrt(2) / 2)
-
-    /// <summary>
-    /// Generates a mesh with a defined inset thickness at the preview borders. Refer to the border schematic to better understand this code.
-    /// </summary>
-    private void GeneratePlayAreaMesh()
-    {
-        if (k_BORDERINSETTHICKNESS * 2 > gameplayManager.WorldSizeOfPreview.x || k_BORDERINSETTHICKNESS * 2 > gameplayManager.WorldSizeOfPreview.y) // invalid inset
-        {
-            return;
-        }
-
-        Mesh mesh = new Mesh();
-
-        Vector3 worldMin = new Vector3(gameplayManager.WorldPositionOfPreviewMin.x, gameplayManager.WorldPositionOfPreviewMin.y, 0f);
-        Vector3 worldMax = new Vector3(gameplayManager.WorldPositionOfPreviewMax.x, gameplayManager.WorldPositionOfPreviewMax.y, 0f);
-
-        Vector3 min = worldMin - k_BORDERINSETTHICKNESS * new Vector3(k_DiagonalDisplacementComponent, k_DiagonalDisplacementComponent, 0f);
-        Vector3 max = worldMax - k_BORDERINSETTHICKNESS * new Vector3(-k_DiagonalDisplacementComponent, -k_DiagonalDisplacementComponent, 0f);
-        // outer verts is from 0 to 3, with 0 bottom left and increment clockwise
-        // inner verts is from 4 to 7, with 4 bottom left and increment clockwise. we want the inner verts to be where the border is too, hence min and max has a displacement vector
-
-        Vector3[] verts = new Vector3[k_NUMBEROFVERTICES];
-        verts[0] = min;
-        verts[1] = new Vector3(min.x, max.y, 0f);
-        verts[2] = max;
-        verts[3] = new Vector3(max.x, min.y, 0f);
-
-        verts[4] = verts[0] + k_BORDERINSETTHICKNESS * new Vector3(k_DiagonalDisplacementComponent, k_DiagonalDisplacementComponent, 0f);
-        verts[5] = verts[1] + k_BORDERINSETTHICKNESS * new Vector3(k_DiagonalDisplacementComponent, -k_DiagonalDisplacementComponent, 0f);
-        verts[6] = verts[2] + k_BORDERINSETTHICKNESS * new Vector3(-k_DiagonalDisplacementComponent, -k_DiagonalDisplacementComponent, 0f);
-        verts[7] = verts[3] + k_BORDERINSETTHICKNESS * new Vector3(-k_DiagonalDisplacementComponent, k_DiagonalDisplacementComponent, 0f);
-
-        localBorderCorners[0] = verts[4];
-        localBorderCorners[1] = verts[5];
-        localBorderCorners[2] = verts[6];
-        localBorderCorners[3] = verts[7];
-
-        int[] tris = new int[k_NUMBEROFTRIANGLES * 3];
-
-        // refer to schematic
-        for (int i = 0; i < k_NUMBEROFTRIANGLES / 2; i++)
-        {
-            int offset = 6 * i; // generate 2 triangles for each cycle
-
-            tris[offset] = i;
-            tris[offset + 1] = (i + 1) % 4;
-            tris[offset + 2] = (i + 1) % 4 + 4;
-
-            tris[offset + 3] = i;
-            tris[offset + 4] = (i + 1) % 4 + 4;
-            tris[offset + 5] = i + 4;
-        }
-
-
-        Vector2[] uvs = new Vector2[k_NUMBEROFVERTICES];
-
-        Vector2 thicknessRelative = (Vector2.one * k_BORDERINSETTHICKNESS) / gameplayManager.WorldSizeOfPreview; // how large the inset thickness relative to whole object scale. Note object scale is 16:9 ratio
-
-        uvs[0] = Vector2.zero;
-        uvs[1] = new Vector2(0, 1);
-        uvs[2] = Vector2.one;
-        uvs[3] = new Vector2(1, 0);
-
-        uvs[4] = uvs[0] + thicknessRelative;
-        uvs[5] = uvs[1] + new Vector2(thicknessRelative.x, -thicknessRelative.y);
-        uvs[6] = uvs[2] + (-1f * thicknessRelative);
-        uvs[7] = uvs[3] + new Vector2(-thicknessRelative.x, thicknessRelative.y);
-
-        mesh.vertices = verts;
-        mesh.triangles = tris;
-        mesh.uv = uvs;
-
-        mesh.RecalculateNormals();
-        mesh.RecalculateTangents();
-        mesh.RecalculateBounds();
-
-        playareaBorderMeshFilter_Front.mesh = playareaBorderMeshFilter_Back.mesh = mesh;
-    }
-
     private const float k_PlayareaMaxRotationDegree = 1.5f;
     private const float k_PlayareaMaxDisplacement = 0.1f;
     private void Update()
@@ -242,22 +180,22 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         Quaternion rotation = Quaternion.Euler(eulerAngles);
         Vector3 displacement = new Vector3(remappedPosition.x * k_PlayareaMaxDisplacement, remappedPosition.y * k_PlayareaMaxDisplacement, 0f);
 
-
+        gameplayManager.AssignGameplayDisplacementRotation(displacement, rotation);
         // Note that the camera is always pointing in +z axis, which means the parent quaternion (camera) is the identity quaternion, so the global rotation is same as the local rotation
         playareaBorderMeshFilter_Front.transform.SetLocalPositionAndRotation(displacement + new Vector3(0f, 0f, playareaBorderMeshFilter_Front.transform.localPosition.z), rotation);
+        playareaBorderMeshFilter_earlyHitPlane.transform.SetLocalPositionAndRotation(displacement + new Vector3(0f, 0f, playareaBorderMeshFilter_earlyHitPlane.transform.localPosition.z), rotation);
         playareaBorderMeshFilter_Back.transform.SetLocalPositionAndRotation(displacement + new Vector3(0f, 0f, playareaBorderMeshFilter_Back.transform.localPosition.z), rotation);
 
         GeneratePerspectiveLines();
     }
 
-    private const float k_PERSPECTIVELINETHICKNESS = 0.025f;
-    private const float k_PERSPECTIVELINELENGTHFACTOR = 0.5f; // how long we draw the perspective line to the vanishing point
+    private const float k_PERSPECTIVELINETHICKNESS = 0.015f;
     private void GeneratePerspectiveLines()
     {
         for (int i = 0; i < 4; i++)
         {
-            Vector3 borderWorldPoint = playareaBorderMeshFilter_Front.transform.TransformPoint(localBorderCorners[i]);
-            Vector3 vanishWorldPoint = playareaBorderMeshFilter_Back.transform.TransformPoint(localBorderCorners[i]);
+            Vector3 borderWorldPoint = playareaBorderMeshFilter_Front.transform.TransformPoint(gameplayManager.LocalBorderCorners[i]);
+            Vector3 vanishWorldPoint = playareaBorderMeshFilter_Back.transform.TransformPoint(gameplayManager.LocalBorderCorners[i]);
             Vector3 position = (borderWorldPoint + vanishWorldPoint) / 2;
             Vector3 fromToVector = vanishWorldPoint - borderWorldPoint;
 

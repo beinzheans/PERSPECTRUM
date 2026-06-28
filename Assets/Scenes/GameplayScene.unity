@@ -2078,6 +2078,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 345824509}
+  - {fileID: 465138981}
   - {fileID: 2097483177}
   - {fileID: 371297462}
   - {fileID: 324723713}
@@ -2775,7 +2776,7 @@ MonoBehaviour:
       BigScrollTimeInterval: 0
       EditorLookaheadTime: 0
     GameEvents:
-      IsFirstTimeStartingGame: 0
+      HasAdjustedOffset: 0
       HasPlayedTutorial: 0
 --- !u!4 &458964315
 Transform:
@@ -2831,6 +2832,92 @@ MonoBehaviour:
   SongVolumeSlider: {fileID: 909944339}
   HitsoundVolumeSlider: {fileID: 595397891}
   ReturnMainMenuButton: {fileID: 774331146}
+--- !u!1 &465138980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 465138981}
+  - component: {fileID: 465138983}
+  - component: {fileID: 465138982}
+  m_Layer: 0
+  m_Name: PlayareaBorder_Early
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &465138981
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 465138980}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330585546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &465138982
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 465138980}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 3722f8319ca40884f95bdeb0cd1f9745, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &465138983
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 465138980}
+  m_Mesh: {fileID: 0}
 --- !u!1 &471277511
 GameObject:
   m_ObjectHideFlags: 0
@@ -6464,6 +6551,7 @@ GameObject:
   - component: {fileID: 1167072927}
   - component: {fileID: 1167072929}
   - component: {fileID: 1167072930}
+  - component: {fileID: 1167072940}
   - component: {fileID: 1167072932}
   - component: {fileID: 1167072931}
   - component: {fileID: 1167072933}
@@ -6473,6 +6561,8 @@ GameObject:
   - component: {fileID: 1167072937}
   - component: {fileID: 1167072938}
   - component: {fileID: 1167072939}
+  - component: {fileID: 1167072942}
+  - component: {fileID: 1167072941}
   m_Layer: 0
   m_Name: GameplayManager
   m_TagString: Untagged
@@ -6494,6 +6584,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameplayRectTransform: {fileID: 471277512}
   gameplayCamera: {fileID: 330585545}
+  IsMetronomeDisabled: 0
 --- !u!4 &1167072928
 Transform:
   m_ObjectHideFlags: 0
@@ -6589,7 +6680,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameplayObjectPrefab: {fileID: 7815377787540894812, guid: 87551f38808ed794da5e1586edf1ec48, type: 3}
   parentTransform: {fileID: 1167072928}
-  k_POOLSIZE: 199
+  k_POOLSIZE: 499
 --- !u!114 &1167072933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6646,6 +6737,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playareaBorderMeshFilter_Front: {fileID: 345824508}
+  playareaBorderMeshFilter_earlyHitPlane: {fileID: 465138983}
   playareaBorderMeshFilter_Back: {fileID: 2097483179}
   perspectiveLineGameObjects:
   - {fileID: 371297461}
@@ -6690,6 +6782,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   normalColor: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
   pulseColor: {r: 0.18431373, g: 0.18431373, b: 0.18431373, a: 1}
+--- !u!114 &1167072940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167072926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 498b4a8b2670a1145bbb6a3e3de19112, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameplayObjectPrefab: {fileID: 8636860551331318054, guid: d32850e27d495df4ca976cb2a2f24f71, type: 3}
+  parentTransform: {fileID: 1167072928}
+  k_POOLSIZE: 4999
+--- !u!114 &1167072941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167072926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c94828d497419ad408ed77af60cf9d58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  k_POOLSIZE: 49
+  particleSystemPrefab: {fileID: 6080298256298802146, guid: 4435b60876b17014d991eab9930217f0, type: 3}
+--- !u!114 &1167072942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167072926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f243463bb9e0a142b57c08020905832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  k_POOLSIZE: 49
+  particleSystemPrefab: {fileID: 6080298256298802146, guid: a4ce2bcd7a0765b4f87353e490fccb93, type: 3}
 --- !u!1 &1168812819
 GameObject:
   m_ObjectHideFlags: 0

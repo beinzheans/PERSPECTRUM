@@ -49,7 +49,6 @@ public static class GameVersionConverter
 
     /// <summary>
     /// Gets a byte array from a file extension <see cref="GameManager.k_FILEEXTENSION"/>. Returns true if it is valid, otherwise returns false. <br></br>
-    /// This allows
     /// </summary>
     /// <param name="fullFilePath"></param>
     /// <param name="result"></param>

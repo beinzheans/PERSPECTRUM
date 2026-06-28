@@ -3,17 +3,49 @@ using UnityEngine;
 /// <summary>
 /// A class to manage the dynamic borders approaching the screen.
 /// </summary>
-public class GameplayDynamicBordersManager : MonoBehaviour
+public abstract class GameplayDynamicBordersManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
+    [SerializeField] private int k_POOLSIZE;
+    [SerializeField] private ParticleSystem particleSystemPrefab;
 
+    private ParticleSystem[] currentParticleSystemPrefabPool;
+
+    private GameplayManager gameplayManager;
+
+    private int poolIndex = 0;
+    private void Start()
+    {
+        gameplayManager = GameplayManager.GameplayInstance;
+
+        currentParticleSystemPrefabPool = new ParticleSystem[k_POOLSIZE];
+        for (int i = 0; i < k_POOLSIZE; i++)
+        {
+            ParticleSystem matchParticleSystem = Instantiate(particleSystemPrefab, gameplayManager.GameplayCamera.transform, false);
+
+            currentParticleSystemPrefabPool[i] = matchParticleSystem;
+        }
+
+        OnStartEvent();
     }
 
-    // Update is called once per frame
-    void Update()
+    protected void PlayParticles()
     {
-
+        currentParticleSystemPrefabPool[poolIndex].Play();
+        poolIndex = (poolIndex + 1) % k_POOLSIZE;
     }
+
+    private void OnDestroy()
+    {
+        OnDestroyEvent();
+    }
+
+    /// <summary>
+    /// Custom implementations of events when the particle system pool starts.
+    /// </summary>
+    protected abstract void OnStartEvent();
+
+    /// <summary>
+    /// Custom implementations of events when the particle system pool is destroyed.
+    /// </summary>
+    protected abstract void OnDestroyEvent();
 }
