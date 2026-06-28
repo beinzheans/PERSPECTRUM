@@ -73,7 +73,7 @@ public static class SaveLoadManager
     /// <returns></returns>
     public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte)
     {
-        bool isValid = GameVersionConverter.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
+        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
 
         if (!isValid)
         {
@@ -274,7 +274,7 @@ public static class SaveLoadManager
 
     public static void GetMetadataOfEditorChartPath(string fullFilePath, out EditorChartMetadata metadata)
     {
-        bool isValid = GameVersionConverter.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
+        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
 
         if (!isValid)
         {

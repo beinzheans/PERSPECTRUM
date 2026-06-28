@@ -1,6 +1,6 @@
 using System.IO;
 
-public static class GameVersionConverter
+public static class GameArchiveValidator
 {
     public static readonly byte[] ValidArchiveMagicBytes = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
     public static bool IsValidArchiveFile(string fullFilePath)
