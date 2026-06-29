@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -252,9 +253,20 @@ public static class GamePersistenceManager
 
         string gamePath = Path.Combine(gameDirectory, $"{fileName}.{GameManager.k_FILEEXTENSION}");
 
-        if (File.Exists(gamePath)) // do not import again if we already imported the tutorial chart
+        if (File.Exists(gamePath))
         {
-            return;
+            LoadChartFile(gamePath, out _, out string metadataJson, out _);
+
+            JObject metadataJObject = JObject.Parse(metadataJson);
+
+            if (!GameVersionConverter.IsChartMetadataUpToDate(metadataJObject))
+            {
+                File.Delete(gamePath); // delete old tutorial if not up to date
+            }
+            else
+            {
+                return;
+            }
         }
 
         File.Copy(streamingAssetPath, gamePath);
