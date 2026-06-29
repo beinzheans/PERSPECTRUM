@@ -141,8 +141,8 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         cursorRawImage.gameObject.SetActive(true);
         comboText.text = "0";
-        gameplay_chartCredit.text = gameplayManager.CurrentMetadata.ChartName;
-        gameplay_songCredit.text = $"{gameplayManager.CurrentMetadata.SongArtist} - {gameplayManager.CurrentMetadata.SongName}";
+        gameplay_chartCredit.text = gameplayManager.CurrentMetadata.BaseMetadata.ChartName;
+        gameplay_songCredit.text = $"{gameplayManager.CurrentMetadata.BaseMetadata.SongArtist} - {gameplayManager.CurrentMetadata.BaseMetadata.SongName}";
         gameplay_matchCount.text = "0";
         gameplay_mismatchCount.text = "0";
         gameplay_bombCount.text = "0";
@@ -153,7 +153,7 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void SetupEndscreenUI()
     {
-        chartName.text = gameplayManager.CurrentMetadata.ChartName;
+        chartName.text = gameplayManager.CurrentMetadata.BaseMetadata.ChartName;
         scoreText.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
         GameplayResultRank rank = MathHelper.ConvertOverallScoreToRank(gameplayManager.CurrentScore);
         rankText.text = MathHelper.ConvertRankToString(rank);

@@ -9,6 +9,7 @@ public class ChartDetailsManager : MonoBehaviour
 
     [SerializeField] private TMP_Text chartTitleText;
     [SerializeField] private TMP_Text chartMapperText;
+    [SerializeField] private TMP_Text chartDifficultyText;
     [SerializeField] private TMP_Text songCreditText;
     [SerializeField] private Button PlayChartButton;
     [SerializeField] private Button DeleteChartButton;
@@ -24,10 +25,10 @@ public class ChartDetailsManager : MonoBehaviour
         PlayChartButton.onClick.RemoveAllListeners();
         DeleteChartButton.onClick.RemoveAllListeners();
 
-        chartTitleText.text = obj.associatedMetadata.ChartName;
-        chartMapperText.text = $"Charted by {obj.associatedMetadata.ChartMapper}";
-        songCreditText.text = $"{obj.associatedMetadata.SongName} by {obj.associatedMetadata.SongArtist}";
-
+        chartTitleText.text = obj.BaseChartMetadata.ChartName;
+        chartMapperText.text = $"Charted by {obj.BaseChartMetadata.ChartMapper}";
+        songCreditText.text = $"{obj.BaseChartMetadata.SongName} by {obj.BaseChartMetadata.SongArtist}";
+        chartDifficultyText.text = $"Difficulty {obj.BaseChartMetadata.ChartDifficulty}";
         PlayChartButton.onClick.AddListener(() => GameManager.GameInstance.RequestPlayChartEvent(obj.AssociatedFullFilePath));
         DeleteChartButton.onClick.AddListener(() =>
         {

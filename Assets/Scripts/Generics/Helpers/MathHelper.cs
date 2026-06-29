@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -624,5 +625,78 @@ public static class MathHelper
         {
             newMouseType = progress <= 0.5f ? current.MouseType : next.MouseType;
         }
+    }
+
+    /// <summary>
+    /// Compares two version numbers to see which is the latest, assuming <paramref name="a"/> and <paramref name="b"/> follow the same formatting. <br></br>
+    /// Returns 1 if <paramref name="a"/> is later than <paramref name="b"/>. <br></br>
+    /// Returns 0 if <paramref name="a"/> is the same as <paramref name="b"/>, or if either is in the wrong format.<br></br>
+    /// Returns -1 if <paramref name="a"/> is earlier than <paramref name="b"/>.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static int CompareGameVersions(string a, string b)
+    {
+        bool aConvertResult = TryConvertStringToVersioning(a, out int aMajor, out int aMinor, out int aRevision);
+        bool bConvertResult = TryConvertStringToVersioning(b, out int bMajor, out int bMinor, out int bRevision);
+
+        if (!aConvertResult || !bConvertResult)
+        {
+            return 0;
+        }
+
+        // this is not the best code but it is the simplest way to compare versioning.
+
+        if (aMajor > bMajor)
+        {
+            return 1;
+        }
+        else if (aMajor < bMajor)
+        {
+            return -1;
+        }
+
+        if (aMinor > bMinor)
+        {
+            return 1;
+        }
+        else if (aMinor < bMinor)
+        {
+            return -1;
+        }
+
+        if (aRevision > bRevision)
+        {
+            return 1;
+        }
+        else if (aRevision < bRevision)
+        {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    private static string versioningRegex = @"[0-9]+.[0-9]+.[0-9]+";
+    public static bool TryConvertStringToVersioning(string s, out int major, out int minor, out int revision)
+    {
+        if (!Regex.IsMatch(s, versioningRegex))
+        {
+            major = minor = revision = 0;
+            return false;
+        }
+
+        // this will always be valid since we regex match the pattern beforehand. 
+        string[] intString = s.Split('.');
+        major = int.Parse(intString[0]);
+        minor = int.Parse(intString[1]);
+        revision = int.Parse(intString[2]);
+        return true;
+    }
+
+    public static bool IsStringMatchVersioningFormat(string s)
+    {
+        return Regex.IsMatch(s, versioningRegex);
     }
 }

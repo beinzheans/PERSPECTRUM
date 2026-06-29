@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -137,7 +138,6 @@ public class GameplayManager : MonoBehaviour
     }
 
     public GameplayMarker CurrentActiveGameplayMarker { get; private set; }
-    private TimerIntervalAction gameplayMetronome;
     public event Action<GameplayMarker> OnGameplayMarkerUpdated;
     public event Action<double> OnGameplayMetronomeFired;
     private const float k_NEARCLIPPLANESCALE = 0.9f;
@@ -309,7 +309,7 @@ public class GameplayManager : MonoBehaviour
 
         if (IsInReplayMode)
         {
-            if (!((GameplayStatisticRecord)CurrentGameplayRecord).ChartMetadata.Equals(CurrentMetadata))
+            if (!((GameplayStatisticRecord)CurrentGameplayRecord).BaseChartMetadata.Equals(CurrentMetadata.BaseMetadata))
             {
                 Debug.LogWarning($"The replay metadata does not match the loaded chart metadata.\n" +
                                  $"The replay will play, but the visuals may have discrepancy.");
@@ -374,14 +374,46 @@ public class GameplayManager : MonoBehaviour
     /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
     /// </summary>
     /// <param name="path"></param>
-    public async void InvokeGameplayStartedEvent(string path)
+    public void InvokeGameplayStartedEvent(string path)
     {
         CurrentPath = path;
-        SaveLoadManager.LoadChartFile(path, out string chartJson, out _, out byte[] bytes);
+        GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] bytes);
 
-        (bool convertResult, EditorChart editorChart, AudioClip clip) = await SaveLoadManager.ConvertFilesToEditorChart(chartJson, bytes);
+        if (string.IsNullOrWhiteSpace(chartJson) || string.IsNullOrWhiteSpace(metadataJson))
+        {
+            Debug.LogWarning($"Invalid chart JSONs, check file! Path: \n" +
+                             $"{path}");
+            return;
+        }
+        JObject chartJObject = JObject.Parse(chartJson);
+        JObject metadataJObject = JObject.Parse(metadataJson);
+        if (!GameVersionConverter.IsChartMetadataUpToDate(metadataJObject))
+        {
+            Debug.LogWarning($"Loaded chart is not up to date with game version!");
+            ConfirmAction action = new ConfirmAction(() =>
+            {
+                if (!GameVersionConverter.ConvertChartVersionToCurrentGameVersion(in chartJObject, in metadataJObject, out JObject convertedChartJObject, out JObject convertedmetadataJObject))
+                {
+                    GameManager.GameInstance.InvokeInformationDisplayNeeded("Can not resolve mismatch, update the game or the chart!", 5d);
+                    return;
+                }
 
-        SaveLoadManager.GetMetadataOfEditorChartPath(path, out EditorChartMetadata metadata);
+                StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes);
+            }, () => { }, "The selected chart has version mismatch.\n" +
+                          "The game will attempt to resolve mismatch, do you still want to continue?");
+
+            GameManager.GameInstance.InvokeConfirmActionNeeded(action);
+            return;
+        }
+
+        StartGameplayFromJsonString(chartJson, metadataJson, bytes);
+    }
+
+    private async void StartGameplayFromJsonString(string chartJson, string metadataJson, byte[] audioBytes)
+    {
+        (bool convertResult, EditorChart editorChart, AudioClip clip) = await GamePersistenceManager.ConvertFilesToEditorChart(chartJson, audioBytes);
+
+        GamePersistenceManager.GetMetadataOfEditorChartFromJson(metadataJson, out EditorChartMetadata metadata);
         if (metadata == null)
         {
             Debug.LogWarning($"Failed to get chart metadata");

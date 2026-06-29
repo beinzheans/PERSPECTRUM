@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using SFB;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ public class ChartChooseManager : MonoBehaviour
     }
     private void CreateChartButtons()
     {
-        SaveLoadManager.ReadEditorChartsInGameStorage(out string[] allPaths);
+        GamePersistenceManager.ReadEditorChartsInGameStorage(out string[] allPaths);
 
         for (int i = 0; i < allPaths.Length; i++)
         {
@@ -45,15 +46,21 @@ public class ChartChooseManager : MonoBehaviour
 
     private void AddChartButton(string path)
     {
-        SaveLoadManager.GetMetadataOfEditorChartPath(path, out EditorChartMetadata metadata);
+        GamePersistenceManager.GetMetadataJsonOfEditorChartPath(path, out string metadataJson);
 
-        if (metadata == null)
+        if (string.IsNullOrWhiteSpace(metadataJson))
+        {
+            return;
+        }
+
+        JObject metadataJObject = JObject.Parse(metadataJson);
+        if (!GameVersionConverter.GetBaseDetailsFromMetadataJObject(metadataJObject, out BaseChartMetadata baseChartMetadata))
         {
             return;
         }
 
         ChartButtonBehavior behavior = Instantiate(chartButtonPrefab, ChartChooseContentRect, false);
-        behavior.AssignChartButtonValues(metadata, path);
+        behavior.AssignChartButtonValues(baseChartMetadata, path);
 
         spawnedChartButtonBehaviors.Add(behavior);
     }
@@ -67,7 +74,7 @@ public class ChartChooseManager : MonoBehaviour
             return;
         }
 
-        if (!SaveLoadManager.ImportEditorChartToGameStorage(paths[0], out string internalChartPath))
+        if (!GamePersistenceManager.ImportEditorChartToGameStorage(paths[0], out string internalChartPath))
         {
             GameManager.GameInstance.InvokeInformationDisplayNeeded("Failed to import chart", 1d);
             return;

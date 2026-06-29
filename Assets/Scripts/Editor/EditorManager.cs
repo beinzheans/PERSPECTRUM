@@ -621,6 +621,7 @@ public class EditorManager : MonoBehaviour
 
         string chartJson = "";
         EditorChartMetadata metadata = OnRequestChartMetadata?.Invoke();
+
         try
         {
             chartJson = JsonConvert.SerializeObject(CurrentEditorChart, GameManager.GameInstance.JsonSerializerSettings);
@@ -643,7 +644,7 @@ public class EditorManager : MonoBehaviour
                              $"{e}");
         }
 
-        SaveLoadManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray);
+        GamePersistenceManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray);
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
     }
 
@@ -657,7 +658,7 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        SaveLoadManager.LoadChartFile(paths[0], out string chartJson, out string metadataJson, out byte[] audioBytes);
+        GamePersistenceManager.LoadChartFile(paths[0], out string chartJson, out string metadataJson, out byte[] audioBytes);
 
         try
         {
@@ -686,7 +687,7 @@ public class EditorManager : MonoBehaviour
                 InvokeOnEditorMetadataLoaded(metadata);
             }
 
-            (bool audioResult, AudioClip clip, byte[] bytes) = await SaveLoadManager.GetAudioClipFromByteArray(audioBytes);
+            (bool audioResult, AudioClip clip, byte[] bytes) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes);
 
             if (!audioResult)
             {
@@ -773,22 +774,12 @@ public class EditorChart : IPlaceDeleteableContainer<EditorHitbox>, IPlaceDelete
 [Serializable]
 public class EditorChartMetadata : IEquatable<EditorChartMetadata>
 {
-    public string ChartName { get; private set; }
-    public string ChartMapper { get; private set; }
-    public string SongName { get; private set; }
-    public string SongArtist { get; private set; }
+    [JsonProperty(GameManager.k_METADATABASEDATAKEY)]
+    public BaseChartMetadata BaseMetadata { get; private set; }
 
-    public string Version { get; private set; }
-    public string GUID { get; private set; }
-    public EditorChartMetadata(string chartName, string chartMapper, string songName, string songArtist, string version, string GUID)
+    public EditorChartMetadata(BaseChartMetadata baseChartMetadata)
     {
-        ChartName = chartName;
-        ChartMapper = chartMapper;
-        SongName = songName;
-        SongArtist = songArtist;
-
-        Version = version;
-        this.GUID = GUID;
+        BaseMetadata = baseChartMetadata;
     }
 
     public override bool Equals(object obj)
@@ -799,18 +790,76 @@ public class EditorChartMetadata : IEquatable<EditorChartMetadata>
     public bool Equals(EditorChartMetadata other)
     {
         return other is not null &&
-               ChartName == other.ChartName &&
+               BaseMetadata.Equals(other.BaseMetadata);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(BaseMetadata);
+    }
+}
+
+/// <summary>
+/// A struct to contain the base metadata of a chart, which is the minimal information to define or identify a chart. <br></br>
+/// Additional data should be defined outside of this struct. We assume that this base struct is NOT modified and will always exist for backwards compatability. <br></br>
+/// </summary>
+[Serializable]
+public struct BaseChartMetadata : IEquatable<BaseChartMetadata>
+{
+    public BaseChartMetadata(string chartName, string chartMapper, string songName, string songArtist, int chartDifficulty, string version, string gUID)
+    {
+        ChartName = chartName;
+        ChartMapper = chartMapper;
+        SongName = songName;
+        SongArtist = songArtist;
+        ChartDifficulty = chartDifficulty;
+        Version = version;
+        GUID = gUID;
+    }
+
+    [JsonProperty(GameManager.k_CHARTNAMEKEY)]
+    public string ChartName { get; private set; }
+
+    [JsonProperty(GameManager.k_CHARTMAPPERKEY)]
+    public string ChartMapper { get; private set; }
+
+    [JsonProperty(GameManager.k_SONGNAMEKEY)]
+    public string SongName { get; private set; }
+
+    [JsonProperty(GameManager.k_SONGARTISTKEY)]
+    public string SongArtist { get; private set; }
+
+    [JsonProperty(GameManager.k_CHARTDIFFICULTYKEY)]
+    public int ChartDifficulty { get; private set; }
+
+    [JsonProperty(GameManager.k_METADATABASEDATAKEY)]
+    public string Version { get; private set; }
+
+    [JsonProperty(GameManager.k_CHARTGUIDKEY)]
+    public string GUID { get; private set; }
+
+    public override bool Equals(object obj)
+    {
+        return obj is BaseChartMetadata metadata && Equals(metadata);
+    }
+
+    public bool Equals(BaseChartMetadata other)
+    {
+        return ChartName == other.ChartName &&
                ChartMapper == other.ChartMapper &&
                SongName == other.SongName &&
                SongArtist == other.SongArtist &&
+               ChartDifficulty == other.ChartDifficulty &&
+               Version == other.Version &&
                GUID == other.GUID;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(ChartName, ChartMapper, SongName, SongArtist); // don't use GUID for hashcode, we only use GUID in the equality checks if there is hash collision
+        return HashCode.Combine(ChartName, ChartMapper, SongName, SongArtist, ChartDifficulty, Version); // don't use GUID for hash code
     }
 }
+
 /// <summary>
 /// A class to describe the editor undo/redo order. Each command will have their own execute and undo command.
 /// </summary>

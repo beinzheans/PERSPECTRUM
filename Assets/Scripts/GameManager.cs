@@ -46,12 +46,23 @@ public class GameManager : MonoBehaviour
     public const double k_HIGHLATENCYTHRESHOLDMS = 100d;
 
     /// <summary>
-    /// Defines a mapping f: Metadata -> set of records. This is used for determining the relation between charts and the gameplay records.
+    /// Defines a mapping f: Base Metadata -> set of records. This is used for determining the relation between charts and the gameplay records.
     /// </summary>
-    public Dictionary<EditorChartMetadata, List<GameplayStatisticRecord>> ChartMetadataToGameplayRecordMapping { get; private set; }
+    public Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> ChartMetadataGUIDToGameplayRecordMapping { get; private set; }
 
     public string k_TUTORIALFILEPATHSTRING { get; private set; }
 
+    /// <summary>
+    /// A key to describe the base metadata field in <see cref="EditorChartMetadata"/> for access.
+    /// </summary>
+    public const string k_METADATABASEDATAKEY = "BaseMetadata";
+
+    public const string k_CHARTNAMEKEY = "ChartName";
+    public const string k_CHARTMAPPERKEY = "ChartMapper";
+    public const string k_SONGNAMEKEY = "SongName";
+    public const string k_SONGARTISTKEY = "SongArtist";
+    public const string k_CHARTGUIDKEY = "GUID";
+    public const string k_CHARTDIFFICULTYKEY = "ChartDifficulty";
     private void Awake()
     {
         if (GameInstance != null)
@@ -76,10 +87,15 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         JsonSerializerSettings.Converters.Add(new Vector2Serializer());
-        k_TUTORIALFILEPATHSTRING = Path.Combine(Application.persistentDataPath, SaveLoadManager.k_GameChartStorageFolderName, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
+        k_TUTORIALFILEPATHSTRING = Path.Combine(Application.persistentDataPath, GamePersistenceManager.k_GameChartStorageFolderName, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
         Application.targetFrameRate = -1;
         CurrentVersion = Application.version;
-        if (!SaveLoadManager.LoadGlobalSettingsFromFile(out GlobalSettings))
+        if (!MathHelper.IsStringMatchVersioningFormat(CurrentVersion))
+        {
+            Debug.LogWarning($"Current version is invalid format!");
+        }
+
+        if (!GamePersistenceManager.LoadGlobalSettingsFromFile(out GlobalSettings))
         {
             InvokeInformationDisplayNeeded("No global settings found");
         }
@@ -88,14 +104,14 @@ public class GameManager : MonoBehaviour
             InvokeInformationDisplayNeeded("Loaded settings");
         }
 
-        SaveLoadManager.ImportTutorialChartToGameStorage();
-        SaveLoadManager.CreateMetadataToRecordsMapping(out Dictionary<EditorChartMetadata, List<GameplayStatisticRecord>> mapping);
-        ChartMetadataToGameplayRecordMapping = mapping;
+        GamePersistenceManager.ImportTutorialChartToGameStorage();
+        GamePersistenceManager.CreateMetadataToRecordsMapping(out Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping);
+        ChartMetadataGUIDToGameplayRecordMapping = mapping;
     }
 
     private void OnApplicationQuit()
     {
-        SaveLoadManager.SaveGlobalSettingsToFile(GlobalSettings);
+        GamePersistenceManager.SaveGlobalSettingsToFile(GlobalSettings);
     }
 
     private void Update()
@@ -120,7 +136,7 @@ public class GameManager : MonoBehaviour
             if (path != k_TUTORIALFILEPATHSTRING)
             {
                 ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayStartedEvent(path)), () => { }, "It is recommended to play the tutorial chart first.\n" +
-                                                                                                                                                                                               "Do you still want to continue?");
+                                                                                                                                                                                                                         "Do you still want to continue?");
                 InvokeConfirmActionNeeded(loadConfirmAction);
                 return;
             }
@@ -152,7 +168,7 @@ public class GameManager : MonoBehaviour
 
     public void AddGameplayRecordToMapping(GameplayStatisticRecord record)
     {
-        SaveLoadManager.UpdateMetadataToRecordsMapping(record, ChartMetadataToGameplayRecordMapping);
+        GamePersistenceManager.UpdateMetadataToRecordsMapping(record, ChartMetadataGUIDToGameplayRecordMapping);
     }
 }
 

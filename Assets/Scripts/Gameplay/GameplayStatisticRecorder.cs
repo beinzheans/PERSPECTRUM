@@ -93,15 +93,15 @@ public class GameplayStatisticRecorder : MonoBehaviour
                                                                      gameplayManager.CurrentScore,
                                                                      timestamp,
                                                                      mouseReplay,
-                                                                     gameplayManager.CurrentMetadata
+                                                                     gameplayManager.CurrentMetadata.BaseMetadata
                                                                      );
 
-        SaveLoadManager.SaveGameplayStatisticRecordToFile(record);
+        GamePersistenceManager.SaveGameplayStatisticRecordToFile(record);
         GameManager.GameInstance.AddGameplayRecordToMapping(record);
     }
 }
 /// <summary>
-/// A class to represent a record of the previous play. Each record will have metadata appended to it to find the corresponding chart.<br></br>
+/// A class to represent a record of the previous play. Each record will have <see cref="global::BaseChartMetadata"/> appended to it to find the corresponding chart.<br></br>
 /// All records and relations should be loaded into the game when the game boots up for fast look-up in a dictionary.
 /// </summary>
 [Serializable]
@@ -116,8 +116,8 @@ public struct GameplayStatisticRecord
     public string RecordTimestamp;
 
     public GameplayReplay GameplayReplay;
-    public EditorChartMetadata ChartMetadata;
-    public GameplayStatisticRecord(int matchCount, int mismatchCount, int missCount, int bombCount, double finalAccuracy, double finalScore, string recordTimestamp, GameplayReplay gameplayReplay, EditorChartMetadata chartMetadata)
+    public BaseChartMetadata BaseChartMetadata;
+    public GameplayStatisticRecord(int matchCount, int mismatchCount, int missCount, int bombCount, double finalAccuracy, double finalScore, string recordTimestamp, GameplayReplay gameplayReplay, BaseChartMetadata baseChartMetadata)
     {
         MatchCount = matchCount;
         MismatchCount = mismatchCount;
@@ -127,7 +127,7 @@ public struct GameplayStatisticRecord
         FinalScore = finalScore;
         RecordTimestamp = recordTimestamp;
         GameplayReplay = gameplayReplay;
-        ChartMetadata = chartMetadata;
+        BaseChartMetadata = baseChartMetadata;
     }
 }
 

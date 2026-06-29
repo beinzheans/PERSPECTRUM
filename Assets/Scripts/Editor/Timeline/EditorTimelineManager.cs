@@ -5,6 +5,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
+
 /// <summary>
 /// A class to manage timeline internal logic and UI logic.
 /// </summary>
@@ -159,7 +160,6 @@ public class EditorTimelineManager : MonoBehaviour
 
             bpmText.text = "??? BPM";
             markerLabelText.text = "Undefined Section";
-
             ClearBeatMarkers();
             return;
         }
@@ -170,7 +170,6 @@ public class EditorTimelineManager : MonoBehaviour
             markerLabelText.text = marker.MarkerLabel;
         }
         currentActiveTimelineMarker = marker;
-
         bpmText.text = $"{currentActiveTimelineMarker.BPM:F3} BPM\n" +
                $"1 : {editorManager.NumberOfBeatSubdivisions}";
 

@@ -1,5 +1,9 @@
 using System.IO;
+using UnityEngine;
 
+/// <summary>
+/// A class to validate archive files.
+/// </summary>
 public static class GameArchiveValidator
 {
     public static readonly byte[] ValidArchiveMagicBytes = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
@@ -71,12 +75,14 @@ public static class GameArchiveValidator
 
         if (IsValidArchiveFile(archiveBytes))
         {
+            Debug.LogWarning($"{fullFilePath} is not ciphered. Please re-export this chart in the Editor to cipher it. This is to protect song owner's copyright.");
+
             result = archiveBytes;
             return true;
         }
         else
         {
-            byte[] cipherBytes = SaveLoadManager.XorProcesser(archiveBytes);
+            byte[] cipherBytes = GamePersistenceManager.XorProcesser(archiveBytes);
 
             if (!IsValidArchiveFile(cipherBytes))
             {

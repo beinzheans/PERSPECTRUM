@@ -31,9 +31,9 @@ public class ChartPlayHistoryManager : MonoBehaviour
     {
         RemoveAllPlayHistoryButton();
 
-        EditorChartMetadata metadata = obj.associatedMetadata;
+        BaseChartMetadata baseMetadata = obj.BaseChartMetadata;
 
-        if (!GameManager.GameInstance.ChartMetadataToGameplayRecordMapping.TryGetValue(metadata, out List<GameplayStatisticRecord> records))
+        if (!GameManager.GameInstance.ChartMetadataGUIDToGameplayRecordMapping.TryGetValue(baseMetadata, out List<GameplayStatisticRecord> records))
         {
             playHistoryLabelText.text = "Play History (0)";
             return;

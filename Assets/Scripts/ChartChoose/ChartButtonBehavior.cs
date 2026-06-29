@@ -7,15 +7,18 @@ using UnityEngine;
 public class ChartButtonBehavior : MonoBehaviour
 {
     [SerializeField] private TMP_Text buttonText;
-    public EditorChartMetadata associatedMetadata;
-    public string AssociatedFullFilePath { get; private set; }
+    [SerializeField] private TMP_Text difficultyText;
 
-    public void AssignChartButtonValues(EditorChartMetadata chartMetadata, string path)
+    public BaseChartMetadata BaseChartMetadata { get; private set; }
+
+    public string AssociatedFullFilePath { get; private set; }
+    public void AssignChartButtonValues(BaseChartMetadata baseChartMetadata, string path)
     {
-        associatedMetadata = chartMetadata;
+        BaseChartMetadata = baseChartMetadata;
         AssociatedFullFilePath = path;
 
-        buttonText.text = $"{chartMetadata.ChartName} by {chartMetadata.ChartMapper}";
+        buttonText.text = $"{BaseChartMetadata.ChartName} by {BaseChartMetadata.ChartMapper}";
+        difficultyText.text = $"Difficulty {BaseChartMetadata.ChartDifficulty}";
     }
 
     public void UI_OnButtonPressed()
