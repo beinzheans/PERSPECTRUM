@@ -56,6 +56,10 @@ public class ChartChooseManager : MonoBehaviour
         JObject metadataJObject = JObject.Parse(metadataJson);
         if (!GameVersionConverter.GetBaseDetailsFromMetadataJObject(metadataJObject, out BaseChartMetadata baseChartMetadata))
         {
+            Debug.Log($"Removed chart due to unsupported file. Path:\n" +
+                      $"{path}");
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Ignored and deleted old chart. Check log.", 1d);
+            File.Delete(path); // the json is not valid to be our chart anymore, we are going to delete it from imported storage.
             return;
         }
 

@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -225,7 +224,7 @@ public static class GamePersistenceManager
             gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}_{copyIndex}.{GameManager.k_FILEEXTENSION}");
         }
 
-        // gamePath does not conflict anymore
+        // gamePath does not conflict anymore. we do this because it's possible different charts share the same name.
 
         internalChartPath = gamePath;
         File.Copy(editorChartPath, gamePath);
