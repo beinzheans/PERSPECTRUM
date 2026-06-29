@@ -29,6 +29,7 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private TMP_Text chartName;
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text rankText;
+    [SerializeField] private TMP_Text difficultyText;
     [SerializeField] private TMP_Text matchText;
     [SerializeField] private TMP_Text mismatchText;
     [SerializeField] private TMP_Text missText;
@@ -158,6 +159,7 @@ public class GameplayUIBehavior : MonoBehaviour
         GameplayResultRank rank = MathHelper.ConvertOverallScoreToRank(gameplayManager.CurrentScore);
         rankText.text = MathHelper.ConvertRankToString(rank);
 
+        difficultyText.text = $"Difficulty {gameplayManager.CurrentMetadata.BaseMetadata.ChartDifficulty}";
         matchText.text = $"Matches: {gameplayManager.MatchHitCount}";
         mismatchText.text = $"Mismatches: {gameplayManager.MismatchHitCount}";
         missText.text = $"Misses: {gameplayManager.MissCount}";
