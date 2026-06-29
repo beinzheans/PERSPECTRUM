@@ -1,3 +1,13 @@
+Copyright (c) 2026 Raymond Yeung. All rights reserved.
+
+All contents provided in this repository is licensed under the PolyForm Strict License 1.0.0, subject to the following **Additional Permissions** below:
+
+# Additional Permissions
+
+Notwithstanding the restrictions under the **Copyright License** section under the PolyForm Strict License 1.0.0, you may change or create new works based on the software for any permitted purpose.
+
+However, you do not have the right to distribute, publish, host or sell the software, or your modification of the software, on any platform for any purposes.
+
 # PolyForm Strict License 1.0.0
 
 <https://polyformproject.org/licenses/strict/1.0.0>
