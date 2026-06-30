@@ -37,14 +37,15 @@ public class GameplayAudioController : MonoBehaviour
         }
 
         double hitboxOffset = obj.RenderTime - gameplayManager.CurrentGameplayTime;
+        float panning = MathHelper.GetAudioPanningFromPosition(obj.NormalizedPosition);
 
         if (obj.HitboxType == HitboxType.A)
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, hitboxOffset - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, hitboxOffset - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
         else
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, hitboxOffset - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, hitboxOffset - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
     }
 
@@ -80,7 +81,7 @@ public class GameplayAudioController : MonoBehaviour
             return;
         }
 
-        AudioEngine.AudioInstance.PlayAudioClip(mismatchHitsoundClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+        AudioEngine.AudioInstance.PlayAudioClip(mismatchHitsoundClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, MathHelper.GetAudioPanningFromPosition(obj.NormalizedPosition));
     }
 
     private void GameplayManager_OnHitboxMatchedHit(VisualHitbox obj)
@@ -90,18 +91,20 @@ public class GameplayAudioController : MonoBehaviour
             return;
         }
 
+        float panning = MathHelper.GetAudioPanningFromPosition(obj.NormalizedPosition);
+
         if (obj.HitboxType == HitboxType.A)
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
         else
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
     }
 
     private void GameplayManager_OnGameplayStarted()
     {
-        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, 0d, 1d);
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, 0d, 1d, 0f);
     }
 }

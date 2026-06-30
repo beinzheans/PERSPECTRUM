@@ -52,9 +52,7 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
         double lookaheadTime = GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime;
         double progress = (math.max(0d, (GameplayManager.GameplayInstance.CurrentGameplayTime + lookaheadTime - AssociatedGameplayObject.RenderTime) / lookaheadTime));
 
-        // use (25^x - 1) / 24 graph for exponential curve
-
-        return (float)((math.pow(25d, progress) - 1) / 24d);
+        return (float)progress; // use linear function
     }
 
 }

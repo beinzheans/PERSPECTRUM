@@ -44,7 +44,10 @@ public class GameManager : MonoBehaviour
 
     public static readonly GlobalSettings DefaultGlobalSettings = new GlobalSettings(0d, false, 0.5f, 0.5f, new GameSettings(3d, 1d), new EditorSettings(1d, 1d), new GameEvents(false, false));
     public const double k_HIGHLATENCYTHRESHOLDMS = 100d;
-
+    /// <summary>
+    /// How much we scale the normalized X position to get our audio panning.
+    /// </summary>
+    public const float k_AUDIOSTEREOPANNINGSCALING = 1f;
     /// <summary>
     /// Defines a mapping f: Base Metadata -> set of records. This is used for determining the relation between charts and the gameplay records.
     /// </summary>

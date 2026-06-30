@@ -41,7 +41,7 @@ public class EditorMusicManager : MonoBehaviour
             return;
         }
 
-        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, GameManager.GameInstance.GlobalSettings.SongVolume, editorManager.EditorPreviewTime, editorManager.PlaybackSpeed);
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, GameManager.GameInstance.GlobalSettings.SongVolume, editorManager.EditorPreviewTime, editorManager.PlaybackSpeed, 0f);
     }
 
     private void EditorManager_OnMusicAudioClipLoaded(AudioClip obj)

@@ -47,7 +47,7 @@ public class AudioEngine : MonoBehaviour
     /// </summary>
     /// <param name="clip"></param>
     /// <param name="playOffsetTime"></param>
-    public void PlayAudioClip(AudioClip clip, double playOffsetTime, float volume, double playbackSpeed)
+    public void PlayAudioClip(AudioClip clip, double playOffsetTime, float volume, double playbackSpeed, float panning)
     {
         if (playOffsetTime < 0d)
         {
@@ -59,6 +59,7 @@ public class AudioEngine : MonoBehaviour
         source.pitch = (float)playbackSpeed;
         source.clip = clip;
         source.volume = volume;
+        source.panStereo = panning;
         audioSourcePool[poolIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
     }
 
@@ -69,7 +70,7 @@ public class AudioEngine : MonoBehaviour
     /// <param name="source"></param>
     /// <param name="playOffsetTime"></param>
     /// <param name="playStartTime">The time at which the audio source starts playing.</param>
-    public void PlayAudioSource(AudioSource source, double playOffsetTime, float volume, double playStartTime, double playbackSpeed)
+    public void PlayAudioSource(AudioSource source, double playOffsetTime, float volume, double playStartTime, double playbackSpeed, float panning)
     {
         if (playOffsetTime < 0d)
         {
@@ -92,6 +93,7 @@ public class AudioEngine : MonoBehaviour
         source.timeSamples = seekSamples;
         source.pitch = (float)playbackSpeed;
         source.volume = volume;
+        source.panStereo = panning;
         source.PlayScheduled(AudioSettings.dspTime + playOffsetTime);
     }
 

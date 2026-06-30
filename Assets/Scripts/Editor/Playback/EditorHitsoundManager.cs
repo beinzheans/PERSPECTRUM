@@ -34,18 +34,18 @@ public class EditorHitsoundManager : MonoBehaviour
             return;
         }
 
-        PlayHitsound(hitbox.HitboxType, 0d);
+        PlayHitsound(hitbox.HitboxType, 0d, MathHelper.GetAudioPanningFromPosition(hitbox.NormalizedPosition));
     }
 
-    private void PlayHitsound(HitboxType hitboxType, double offset)
+    private void PlayHitsound(HitboxType hitboxType, double offset, float panning)
     {
         if (hitboxType == HitboxType.A)
         {
-            AudioEngine.AudioInstance.PlayAudioClip(hitsound_A, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+            AudioEngine.AudioInstance.PlayAudioClip(hitsound_A, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
         else
         {
-            AudioEngine.AudioInstance.PlayAudioClip(hitsound_B, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d);
+            AudioEngine.AudioInstance.PlayAudioClip(hitsound_B, offset, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
     }
 }

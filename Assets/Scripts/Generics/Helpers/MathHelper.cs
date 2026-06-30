@@ -699,4 +699,24 @@ public static class MathHelper
     {
         return Regex.IsMatch(s, versioningRegex);
     }
+
+    /// <summary>
+    /// The maximum extent we allow the panning for audio.
+    /// </summary>
+    private const float k_AUDIOPANNINGMAX = 0.75f;
+    /// <summary>
+    /// Converts a normalized position to audio panning to create illusion of space. That is, a mapping f: [0, 1] -> [-<see cref="k_AUDIOPANNINGMAX"/>, <see cref="k_AUDIOPANNINGMAX"/>]. <br></br>
+    /// Uses the sigmoid function to compute panning instead of linear.
+    /// </summary>
+    /// <param name="normalizedPosition"></param>
+    /// <returns></returns>
+    public static float GetAudioPanningFromPosition(Vector2 normalizedPosition)
+    {
+        float x = normalizedPosition.x;
+
+        float num = k_AUDIOPANNINGMAX * 2f;
+        float denom = 1f + math.exp(-10f * (x - 0.5f));
+
+        return num / denom - k_AUDIOPANNINGMAX;
+    }
 }

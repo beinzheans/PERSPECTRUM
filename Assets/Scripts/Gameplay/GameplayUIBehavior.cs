@@ -5,15 +5,10 @@ using UnityEngine.UI;
 
 public class GameplayUIBehavior : MonoBehaviour
 {
-    private const int k_CURSORNONECOLORINDEX = 0;
-    private const int k_CURSORACOLORINDEX = 1;
-    private const int k_CURSORBCOLORINDEX = 2;
-    [SerializeField] private Color[] cursorColors;
     private GameplayManager gameplayManager;
 
     [Header("Gameplay UI")]
     [SerializeField] private GameObject gameplayUI;
-    [SerializeField] private RawImage cursorRawImage;
     [SerializeField] private TMP_Text comboText;
     [SerializeField] private TMP_Text gameplay_chartCredit;
     [SerializeField] private TMP_Text gameplay_songCredit;
@@ -49,7 +44,6 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplayManager.OnHitboxMiss += GameplayManager_OnHitboxMiss;
         gameplayManager.OnHitboxMismatchedHit += GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnHitboxBombHit += GameplayManager_OnHitboxBombHit;
-        gameplayManager.OnMouseActiveTypeChanged += GameplayManager_OnMouseActiveTypeChanged;
     }
 
     private void GameplayManager_OnHitboxBombHit(VisualHitbox hitbox)
@@ -69,7 +63,6 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplayManager.OnHitboxMiss -= GameplayManager_OnHitboxMiss;
         gameplayManager.OnHitboxMismatchedHit -= GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnHitboxBombHit -= GameplayManager_OnHitboxBombHit;
-        gameplayManager.OnMouseActiveTypeChanged -= GameplayManager_OnMouseActiveTypeChanged;
     }
 
     private void GameplayManager_OnHitboxMismatchedHit(VisualHitbox obj)
@@ -83,33 +76,13 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void GameplayManager_OnGameplayEnded()
     {
-        Cursor.visible = true;
         gameplayUI.SetActive(false);
         endscreenUI.SetActive(true);
-        cursorRawImage.gameObject.SetActive(false);
-
         SetupEndscreenUI();
-    }
-
-    private void GameplayManager_OnMouseActiveTypeChanged(MouseActiveType obj)
-    {
-        switch (obj)
-        {
-            case MouseActiveType.NONE:
-                cursorRawImage.color = cursorColors[k_CURSORNONECOLORINDEX];
-                break;
-            case MouseActiveType.A:
-                cursorRawImage.color = cursorColors[k_CURSORACOLORINDEX];
-                break;
-            case MouseActiveType.B:
-                cursorRawImage.color = cursorColors[k_CURSORBCOLORINDEX];
-                break;
-        }
     }
 
     private void GameplayManager_OnGameplayStarted()
     {
-        Cursor.visible = false;
         gameplayUI.SetActive(true);
         endscreenUI.SetActive(false);
         SetupGameplayUI();
@@ -131,16 +104,9 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
     }
 
-    private void Update()
-    {
-        RectTransform cursorRect = cursorRawImage.rectTransform;
-        cursorRect.anchorMin = cursorRect.anchorMax = gameplayManager.GameplayMousePosition;
-        cursorRect.anchoredPosition = Vector2.zero;
-    }
 
     private void SetupGameplayUI()
     {
-        cursorRawImage.gameObject.SetActive(true);
         comboText.text = "0";
         gameplay_chartCredit.text = gameplayManager.CurrentMetadata.BaseMetadata.ChartName;
         gameplay_songCredit.text = $"{gameplayManager.CurrentMetadata.BaseMetadata.SongArtist} - {gameplayManager.CurrentMetadata.BaseMetadata.SongName}";
