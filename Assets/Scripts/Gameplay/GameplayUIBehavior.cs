@@ -18,6 +18,7 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private TMP_Text gameplay_missCount;
     [SerializeField] private TMP_Text gameplay_accuracyPercent;
     [SerializeField] private TMP_Text gameplay_score;
+    [SerializeField] private TMP_Text gameplay_chartDifficulty;
 
     [Header("Endscreen UI")]
     [SerializeField] private GameObject endscreenUI;
@@ -110,6 +111,7 @@ public class GameplayUIBehavior : MonoBehaviour
         comboText.text = "0";
         gameplay_chartCredit.text = gameplayManager.CurrentMetadata.BaseMetadata.ChartName;
         gameplay_songCredit.text = $"{gameplayManager.CurrentMetadata.BaseMetadata.SongArtist} - {gameplayManager.CurrentMetadata.BaseMetadata.SongName}";
+        gameplay_chartDifficulty.text = $"Difficulty {gameplayManager.CurrentMetadata.BaseMetadata.ChartDifficulty}";
         gameplay_matchCount.text = "0";
         gameplay_mismatchCount.text = "0";
         gameplay_bombCount.text = "0";
