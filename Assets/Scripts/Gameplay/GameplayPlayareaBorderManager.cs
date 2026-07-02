@@ -22,8 +22,6 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     private double previousPulseTime;
     private double pulseInterval;
 
-    [SerializeField] private GameObject[] perspectiveLineGameObjects = new GameObject[4]; // 0 is bottom-left corner, increment clockwise.
-
 
     private void Start()
     {
@@ -185,25 +183,5 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         playareaBorderMeshFilter_Front.transform.SetLocalPositionAndRotation(displacement + new Vector3(0f, 0f, playareaBorderMeshFilter_Front.transform.localPosition.z), rotation);
         playareaBorderMeshFilter_earlyHitPlane.transform.SetLocalPositionAndRotation(displacement + new Vector3(0f, 0f, playareaBorderMeshFilter_earlyHitPlane.transform.localPosition.z), rotation);
         playareaBorderMeshFilter_Back.transform.SetLocalPositionAndRotation(displacement + new Vector3(0f, 0f, playareaBorderMeshFilter_Back.transform.localPosition.z), rotation);
-
-        GeneratePerspectiveLines();
-    }
-
-    private const float k_PERSPECTIVELINETHICKNESS = 0.015f;
-    private void GeneratePerspectiveLines()
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            Vector3 borderWorldPoint = playareaBorderMeshFilter_Front.transform.TransformPoint(gameplayManager.LocalBorderCorners[i]);
-            Vector3 vanishWorldPoint = playareaBorderMeshFilter_Back.transform.TransformPoint(gameplayManager.LocalBorderCorners[i]);
-            Vector3 position = (borderWorldPoint + vanishWorldPoint) / 2;
-            Vector3 fromToVector = vanishWorldPoint - borderWorldPoint;
-
-            Vector3 size = new Vector3(k_PERSPECTIVELINETHICKNESS, k_PERSPECTIVELINETHICKNESS, fromToVector.magnitude);
-            Quaternion rotation = Quaternion.LookRotation(fromToVector, Vector3.up);
-
-            perspectiveLineGameObjects[i].transform.localScale = size;
-            perspectiveLineGameObjects[i].transform.SetPositionAndRotation(position, rotation);
-        }
     }
 }

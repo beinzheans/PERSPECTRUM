@@ -11615,6 +11615,7 @@ GameObject:
   - component: {fileID: 1167072934}
   - component: {fileID: 1167072935}
   - component: {fileID: 1167072936}
+  - component: {fileID: 1167072944}
   - component: {fileID: 1167072937}
   - component: {fileID: 1167072938}
   - component: {fileID: 1167072939}
@@ -11793,11 +11794,6 @@ MonoBehaviour:
   playareaBorderMeshFilter_Front: {fileID: 345824508}
   playareaBorderMeshFilter_earlyHitPlane: {fileID: 465138983}
   playareaBorderMeshFilter_Back: {fileID: 2097483179}
-  perspectiveLineGameObjects:
-  - {fileID: 371297461}
-  - {fileID: 324723712}
-  - {fileID: 1457523506}
-  - {fileID: 1017925882}
 --- !u!114 &1167072937
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11897,6 +11893,25 @@ MonoBehaviour:
   - {r: 0, g: 0.9600265, b: 1, a: 1}
   cursorRawImage: {fileID: 1641882400}
   cursorTrailParticleSystem: {fileID: 1127574040}
+--- !u!114 &1167072944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167072926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51aba88a921b5b04fac8cef92c829df8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frontHitPlane: {fileID: 345824509}
+  backHitPlane: {fileID: 2097483177}
+  perspectiveLineGameObjects:
+  - {fileID: 371297461}
+  - {fileID: 324723712}
+  - {fileID: 1457523506}
+  - {fileID: 1017925882}
 --- !u!1 &1168812819
 GameObject:
   m_ObjectHideFlags: 0
