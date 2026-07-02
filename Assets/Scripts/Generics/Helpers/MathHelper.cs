@@ -744,19 +744,4 @@ public static class MathHelper
             return new Vector2(-GameManager.aspectRatioReciprocalFloat * pos.y + 25f / 32f, GameManager.aspectRatioFloat * pos.x - 7f / 18f);
         }
     }
-
-    /// <summary>
-    /// Uses bitwise operations to get the undo version (inverse) of <paramref name="mode"/>.
-    /// </summary>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-    public static MoveSelectedMode GetUndoOfMoveMode(in MoveSelectedMode mode)
-    {
-        if (!(mode.HasFlag(MoveSelectedMode.Rotate_90_Clockwise) ^ mode.HasFlag(MoveSelectedMode.Rotate_90_Anticlockwise))) // we only care if exactly one flag is on
-        {
-            return mode;
-        }
-
-        return mode ^ (MoveSelectedMode.Rotate_90_Clockwise | MoveSelectedMode.Rotate_90_Anticlockwise);
-    }
 }
