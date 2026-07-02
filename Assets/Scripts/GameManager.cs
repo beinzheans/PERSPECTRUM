@@ -25,7 +25,8 @@ public class GameManager : MonoBehaviour
     public const string k_TUTORIALCHARTNAME = "tutorial";
 
     public static readonly Vector2 aspectRatioConversionScale = new Vector2(0.490261239f, 0.871575537f);
-
+    public static readonly float aspectRatioFloat = 16f / 9f;
+    public static readonly float aspectRatioReciprocalFloat = 9f / 16f;
     public static GameManager GameInstance;
     public Vector2 MousePosition { get; private set; }
     public PlayerInputActions InputActions { get; private set; }

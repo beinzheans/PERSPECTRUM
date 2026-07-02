@@ -719,4 +719,44 @@ public static class MathHelper
 
         return num / denom - k_AUDIOPANNINGMAX;
     }
+
+    public static Vector2 GetMirroredPosition(in Vector2 pos, MoveSelectedMode mode)
+    {
+        return new Vector2(mode.HasFlag(MoveSelectedMode.Vertical) ? 1f - pos.x : pos.x, mode.HasFlag(MoveSelectedMode.Horizontal) ? 1f - pos.y : pos.y);
+    }
+
+    public static Vector2 GetRotatedPosition(in Vector2 pos, MoveSelectedMode mode)
+    {
+        if (!(mode.HasFlag(MoveSelectedMode.Rotate_90_Clockwise) ^ mode.HasFlag(MoveSelectedMode.Rotate_90_Anticlockwise)))
+        {
+            return pos; // do nothing, we only care if exactly one rotation is done
+        }
+
+        // we precompute the matrix transformation, hence the "magic numbers", though they are just a result of precompute matrix.
+        // note we use normal math convention, so anticlockwise is positive, so consider this if you want to derive it yourself
+
+        if (mode.HasFlag(MoveSelectedMode.Rotate_90_Clockwise))
+        {
+            return new Vector2(GameManager.aspectRatioReciprocalFloat * pos.y + 7f / 32f, -GameManager.aspectRatioFloat * pos.x + 25f / 18f);
+        }
+        else
+        {
+            return new Vector2(-GameManager.aspectRatioReciprocalFloat * pos.y + 25f / 32f, GameManager.aspectRatioFloat * pos.x - 7f / 18f);
+        }
+    }
+
+    /// <summary>
+    /// Uses bitwise operations to get the undo version (inverse) of <paramref name="mode"/>.
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+    public static MoveSelectedMode GetUndoOfMoveMode(in MoveSelectedMode mode)
+    {
+        if (!(mode.HasFlag(MoveSelectedMode.Rotate_90_Clockwise) ^ mode.HasFlag(MoveSelectedMode.Rotate_90_Anticlockwise))) // we only care if exactly one flag is on
+        {
+            return mode;
+        }
+
+        return mode ^ (MoveSelectedMode.Rotate_90_Clockwise | MoveSelectedMode.Rotate_90_Anticlockwise);
+    }
 }

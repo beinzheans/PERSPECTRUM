@@ -53,7 +53,12 @@ public class EditorDynamicObject : EditorObject, IPlaceDeleteable, IEditable
         return new EditorDynamicObject(RenderTime);
     }
 
-    public virtual void Mirror(MirrorAxis axis)
+    public virtual void Move_Mirror(MoveSelectedMode moveMode)
+    {
+        return;
+    }
+
+    public virtual void Move_Rotate(MoveSelectedMode moveMode)
     {
         return;
     }

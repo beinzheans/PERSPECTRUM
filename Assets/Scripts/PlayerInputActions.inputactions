@@ -115,7 +115,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "MirrorObjects",
+                    "name": "MoveSelectedObjects",
                     "type": "Button",
                     "id": "89f285b0-902c-4b2e-8f35-fcffb757851a",
                     "expectedControlType": "",
@@ -364,7 +364,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MirrorObjects",
+                    "action": "MoveSelectedObjects",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -375,7 +375,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KB&M",
-                    "action": "MirrorObjects",
+                    "action": "MoveSelectedObjects",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -386,7 +386,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KB&M",
-                    "action": "MirrorObjects",
+                    "action": "MoveSelectedObjects",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
