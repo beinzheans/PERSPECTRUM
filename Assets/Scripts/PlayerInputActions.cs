@@ -26,7 +26,7 @@ using UnityEngine.InputSystem.Utilities;
 /// using namespace UnityEngine;
 /// using UnityEngine.InputSystem;
 ///
-/// // Example of using an InputActionMap named "Player" from A UnityEngine.MonoBehaviour implementing callback interface.
+/// // Example of using an InputActionMap named "Player" from a UnityEngine.MonoBehaviour implementing callback interface.
 /// public class Example : MonoBehaviour, MyActions.IPlayerActions
 /// {
 ///     private MyActions_Actions m_Actions;                  // Source code representation of asset.
@@ -80,7 +80,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     public InputActionAsset asset { get; }
 
     /// <summary>
-    /// Constructs A new instance.
+    /// Constructs a new instance.
     /// </summary>
     public @PlayerInputActions()
     {
@@ -994,7 +994,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         private @PlayerInputActions m_Wrapper;
 
         /// <summary>
-        /// Construct A new instance of the input action map wrapper class.
+        /// Construct a new instance of the input action map wrapper class.
         /// </summary>
         public EditorActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
@@ -1244,7 +1244,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     }
     /// <summary>
-    /// Provides A new <see cref="EditorActions" /> instance referencing this action map.
+    /// Provides a new <see cref="EditorActions" /> instance referencing this action map.
     /// </summary>
     public EditorActions @Editor => new EditorActions(this);
 
@@ -1263,7 +1263,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         private @PlayerInputActions m_Wrapper;
 
         /// <summary>
-        /// Construct A new instance of the input action map wrapper class.
+        /// Construct a new instance of the input action map wrapper class.
         /// </summary>
         public GameplayActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
@@ -1373,7 +1373,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     }
     /// <summary>
-    /// Provides A new <see cref="GameplayActions" /> instance referencing this action map.
+    /// Provides a new <see cref="GameplayActions" /> instance referencing this action map.
     /// </summary>
     public GameplayActions @Gameplay => new GameplayActions(this);
     private int m_KBMSchemeIndex = -1;
