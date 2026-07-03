@@ -93,7 +93,14 @@ public class GameManager : MonoBehaviour
     {
         JsonSerializerSettings.Converters.Add(new Vector2Serializer());
         k_TUTORIALFILEPATHSTRING = Path.Combine(Application.persistentDataPath, GamePersistenceManager.k_GameChartStorageFolderName, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
-        Application.targetFrameRate = -1;
+
+        // let's just by default enable v-sync
+        // in the future we will make settings to allow users to choose
+        // (in the settings rehaul update)
+        RefreshRate refreshRate = Screen.currentResolution.refreshRateRatio;
+
+        Screen.SetResolution(Screen.width, Screen.height, Screen.fullScreenMode, refreshRate);
+
         CurrentVersion = Application.version;
         if (!MathHelper.IsStringMatchVersioningFormat(CurrentVersion))
         {
