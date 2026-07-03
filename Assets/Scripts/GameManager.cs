@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public const string k_METADATABASEDATAKEY = "BaseMetadata";
 
+    public const string k_CHARTVERSIONKEY = "Version";
     public const string k_CHARTNAMEKEY = "ChartName";
     public const string k_CHARTMAPPERKEY = "ChartMapper";
     public const string k_SONGNAMEKEY = "SongName";

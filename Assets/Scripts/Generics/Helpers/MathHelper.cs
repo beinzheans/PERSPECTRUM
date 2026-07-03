@@ -628,9 +628,9 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Compares two version numbers to see which is the latest, assuming <paramref name="a"/> and <paramref name="b"/> follow the same formatting. <br></br>
+    /// Compares two version numbers to see which is the latest, assuming <paramref name="a"/> and <paramref name="b"/> has a valid version number (see <see cref="IsStringMatchVersioningFormat(string)"/>). <br></br>
     /// Returns 1 if <paramref name="a"/> is later than <paramref name="b"/>. <br></br>
-    /// Returns 0 if <paramref name="a"/> is the same as <paramref name="b"/>, or if either is in the wrong format.<br></br>
+    /// Returns 0 if <paramref name="a"/> is the same as <paramref name="b"/> or if the format is invalid. <br></br>
     /// Returns -1 if <paramref name="a"/> is earlier than <paramref name="b"/>.
     /// </summary>
     /// <param name="a"></param>
@@ -681,6 +681,12 @@ public static class MathHelper
     private static string versioningRegex = @"[0-9]+.[0-9]+.[0-9]+";
     public static bool TryConvertStringToVersioning(string s, out int major, out int minor, out int revision)
     {
+        if (string.IsNullOrWhiteSpace(s))
+        {
+            major = minor = revision = 0;
+            return false;
+        }
+
         if (!Regex.IsMatch(s, versioningRegex))
         {
             major = minor = revision = 0;
@@ -697,6 +703,11 @@ public static class MathHelper
 
     public static bool IsStringMatchVersioningFormat(string s)
     {
+        if (string.IsNullOrWhiteSpace(s))
+        {
+            return false;
+        }
+
         return Regex.IsMatch(s, versioningRegex);
     }
 

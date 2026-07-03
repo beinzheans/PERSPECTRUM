@@ -9,12 +9,11 @@ public static class GameVersionConverter
 {
     private static readonly List<VersionConverter> allVersionConverters = new List<VersionConverter>()
     {
-        new VersionConvert_1_0_0_to_1_1_0(),
     };
 
     /// <summary>
     /// Attempts to convert a chart to the current game version. <br></br>
-    /// Returns true if the chart is successfully upgraded. Returns false if the game is outdated for the chart OR if the chart has no valid <see cref="VersionConverter"/> path upgrade.
+    /// Returns true if the chart is successfully upgraded to the current version. Returns false if the game is outdated for the chart OR if the chart has no valid <see cref="VersionConverter"/> upgrade path.
     /// </summary>
     /// <param name="chartJObject"></param>
     /// <param name="metadataJObject"></param>
@@ -32,11 +31,11 @@ public static class GameVersionConverter
 
         string version = baseChartMetadata.Version;
 
-        if (string.IsNullOrWhiteSpace(version))
+        if (!MathHelper.IsStringMatchVersioningFormat(version))
         {
             convertedChartJObject = chartJObject;
             convertedmetadataJObject = metadataJObject;
-            return false; // version cant be read somehow, just return false
+            return false;
         }
 
         int compareResult = MathHelper.CompareGameVersions(version, GameManager.GameInstance.CurrentVersion);
@@ -44,7 +43,7 @@ public static class GameVersionConverter
         {
             convertedChartJObject = chartJObject;
             convertedmetadataJObject = metadataJObject;
-            return false; // game is outdated, can not convert.
+            return false; // game is outdated, can not convert (no forward compataibility support)
         }
         else if (compareResult == 0)
         {
@@ -73,22 +72,39 @@ public static class GameVersionConverter
             return ConvertChartVersionToCurrentGameVersion(in tempChartJObject, in tempMetadataJObject, out convertedChartJObject, out convertedmetadataJObject);
         }
 
-        Debug.Log($"Can not convert to current game version.");
+        Debug.Log($"Can not convert to current game version, no valid converters.");
         convertedChartJObject = chartJObject;
         convertedmetadataJObject = metadataJObject;
         return false;
     }
 
-    public static bool IsChartMetadataUpToDate(in JObject metadataJObject)
+    /// <summary>
+    /// Whether or not the chart metadata is exactly the same with the current game version. <br></br>
+    /// Returns true if metadata provided is valid, otherwise returns false. <br></br> 
+    /// Use <paramref name="compareResult"/> to see if the chart or game is outdated (see <see cref="MathHelper.CompareGameVersions(string, string)"/> for version comparsion.) 
+    /// </summary>
+    /// <param name="metadataJObject"></param>
+    /// <param name="compareResult"></param>
+    /// <returns></returns>
+    public static bool CompareChartMetadataWithCurrentVersion(in JObject metadataJObject, out int compareResult)
     {
         if (!GetBaseDetailsFromMetadataJObject(metadataJObject, out BaseChartMetadata baseChartMetadata))
         {
+            compareResult = 0;
             return false;
         }
 
-        int compareResult = MathHelper.CompareGameVersions(baseChartMetadata.Version, GameManager.GameInstance.CurrentVersion);
+        string metadataVersion = baseChartMetadata.Version;
+        
+        if (!MathHelper.IsStringMatchVersioningFormat(metadataVersion) || !MathHelper.IsStringMatchVersioningFormat(GameManager.GameInstance.CurrentVersion))
+        {
+            compareResult = 0;
+            return false;
+        }
 
-        return compareResult == 0;
+        compareResult = MathHelper.CompareGameVersions(baseChartMetadata.Version, GameManager.GameInstance.CurrentVersion);
+
+        return true;
     }
 
     /// <summary>

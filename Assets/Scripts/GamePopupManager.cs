@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 /// </summary>
 public class GamePopupManager : MonoBehaviour
 {
-    private ConfirmAction currentConfirmAction;
+    private Queue<ConfirmAction> confirmActionQueue = new();
 
     [Header("Confirmation Popup")]
     [SerializeField] private GameObject popupPanel;
@@ -26,6 +27,7 @@ public class GamePopupManager : MonoBehaviour
 
     private GameManager gameInstance;
 
+    private TimerIntervalAction fadeOutTimer;
     private void Start()
     {
         HidePanel();
@@ -50,8 +52,9 @@ public class GamePopupManager : MonoBehaviour
 
     private void FadeInInformationPanel(double aliveTime)
     {
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutTimer);
         infoPopupPanelAnimation.SetTrigger(k_FadeInAnimationString);
-        TimerIntervalAction fadeOutTimer = new TimerIntervalAction(this, (x) => FadeOutInformationPanel(), () => { }, aliveTime, -1d);
+        fadeOutTimer = new TimerIntervalAction(this, (x) => FadeOutInformationPanel(), () => { }, aliveTime, -1d);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutTimer);
     }
 
@@ -62,43 +65,54 @@ public class GamePopupManager : MonoBehaviour
     }
     private void EditorInstance_OnConfirmActionNeeded(ConfirmAction obj)
     {
-        currentConfirmAction = obj;
+        confirmActionQueue.Enqueue(obj);
+
+        CheckForNextConfirmAction();
+    }
+
+    private void CheckForNextConfirmAction()
+    {
+        if (confirmActionQueue.Count <= 0)
+        {
+            HidePanel();
+            return;
+        }
+
+        ConfirmAction obj = confirmActionQueue.Peek();
+
         popupDescriptionText.text = obj.MessageToDisplay;
 
         ShowPanel();
     }
-
     public void UI_OnConfirmButtonPressed()
     {
-        if (currentConfirmAction == null)
-        {
-            return;
-        }
-
-        currentConfirmAction.ExecuteConfirmAction();
-        gameInstance.InvokeInformationDisplayNeeded("Confirmed Action", 0.5d);
-        HidePanel();
+        ConfirmAction action = confirmActionQueue.Dequeue();
+        action.ExecuteConfirmAction();
+        CheckForNextConfirmAction();
     }
 
     public void UI_OnDenyButtonPressed()
     {
-        if (currentConfirmAction == null)
+        ConfirmAction action = confirmActionQueue.Dequeue();
+        action.ExecuteDenyAction();
+        CheckForNextConfirmAction();
+    }
+    private void HidePanel()
+    {
+        if (!popupPanel.activeSelf)
         {
             return;
         }
 
-        currentConfirmAction.ExecuteDenyAction();
-        currentConfirmAction = null;
-        gameInstance.InvokeInformationDisplayNeeded("Cancelled Action", 0.5d);
-        HidePanel();
-    }
-    private void HidePanel()
-    {
         popupPanel.SetActive(false);
     }
 
     private void ShowPanel()
     {
+        if (popupPanel.activeSelf)
+        {
+            return;
+        }
         popupPanel.SetActive(true);
     }
 }

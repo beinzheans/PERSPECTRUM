@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SFB;
 using System;
 using System.Collections.Generic;
@@ -648,7 +649,7 @@ public class EditorManager : MonoBehaviour
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
     }
 
-    public async Task LoadEditorChart()
+    public void LoadEditorChart()
     {
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Load From File", "", GameManager.k_FILEEXTENSION, false);
 
@@ -660,6 +661,41 @@ public class EditorManager : MonoBehaviour
 
         GamePersistenceManager.LoadChartFile(paths[0], out string chartJson, out string metadataJson, out byte[] audioBytes);
 
+        JObject chartJObject = JObject.Parse(chartJson);
+        JObject metadataJObject = JObject.Parse(metadataJson);
+
+        bool validResult = GameVersionConverter.CompareChartMetadataWithCurrentVersion(in metadataJObject, out int compareResult);
+
+        if (!validResult)
+        {
+            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
+                                                                                                                                               "Do you want to continue?");
+            GameManager.GameInstance.InvokeConfirmActionNeeded(invalidConfirmAction);
+        }
+        else if (compareResult == 1)
+        {
+            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
+                                                                                                                                                    "Do you want to continue?");
+            GameManager.GameInstance.InvokeConfirmActionNeeded(outdatedGameConfirmAction);
+        }
+        else if (compareResult == -1)
+        {
+            bool result = GameVersionConverter.ConvertChartVersionToCurrentGameVersion(in chartJObject, in metadataJObject, out JObject convertedChartJObject, out JObject convertedmetadataJObject);
+            chartJson = convertedChartJObject.ToString();
+            metadataJson = convertedmetadataJObject.ToString();
+
+            ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has a version mismatch, the game has attempted to resolve it.\n" +
+                                                                                                                                               "Do you want to continue?");
+            GameManager.GameInstance.InvokeConfirmActionNeeded(convertConfirmAction);
+        }
+        else
+        {
+            ConvertToEditorChart(chartJson, metadataJson, audioBytes);
+        }
+    }
+
+    private async void ConvertToEditorChart(string chartJson, string metadataJson, byte[] audioBytes)
+    {
         try
         {
             EditorChart loadedChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, GameManager.GameInstance.JsonSerializerSettings);
@@ -832,7 +868,7 @@ public struct BaseChartMetadata : IEquatable<BaseChartMetadata>
     [JsonProperty(GameManager.k_CHARTDIFFICULTYKEY)]
     public int ChartDifficulty { get; private set; }
 
-    [JsonProperty(GameManager.k_METADATABASEDATAKEY)]
+    [JsonProperty(GameManager.k_CHARTVERSIONKEY)]
     public string Version { get; private set; }
 
     [JsonProperty(GameManager.k_CHARTGUIDKEY)]
@@ -843,20 +879,19 @@ public struct BaseChartMetadata : IEquatable<BaseChartMetadata>
         return obj is BaseChartMetadata metadata && Equals(metadata);
     }
 
-    public bool Equals(BaseChartMetadata other)
+    public bool Equals(BaseChartMetadata other) // don't use version for equals. Because when we convert, we directly change the versions field too.
     {
         return ChartName == other.ChartName &&
                ChartMapper == other.ChartMapper &&
                SongName == other.SongName &&
                SongArtist == other.SongArtist &&
                ChartDifficulty == other.ChartDifficulty &&
-               Version == other.Version &&
                GUID == other.GUID;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(ChartName, ChartMapper, SongName, SongArtist, ChartDifficulty, Version); // don't use GUID for hash code
+        return HashCode.Combine(ChartName, ChartMapper, SongName, SongArtist, ChartDifficulty); // don't use GUID nor version for hash code
     }
 }
 
