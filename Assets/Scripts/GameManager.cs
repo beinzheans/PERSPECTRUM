@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     public event Action OnPauseMenuEnable;
     public event Action OnPauseMenuDisable;
+    public event Action<string> OnPauseMenuDescriptionChanged;
 
     public event Action OnGameSettingsChanged;
     public Mesh NoteMesh { get; private set; }
@@ -81,8 +82,6 @@ public class GameManager : MonoBehaviour
         {
             GameInstance = this;
             DontDestroyOnLoad(gameObject);
-            DontDestroyOnLoad(popupCanvas.gameObject);
-            DontDestroyOnLoad(pauseCanvas.gameObject);
         }
 
         InputActions = new();
@@ -173,6 +172,10 @@ public class GameManager : MonoBehaviour
         OnPauseMenuDisable?.Invoke();
     }
 
+    public void InvokeGamePauseDescriptionChanged(string description)
+    {
+        OnPauseMenuDescriptionChanged?.Invoke(description);
+    }
     public void InvokeGameSettingsChanged()
     {
         OnGameSettingsChanged?.Invoke();

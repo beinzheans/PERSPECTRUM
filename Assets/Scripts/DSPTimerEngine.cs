@@ -21,7 +21,6 @@ public class DSPTimerEngine : MonoBehaviour
         if (DSPTimerEngine.TimerInstance == null)
         {
             TimerInstance = this;
-            DontDestroyOnLoad(gameObject);
             return;
         }
 
