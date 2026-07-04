@@ -1,8 +1,4 @@
-using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 /// <summary>
 /// A class to represent the base module of the pause section. <br></br>

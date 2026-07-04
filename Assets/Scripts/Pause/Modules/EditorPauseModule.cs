@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class EditorPauseModule : BasePauseModule
 {
     private const int k_LOOKAHEADTIMEINDEX = 0;

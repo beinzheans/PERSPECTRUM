@@ -238,6 +238,12 @@ public struct EditorSettings
 }
 
 [Serializable]
+public struct GraphicSettings
+{
+    public Resolution Resolution;
+    public AntiAliasingMSAA antiAliasingMSAA;
+}
+[Serializable]
 public struct GameEvents
 {
     public bool HasAdjustedOffset;
@@ -247,4 +253,12 @@ public struct GameEvents
         this.HasAdjustedOffset = hasAdjustedOffset;
         this.HasPlayedTutorial = isFirstTimePlayingChart;
     }
+}
+
+public enum AntiAliasingMSAA
+{
+    Off = 0,
+    Two = 1,
+    Four = 2,
+    Eight = 4
 }

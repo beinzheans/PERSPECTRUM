@@ -122,7 +122,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
 public struct PauseMenuGroupData : IEquatable<PauseMenuGroupData>
 {
     [SerializeField] private string groupLabel;
-    
+
     public string GroupLabel { get => groupLabel; }
 
     [SerializeField] private PauseMenuGroupType groupType;
@@ -161,5 +161,5 @@ public enum PauseMenuGroupType
     INPUT_FIELD = 1,
     SLIDER = 2,
     TOGGLE_BUTTON = 4,
-
+    DROP_DOWN = 8
 }

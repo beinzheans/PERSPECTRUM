@@ -419,7 +419,7 @@ public class GameplayManager : MonoBehaviour
                 GameManager.GameInstance.InvokeInformationDisplayNeeded("Resolved version mismatch", 1d);
 
                 StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes);
-            }, () => SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { }), 
+            }, () => SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { }),
             "The selected chart is outdated.\n" +
             "The game will attempt to resolve mismatch, do you still want to continue?");
 

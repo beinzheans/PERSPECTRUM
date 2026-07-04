@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class GlobalPauseModule : BasePauseModule
 {
     private const int k_OFFSETGROUPINDEX = 0;
@@ -10,7 +8,7 @@ public class GlobalPauseModule : BasePauseModule
     protected override void OnModuleInitialized()
     {
         pauseMenuGroups[k_OFFSETGROUPINDEX].SetGroupAction_InputField((x) =>
-        { 
+        {
             if (double.TryParse(x, out double ms))
             {
                 GameManager.GameInstance.GlobalSettings.AudioOffsetMs = ms;

@@ -95,7 +95,7 @@ public static class GameVersionConverter
         }
 
         string metadataVersion = baseChartMetadata.Version;
-        
+
         if (!MathHelper.IsStringMatchVersioningFormat(metadataVersion) || !MathHelper.IsStringMatchVersioningFormat(GameManager.GameInstance.CurrentVersion))
         {
             compareResult = 0;

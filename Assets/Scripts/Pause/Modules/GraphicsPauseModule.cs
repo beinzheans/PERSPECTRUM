@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class GraphicsPauseModule : BasePauseModule
 {
     // todo: make this access URP, change:
