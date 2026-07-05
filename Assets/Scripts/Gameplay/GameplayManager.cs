@@ -149,6 +149,22 @@ public class GameplayManager : MonoBehaviour
 
     private void Start()
     {
+        CreateGameplayReferencePoints();
+        
+        CurrentActiveGameplayMarker = null;
+
+        gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
+        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+        gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
+
+        GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
+        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        GameManager.GameInstance.OnGameGraphicSettingsChanged += GameInstance_OnGameGraphicSettingsChanged;
+        GeneratePlayAreaMesh();
+    }
+
+    private void CreateGameplayReferencePoints()
+    {
         Vector2 minScreenCoordinates = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(0f, 0f), gameplayRectTransform);
         Vector2 maxScreenCoordinates = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(1f, 1f), gameplayRectTransform);
 
@@ -159,16 +175,10 @@ public class GameplayManager : MonoBehaviour
         ScreenSizeOfPreview = maxScreenCoordinates - minScreenCoordinates;
 
         WorldToScreenSizeRatioOfPreview = WorldSizeOfPreview / ScreenSizeOfPreview * GameManager.aspectRatioConversionScale;
-
-        CurrentActiveGameplayMarker = null;
-
-        gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
-        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
-        gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
-
-        GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
-        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
-
+    }
+    private void GameInstance_OnGameGraphicSettingsChanged()
+    {
+        CreateGameplayReferencePoints();
         GeneratePlayAreaMesh();
     }
 

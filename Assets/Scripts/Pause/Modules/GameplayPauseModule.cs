@@ -2,6 +2,12 @@ public class GameplayPauseModule : BasePauseModule
 {
     private const int k_GAMESCROLLSPEEDGROUPINDEX = 0;
     private const int k_LOOKAHEADGROUPINDEX = 1;
+
+    protected override void OnModuleAwake()
+    {
+        return;
+    }
+
     protected override void OnModuleInitialized()
     {
         pauseMenuGroups[k_GAMESCROLLSPEEDGROUPINDEX].SetGroupAction_InputField(x =>
@@ -18,6 +24,7 @@ public class GameplayPauseModule : BasePauseModule
             }
 
             GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed = speed;
+            GameManager.GameInstance.InvokeGameSettingsChanged();
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed.ToString("F2"));
 
         pauseMenuGroups[k_LOOKAHEADGROUPINDEX].SetGroupAction_InputField(x =>
@@ -34,6 +41,7 @@ public class GameplayPauseModule : BasePauseModule
             }
 
             GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime = time;
+            GameManager.GameInstance.InvokeGameSettingsChanged();
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime.ToString("F2"));
 
     }

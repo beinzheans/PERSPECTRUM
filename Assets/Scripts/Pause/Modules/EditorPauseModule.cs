@@ -2,6 +2,12 @@ public class EditorPauseModule : BasePauseModule
 {
     private const int k_LOOKAHEADTIMEINDEX = 0;
     private const int k_SHIFTSCROLLTIMEINTERVAL = 1;
+
+    protected override void OnModuleAwake()
+    {
+        return;
+    }
+
     protected override void OnModuleInitialized()
     {
         pauseMenuGroups[k_LOOKAHEADTIMEINDEX].SetGroupAction_InputField(x =>

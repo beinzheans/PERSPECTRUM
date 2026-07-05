@@ -2,7 +2,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 public class GameManager : MonoBehaviour
 {
     public readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
@@ -39,13 +42,16 @@ public class GameManager : MonoBehaviour
     public event Action<string> OnPauseMenuDescriptionChanged;
 
     public event Action OnGameSettingsChanged;
+    public event Action OnGameGraphicSettingsChanged;
     public Mesh NoteMesh { get; private set; }
     public string CurrentVersion { get; private set; }
 
     public GlobalSettings GlobalSettings;
 
-    public static readonly GlobalSettings DefaultGlobalSettings = new GlobalSettings(0d, false, 0.5f, 0.5f, new GameSettings(3d, 1d), new EditorSettings(1d, 1d), new GameEvents(false, false));
+    public static GlobalSettings DefaultGlobalSettings;
+
     public const double k_HIGHLATENCYTHRESHOLDMS = 100d;
+
     /// <summary>
     /// How much we scale the normalized X position to get our audio panning.
     /// </summary>
@@ -69,6 +75,9 @@ public class GameManager : MonoBehaviour
     public const string k_SONGARTISTKEY = "SongArtist";
     public const string k_CHARTGUIDKEY = "GUID";
     public const string k_CHARTDIFFICULTYKEY = "ChartDifficulty";
+
+    private UniversalRenderPipelineAsset URP_asset;
+    public List<Vector2Int> AllPossibleResolutions { get; private set; }
     private void Awake()
     {
         if (GameInstance != null)
@@ -90,15 +99,14 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        DefaultGlobalSettings = new GlobalSettings(0d, false, 0.5f, 0.5f,
+                                                  new GameSettings(3d, 1d),
+                                                  new EditorSettings(1d, 1d),
+                                                  new GraphicSettings(new Vector2Int(Display.main.systemWidth, Display.main.systemHeight), true, AntiAliasingMSAA.Off, 1f, true, 0),
+                                                  new GameEvents(false, false));
+
         JsonSerializerSettings.Converters.Add(new Vector2Serializer());
         k_TUTORIALFILEPATHSTRING = Path.Combine(Application.persistentDataPath, GamePersistenceManager.k_GameChartStorageFolderName, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
-
-        // let's just by default enable v-sync
-        // in the future we will make settings to allow users to choose
-        // (in the settings rehaul update)
-        RefreshRate refreshRate = Screen.currentResolution.refreshRateRatio;
-
-        Screen.SetResolution(Screen.width, Screen.height, Screen.fullScreenMode, refreshRate);
 
         CurrentVersion = Application.version;
         if (!MathHelper.IsStringMatchVersioningFormat(CurrentVersion))
@@ -114,10 +122,67 @@ public class GameManager : MonoBehaviour
         {
             InvokeInformationDisplayNeeded("Loaded settings");
         }
+        UniversalRenderPipelineAsset asset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+        if (!asset)
+        {
+            Debug.LogWarning($"Current rendering pipeline is not using URP! This is horrible!!!");
+        }
+        else
+        {
+            URP_asset = asset;
+        }
 
+        SetupGraphicalSettings();
         GamePersistenceManager.ImportTutorialChartToGameStorage();
         GamePersistenceManager.CreateMetadataToRecordsMapping(out Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping);
         ChartMetadataGUIDToGameplayRecordMapping = mapping;
+    }
+
+    private void SetupGraphicalSettings()
+    {
+        int width = GlobalSettings.GraphicSettings.CurrentResolution.x;
+        int height = GlobalSettings.GraphicSettings.CurrentResolution.y;
+        FullScreenMode fullScreenMode = GlobalSettings.GraphicSettings.IsUseFullScreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
+        if (GlobalSettings.GraphicSettings.FrameRateLimit > 0)
+        {
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = GlobalSettings.GraphicSettings.FrameRateLimit;
+            Screen.SetResolution(width, height, fullScreenMode);
+        }
+        else if (GlobalSettings.GraphicSettings.IsUseVsync)
+        {
+            QualitySettings.vSyncCount = 1;
+            Screen.SetResolution(width, height, fullScreenMode, Screen.currentResolution.refreshRateRatio);
+        }
+        else
+        {
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = -1;
+            Screen.SetResolution(width, height, fullScreenMode);
+        }
+
+        int msaaCount;
+        switch (GlobalSettings.GraphicSettings.AntiAliasingMSAA)
+        {
+            case AntiAliasingMSAA.Off:
+                msaaCount = 1;
+                break;
+            case AntiAliasingMSAA.Two:
+                msaaCount = 2;
+                break;
+            case AntiAliasingMSAA.Four:
+                msaaCount = 4;
+                break;
+            case AntiAliasingMSAA.Eight:
+                msaaCount = 8;
+                break;
+            default:
+                msaaCount = 1;
+                break;
+        }
+
+        URP_asset.msaaSampleCount = msaaCount;
+        URP_asset.renderScale = Mathf.Clamp(GlobalSettings.GraphicSettings.RenderScale, 0.25f, 1f);
     }
 
     private void OnApplicationQuit()
@@ -181,6 +246,12 @@ public class GameManager : MonoBehaviour
         OnGameSettingsChanged?.Invoke();
     }
 
+    public void InvokeGraphicSettingsChanged()
+    {
+        SetupGraphicalSettings();
+        OnGameGraphicSettingsChanged?.Invoke();
+    }
+
     public void AddGameplayRecordToMapping(GameplayStatisticRecord record)
     {
         GamePersistenceManager.UpdateMetadataToRecordsMapping(record, ChartMetadataGUIDToGameplayRecordMapping);
@@ -197,10 +268,11 @@ public struct GlobalSettings
 
     public GameSettings GameSettings;
     public EditorSettings EditorSettings;
+    public GraphicSettings GraphicSettings;
     public GameEvents GameEvents;
 
     // we are going to trust that the settings file has valid inputs. Lol
-    public GlobalSettings(double audioOffsetMs, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, GameSettings gameSettings, EditorSettings editorSettings, GameEvents gameEvents)
+    public GlobalSettings(double audioOffsetMs, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, GameSettings gameSettings, EditorSettings editorSettings, GraphicSettings graphicSettings, GameEvents gameEvents)
     {
         AudioOffsetMs = audioOffsetMs;
         UsePrescheduledHitsounds = usePrescheduledHitsounds;
@@ -208,6 +280,7 @@ public struct GlobalSettings
         HitsoundVolume = hitsoundVolume;
         GameSettings = gameSettings;
         EditorSettings = editorSettings;
+        GraphicSettings = graphicSettings;
         GameEvents = gameEvents;
     }
 }
@@ -240,8 +313,28 @@ public struct EditorSettings
 [Serializable]
 public struct GraphicSettings
 {
-    public Resolution Resolution;
-    public AntiAliasingMSAA antiAliasingMSAA;
+    /// <summary>
+    /// x is width, y is height
+    /// </summary>
+    public Vector2Int CurrentResolution;
+    public bool IsUseFullScreen;
+    public AntiAliasingMSAA AntiAliasingMSAA;
+    public float RenderScale;
+    public bool IsUseVsync;
+    /// <summary>
+    /// Set to non-positive for no limit (unless if VSync is on), positive ints for FPS limit (overrides VSync).
+    /// </summary>
+    public int FrameRateLimit;
+
+    public GraphicSettings(Vector2Int currentResolution, bool isUseFullscreen, AntiAliasingMSAA antiAliasingMSAA, float renderScale, bool isUseVsync, int frameRateLimit)
+    {
+        CurrentResolution = currentResolution;
+        IsUseFullScreen = isUseFullscreen;
+        AntiAliasingMSAA = antiAliasingMSAA;
+        RenderScale = renderScale;
+        IsUseVsync = isUseVsync;
+        FrameRateLimit = frameRateLimit;
+    }
 }
 [Serializable]
 public struct GameEvents
@@ -257,8 +350,8 @@ public struct GameEvents
 
 public enum AntiAliasingMSAA
 {
-    Off = 0,
-    Two = 1,
-    Four = 2,
-    Eight = 4
+    Off,
+    Two,
+    Four,
+    Eight
 }

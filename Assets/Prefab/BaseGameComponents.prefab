@@ -61,6 +61,13 @@ MonoBehaviour:
     EditorSettings:
       BigScrollTimeInterval: 0
       EditorLookaheadTime: 0
+    GraphicSettings:
+      CurrentResolution: {x: 0, y: 0}
+      IsUseFullScreen: 0
+      AntiAliasingMSAA: 0
+      RenderScale: 0
+      IsUseVsync: 0
+      FrameRateLimit: 0
     GameEvents:
       HasAdjustedOffset: 0
       HasPlayedTutorial: 0
@@ -1715,7 +1722,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5601820957882515838}
   m_HandleRect: {fileID: 2844844318821879516}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1902,6 +1909,7 @@ GameObject:
   - component: {fileID: 7595476794094567935}
   - component: {fileID: 4681279834613601856}
   - component: {fileID: 3025693897579689320}
+  - component: {fileID: 7574112646392885113}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1959,6 +1967,7 @@ MonoBehaviour:
   - {fileID: 7595476794094567935}
   - {fileID: 4681279834613601856}
   - {fileID: 3025693897579689320}
+  - {fileID: 7574112646392885113}
   PauseModuleButtonPrefab: {fileID: 6477961016243264160, guid: 4eef9e8d46060d9449d643da2cc574f7, type: 3}
   ReturnMainMenuButton: {fileID: 206076214068565302}
   PauseDescriptionText: {fileID: 8368447577341498153}
@@ -1976,7 +1985,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenuGroupInfo:
-  - groupLabel: Game Offset (ms)
+  - groupLabel: Audio Offset (ms)
     groupType: 1
     groupDescription: 'Adjusts the offset for better synchronisation.
 
@@ -2050,6 +2059,48 @@ MonoBehaviour:
     groupType: 1
     groupDescription: How much the Editor scrolls when Shift-Scroll is performed.
   moduleName: Editor
+  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  groupContentRectTransform: {fileID: 2617089836302549600}
+--- !u!114 &7574112646392885113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5620176167719096081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89dbc796af2b654895808f014f273b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseMenuGroupInfo:
+  - groupLabel: Resolution
+    groupType: 8
+    groupDescription: 'Changes the resolution of the game. Choose a suitable resolution
+      in this window.
+
+      This only effects Fullscreen mode.'
+  - groupLabel: Fullscreen Mode
+    groupType: 4
+    groupDescription: Whether or not the game will run in fullscreen.
+  - groupLabel: MSAA (Anti-Aliasing)
+    groupType: 8
+    groupDescription: How many samples MSAA will use for anti-aliasing. Use this
+      to smooth out jagged lines at the cost of performance.
+  - groupLabel: Render Scale
+    groupType: 2
+    groupDescription: How much the current resolution is scaled up for rendering.
+      Set this to a lower value for a lower render resolution.
+  - groupLabel: VSync
+    groupType: 4
+    groupDescription: Whether or not VSync (Vertical Sync) is used. This will limit
+      the game to run at the monitor's refresh rate.
+  - groupLabel: Frame Limit
+    groupType: 1
+    groupDescription: "A custom framerate limit. \nSet this to a positive integer
+      for a custom limit that overrides your VSync setting.\nSet this to zero (or
+      negative integer) for no custom limit."
+  moduleName: Graphics
   pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
 --- !u!1 &5638263883382110480
@@ -2889,8 +2940,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 50, y: -0.00018816088}
-  m_SizeDelta: {x: -100, y: 0}
+  m_AnchoredPosition: {x: 25, y: 0.000035762787}
+  m_SizeDelta: {x: -50, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &4907885049649941754
 MonoBehaviour:

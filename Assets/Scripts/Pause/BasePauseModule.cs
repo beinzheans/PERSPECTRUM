@@ -26,6 +26,7 @@ public abstract class BasePauseModule : MonoBehaviour
     private void Awake()
     {
         InstantiatePauseGroups();
+        OnModuleAwake();
     }
     private void InstantiatePauseGroups()
     {
@@ -37,6 +38,11 @@ public abstract class BasePauseModule : MonoBehaviour
             pauseMenuGroups[i].gameObject.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// Custom implementation of events when the module is awake. Use this to cache calculation results.
+    /// </summary>
+    protected abstract void OnModuleAwake();
     public void InitializeModule()
     {
         for (int i = 0; i < pauseMenuGroupInfo.Length; i++)

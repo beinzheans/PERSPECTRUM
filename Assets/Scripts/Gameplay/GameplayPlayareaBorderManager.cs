@@ -36,7 +36,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
         playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
 
-        playareaBorderMeshFilter_Back.mesh = playareaBorderMeshFilter_earlyHitPlane.mesh = playareaBorderMeshFilter_Front.mesh = gameplayManager.PlayAreaBorderMesh;
+        playareaBorderMeshFilter_Back.sharedMesh = playareaBorderMeshFilter_earlyHitPlane.sharedMesh = playareaBorderMeshFilter_Front.sharedMesh = gameplayManager.PlayAreaBorderMesh;
 
         gameplayManager.AssignGameplayBorderScale(Vector3.one);
         gameplayManager.AssignGameplayDisplacementRotation(Vector3.zero, Quaternion.identity);
@@ -48,6 +48,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
     }
+
+
     private void GameplayManager_OnGameplayRestarted()
     {
         previousPulseTime = 0d;
