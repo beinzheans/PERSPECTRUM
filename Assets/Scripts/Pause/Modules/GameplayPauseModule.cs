@@ -23,8 +23,7 @@ public class GameplayPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed = speed;
-            GameManager.GameInstance.InvokeGameSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed, speed);
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed.ToString("F2"));
 
         pauseMenuGroups[k_LOOKAHEADGROUPINDEX].SetGroupAction_InputField(x =>
@@ -40,8 +39,7 @@ public class GameplayPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime = time;
-            GameManager.GameInstance.InvokeGameSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime, time);
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime.ToString("F2"));
 
     }

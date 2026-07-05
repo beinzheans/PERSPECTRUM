@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -42,7 +44,6 @@ public class GameManager : MonoBehaviour
     public event Action<string> OnPauseMenuDescriptionChanged;
 
     public event Action OnGameSettingsChanged;
-    public event Action OnGameGraphicSettingsChanged;
     public Mesh NoteMesh { get; private set; }
     public string CurrentVersion { get; private set; }
 
@@ -243,15 +244,10 @@ public class GameManager : MonoBehaviour
     }
     public void InvokeGameSettingsChanged()
     {
+        SetupGraphicalSettings();
+        Debug.Log($"Settings changed!");
         OnGameSettingsChanged?.Invoke();
     }
-
-    public void InvokeGraphicSettingsChanged()
-    {
-        SetupGraphicalSettings();
-        OnGameGraphicSettingsChanged?.Invoke();
-    }
-
     public void AddGameplayRecordToMapping(GameplayStatisticRecord record)
     {
         GamePersistenceManager.UpdateMetadataToRecordsMapping(record, ChartMetadataGUIDToGameplayRecordMapping);
@@ -259,17 +255,20 @@ public class GameManager : MonoBehaviour
 }
 
 [Serializable]
-public struct GlobalSettings
+public class GlobalSettings
 {
-    public double AudioOffsetMs;
-    public bool UsePrescheduledHitsounds;
-    public float SongVolume;
-    public float HitsoundVolume;
+    public double AudioOffsetMs { get; private set; }
 
-    public GameSettings GameSettings;
-    public EditorSettings EditorSettings;
-    public GraphicSettings GraphicSettings;
-    public GameEvents GameEvents;
+    public bool UsePrescheduledHitsounds { get; private set; }
+
+    public float SongVolume { get; private set; }
+    public float HitsoundVolume { get; private set; }
+
+    public GameSettings GameSettings { get; private set; }
+    public EditorSettings EditorSettings { get; private set; }
+    public GraphicSettings GraphicSettings { get; private set; }
+    public GameEvents GameEvents { get; private set; }
+
 
     // we are going to trust that the settings file has valid inputs. Lol
     public GlobalSettings(double audioOffsetMs, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, GameSettings gameSettings, EditorSettings editorSettings, GraphicSettings graphicSettings, GameEvents gameEvents)
@@ -278,18 +277,45 @@ public struct GlobalSettings
         UsePrescheduledHitsounds = usePrescheduledHitsounds;
         SongVolume = songVolume;
         HitsoundVolume = hitsoundVolume;
+
         GameSettings = gameSettings;
         EditorSettings = editorSettings;
         GraphicSettings = graphicSettings;
         GameEvents = gameEvents;
     }
+
+    /// <summary>
+    /// Edits the current settings using an expression and invokes <see cref="GameManager.OnGameSettingsChanged"/>
+    /// </summary>
+    /// <typeparam name="TValue">The type of the setting to edit</typeparam>
+    /// <param name="editAction">The expression tree used to edit. Write the property you want to target here.</param>
+    /// <param name="newValue">The new value you want to assign to your target property.</param>
+
+    public void EditSettings<TValue>(Expression<Func<TValue>> editAction, TValue newValue)
+    {
+        if (editAction.Body is not MemberExpression expression)
+        {
+            return;
+        }
+
+        if (expression.Member is not PropertyInfo property)
+        {
+            return;
+        }
+
+        Expression<Func<object>> lambda = Expression.Lambda<Func<object>>(Expression.Convert(expression.Expression, typeof(object)));
+        object targetInstance = lambda.Compile()();
+
+        property.SetValue(targetInstance, newValue);
+        GameManager.GameInstance.InvokeGameSettingsChanged();
+    }
 }
 
 [Serializable]
-public struct GameSettings
+public class GameSettings
 {
-    public double GameScrollSpeed;
-    public double GameLookaheadTime;
+    public double GameScrollSpeed { get; private set; }
+    public double GameLookaheadTime { get; private set; }
     public GameSettings(double gameScrollSpeed, double gameLookaheadTime)
     {
         GameScrollSpeed = gameScrollSpeed;
@@ -298,10 +324,10 @@ public struct GameSettings
 }
 
 [Serializable]
-public struct EditorSettings
+public class EditorSettings
 {
-    public double BigScrollTimeInterval;
-    public double EditorLookaheadTime;
+    public double BigScrollTimeInterval { get; private set; }
+    public double EditorLookaheadTime { get; private set; }
 
     public EditorSettings(double bigScrollTimeInterval, double editorLookaheadTime)
     {
@@ -311,20 +337,20 @@ public struct EditorSettings
 }
 
 [Serializable]
-public struct GraphicSettings
+public class GraphicSettings
 {
     /// <summary>
     /// x is width, y is height
     /// </summary>
-    public Vector2Int CurrentResolution;
-    public bool IsUseFullScreen;
-    public AntiAliasingMSAA AntiAliasingMSAA;
-    public float RenderScale;
-    public bool IsUseVsync;
+    public Vector2Int CurrentResolution { get; private set; }
+    public bool IsUseFullScreen { get; private set; }
+    public AntiAliasingMSAA AntiAliasingMSAA { get; private set; }
+    public float RenderScale { get; private set; }
+    public bool IsUseVsync { get; private set; }
     /// <summary>
     /// Set to non-positive for no limit (unless if VSync is on), positive ints for FPS limit (overrides VSync).
     /// </summary>
-    public int FrameRateLimit;
+    public int FrameRateLimit { get; private set; }
 
     public GraphicSettings(Vector2Int currentResolution, bool isUseFullscreen, AntiAliasingMSAA antiAliasingMSAA, float renderScale, bool isUseVsync, int frameRateLimit)
     {
@@ -337,10 +363,10 @@ public struct GraphicSettings
     }
 }
 [Serializable]
-public struct GameEvents
+public class GameEvents
 {
-    public bool HasAdjustedOffset;
-    public bool HasPlayedTutorial;
+    public bool HasAdjustedOffset { get; private set; }
+    public bool HasPlayedTutorial { get; private set; }
     public GameEvents(bool hasAdjustedOffset, bool isFirstTimePlayingChart)
     {
         this.HasAdjustedOffset = hasAdjustedOffset;

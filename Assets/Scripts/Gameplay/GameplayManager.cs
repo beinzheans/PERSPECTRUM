@@ -159,7 +159,6 @@ public class GameplayManager : MonoBehaviour
 
         GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
-        GameManager.GameInstance.OnGameGraphicSettingsChanged += GameInstance_OnGameGraphicSettingsChanged;
         GeneratePlayAreaMesh();
     }
 
@@ -175,11 +174,6 @@ public class GameplayManager : MonoBehaviour
         ScreenSizeOfPreview = maxScreenCoordinates - minScreenCoordinates;
 
         WorldToScreenSizeRatioOfPreview = WorldSizeOfPreview / ScreenSizeOfPreview * GameManager.aspectRatioConversionScale;
-    }
-    private void GameInstance_OnGameGraphicSettingsChanged()
-    {
-        CreateGameplayReferencePoints();
-        GeneratePlayAreaMesh();
     }
 
     private const float k_BORDERINSETTHICKNESS = 0.025f;
@@ -269,6 +263,9 @@ public class GameplayManager : MonoBehaviour
     {
         GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
         gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
+
+        CreateGameplayReferencePoints();
+        GeneratePlayAreaMesh();
     }
 
     private void OnDestroy()
@@ -526,7 +523,7 @@ public class GameplayManager : MonoBehaviour
     {
         if (MatchHitCount + MismatchHitCount + MissCount == MaxHitboxCount && CurrentPath == GameManager.GameInstance.k_TUTORIALFILEPATHSTRING)
         {
-            GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial = true;
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial, true);
         }
 
         OnGameplayEnded?.Invoke();

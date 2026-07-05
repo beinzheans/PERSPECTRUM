@@ -31,15 +31,13 @@ public class GraphicsPauseModule : BasePauseModule
 
         pauseMenuGroups[k_RESOLUTIONINDEX].SetGroupAction_Dropdown(GetStringRepresentationOfScreenResolution(allPossibleResolutions), 
             x => {
-                GameManager.GameInstance.GlobalSettings.GraphicSettings.CurrentResolution = allPossibleResolutions[x];
-                GameManager.GameInstance.InvokeGraphicSettingsChanged();
+                GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.CurrentResolution, allPossibleResolutions[x]);
                 }, 
             GetStringRepresentationOfCurrentScreenResolution());
 
         pauseMenuGroups[k_FULLSCREENINDEX].SetGroupAction_Toggle(x =>
         {
-            GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseFullScreen = x;
-            GameManager.GameInstance.InvokeGraphicSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseFullScreen, x);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseFullScreen);
 
         pauseMenuGroups[k_ANTIALIASINGINDEX].SetGroupAction_Dropdown(x =>
@@ -64,19 +62,17 @@ public class GraphicsPauseModule : BasePauseModule
                     break;
             }
 
-            GameManager.GameInstance.GlobalSettings.GraphicSettings.AntiAliasingMSAA = antiAliasing;
-            GameManager.GameInstance.InvokeGraphicSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.AntiAliasingMSAA, antiAliasing);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.AntiAliasingMSAA);
 
         pauseMenuGroups[k_RENDERSCALEINDEX].SetGroupAction_Slider(x =>
         {
             float value = math.remap(0f, 1f, 0.5f, 1f, x);
 
-            GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale = value;
-            GameManager.GameInstance.InvokeGraphicSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale, value);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale);
 
-        pauseMenuGroups[k_VSYNCINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync = x, GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync);
+        pauseMenuGroups[k_VSYNCINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync, x), GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync);
 
         pauseMenuGroups[k_FRAMELIMITINDEX].SetGroupAction_InputField(x =>
         {
@@ -87,8 +83,7 @@ public class GraphicsPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit = result;
-            GameManager.GameInstance.InvokeGraphicSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit, result);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit.ToString());
     }
     private List<Vector2Int> GetAllScreenResolutions()

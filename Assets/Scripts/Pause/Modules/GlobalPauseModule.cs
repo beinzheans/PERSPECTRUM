@@ -16,21 +16,18 @@ public class GlobalPauseModule : BasePauseModule
         {
             if (double.TryParse(x, out double ms))
             {
-                GameManager.GameInstance.GlobalSettings.AudioOffsetMs = ms;
+                GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.AudioOffsetMs, ms);
             }
         }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs.ToString("F2"));
         pauseMenuGroups[k_PREDICTIVEHITSOUNDGROUPINDEX].SetGroupAction_Toggle((x) => {
-            GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds = x;
-            GameManager.GameInstance.InvokeGameSettingsChanged(); 
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, x);
         }, GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds);
         pauseMenuGroups[k_SONGVOLUMEGROUPINDEX].SetGroupAction_Slider((x) =>
         {
-            GameManager.GameInstance.GlobalSettings.SongVolume = x;
-            GameManager.GameInstance.InvokeGameSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.SongVolume, x);
         }, GameManager.GameInstance.GlobalSettings.SongVolume);
         pauseMenuGroups[k_HITSOUNDVOLUMEGROUPINDEX].SetGroupAction_Slider((x) => {
-            GameManager.GameInstance.GlobalSettings.HitsoundVolume = x;
-            GameManager.GameInstance.InvokeGameSettingsChanged();
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.HitsoundVolume, x);
         }, GameManager.GameInstance.GlobalSettings.HitsoundVolume);
     }
 }

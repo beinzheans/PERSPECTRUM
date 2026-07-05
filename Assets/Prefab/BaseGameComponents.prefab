@@ -50,27 +50,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   popupCanvas: {fileID: 7560833971648385375}
   pauseCanvas: {fileID: 5944438422091964820}
-  GlobalSettings:
-    AudioOffsetMs: 0
-    UsePrescheduledHitsounds: 0
-    SongVolume: 0
-    HitsoundVolume: 0
-    GameSettings:
-      GameScrollSpeed: 0
-      GameLookaheadTime: 0
-    EditorSettings:
-      BigScrollTimeInterval: 0
-      EditorLookaheadTime: 0
-    GraphicSettings:
-      CurrentResolution: {x: 0, y: 0}
-      IsUseFullScreen: 0
-      AntiAliasingMSAA: 0
-      RenderScale: 0
-      IsUseVsync: 0
-      FrameRateLimit: 0
-    GameEvents:
-      HasAdjustedOffset: 0
-      HasPlayedTutorial: 0
 --- !u!1 &211504208204402546
 GameObject:
   m_ObjectHideFlags: 0
@@ -2083,7 +2062,7 @@ MonoBehaviour:
   - groupLabel: Fullscreen Mode
     groupType: 4
     groupDescription: Whether or not the game will run in fullscreen.
-  - groupLabel: MSAA (Anti-Aliasing)
+  - groupLabel: MSAA (Anti-Aliasing) Samples
     groupType: 8
     groupDescription: How many samples MSAA will use for anti-aliasing. Use this
       to smooth out jagged lines at the cost of performance.

@@ -25,13 +25,14 @@ public class AudioCalibrationManager : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
         predictiveHitsoundStorage = GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds;
-        GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds = true;
+
+        GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, true);
         string chartFilePath = Path.Combine(Application.streamingAssetsPath, $"{k_CALIBRATIONCHARTNAME}.{GameManager.k_FILEEXTENSION}");
 
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
         offsetSlider.value = (float)(GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
-        offsetSlider.onValueChanged.AddListener((x) => { GameManager.GameInstance.GlobalSettings.AudioOffsetMs = (double)(1000f * x); UpdateOffsetText(); });
+        offsetSlider.onValueChanged.AddListener((x) => { GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.AudioOffsetMs, (double)(1000f * x)); UpdateOffsetText(); });
 
         TimerIntervalAction startAction = new TimerIntervalAction(this, x => gameplayManager.InvokeGameplayStartedEvent(chartFilePath), () => { }, k_CALIBRATIONWAITTIME, -1d);
         DSPTimerEngine.TimerInstance.AddActionToTimer(startAction);
@@ -64,7 +65,7 @@ public class AudioCalibrationManager : MonoBehaviour
     {
         gameplayManager.OnGameplayStarted -= GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded -= GameplayManager_OnGameplayEnded;
-        GameManager.GameInstance.GlobalSettings.GameEvents.HasAdjustedOffset = true;
-        GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds = predictiveHitsoundStorage;
+        GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasAdjustedOffset, true);
+        GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, predictiveHitsoundStorage);
     }
 }
