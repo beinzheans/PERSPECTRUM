@@ -57,24 +57,44 @@ public class GameplayLogicManager : MonoBehaviour
     }
     private void SwitchBInput_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         currentActiveMouseType = inputActions.Gameplay.SwitchAInput.IsPressed() ? MouseActiveType.A : MouseActiveType.NONE;
         gameplayManager.InvokeMouseActiveTypeChanged(currentActiveMouseType);
     }
 
     private void SwitchBInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         currentActiveMouseType = MouseActiveType.B;
         gameplayManager.InvokeMouseActiveTypeChanged(currentActiveMouseType);
     }
 
     private void SwitchAInput_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         currentActiveMouseType = inputActions.Gameplay.SwitchBInput.IsPressed() ? MouseActiveType.B : MouseActiveType.NONE;
         gameplayManager.InvokeMouseActiveTypeChanged(currentActiveMouseType);
     }
 
     private void SwitchAInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         currentActiveMouseType = MouseActiveType.A;
         gameplayManager.InvokeMouseActiveTypeChanged(currentActiveMouseType);
     }

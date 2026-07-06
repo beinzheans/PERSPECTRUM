@@ -20,6 +20,11 @@ public class EditorPauseManager : MonoBehaviour
 
     private void EscapeMenuInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         IsInPauseMenu = !IsInPauseMenu;
     }
 }

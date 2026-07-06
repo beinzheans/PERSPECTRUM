@@ -83,7 +83,7 @@ public class GraphicsPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit, result);
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit, Mathf.Max(result, 30));
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit.ToString());
     }
     private List<Vector2Int> GetAllScreenResolutions()

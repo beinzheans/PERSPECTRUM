@@ -23,6 +23,11 @@ public class EditorSelectionToolManager : EditorUIBehavior
 
     private void MoveSelectedObjects_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (moveMode == MoveSelectedMode.None)
         {
             return;

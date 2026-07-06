@@ -58,6 +58,11 @@ public class EditorPlaybackManager : EditorUIBehavior
     }
     private void EditorStartPlayback_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         playbackState = !playbackState;
 
         if (playbackState)

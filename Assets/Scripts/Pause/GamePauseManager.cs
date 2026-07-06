@@ -93,6 +93,11 @@ public class GamePauseManager : MonoBehaviour
     }
     private void EscapeMenuInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         isInPauseMenu = !isInPauseMenu;
 
         if (isInPauseMenu)

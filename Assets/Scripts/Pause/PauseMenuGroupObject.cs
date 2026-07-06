@@ -26,6 +26,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
 
     [SerializeField] private Button groupButton;
 
+    [SerializeField] private TMP_Text groupValueDisplay;
     public void SetGroupData(PauseMenuGroupData groupData)
     {
         PauseMenuGroupData = groupData;
@@ -37,6 +38,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
         groupToggle.gameObject.SetActive(false);
         groupDropdown.gameObject.SetActive(false);
         groupButton.gameObject.SetActive(false);
+        groupValueDisplay.gameObject.SetActive(false);
     }
 
     public void SetGroupAction_InputField(Action<string> inputFieldAction, string inputFieldValue = "")
@@ -179,6 +181,22 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
         }
     }
 
+    public void SetGroupDisplayText(string displayText)
+    {
+        if (!hasAssignedGroupData)
+        {
+            Debug.LogWarning($"Group {gameObject.name} has not assigned group data yet!", gameObject);
+            return;
+        }
+
+        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.TEXT_DISPLAY))
+        {
+            groupValueDisplay.gameObject.SetActive(true);
+            groupValueDisplay.text = displayText;
+        }
+
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!string.IsNullOrWhiteSpace(PauseMenuGroupData.GroupDescription))
@@ -266,5 +284,9 @@ public enum PauseMenuGroupType
     /// <summary>
     /// Adds a button to the group. To toggle between states, use <see cref="TOGGLE_BUTTON"/>.
     /// </summary>
-    CLICK_BUTTON = 16
+    CLICK_BUTTON = 16,
+    /// <summary>
+    /// Adds a display to the group as a text. This is a read-only value.
+    /// </summary>
+    TEXT_DISPLAY = 32
 }

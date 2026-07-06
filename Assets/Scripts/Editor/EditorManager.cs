@@ -183,16 +183,31 @@ public class EditorManager : MonoBehaviour
 
     private void RedoEditorCommand_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         RedoEditorCommand();
     }
 
     private void UndoEditorCommand_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         UndoEditorCommand();
     }
 
     private void SelectAllVisibleEditorObjects_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         for (int i = 0; i < EditorRenderables.Count; i++)
         {
             if (EditorRenderables[i] is not EditorDynamicObject editorObj)
@@ -237,6 +252,11 @@ public class EditorManager : MonoBehaviour
 
     private void ScrollEditorTime_BigScroll_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (IsEditorInPlaybackState)
         {
             return;
@@ -257,6 +277,11 @@ public class EditorManager : MonoBehaviour
 
     private void ScrollEditorBeatSubdivision_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (obj.ReadValue<Vector2>().y > 0f)
         {
             numberOfBeatSubdivisions++;
@@ -276,6 +301,11 @@ public class EditorManager : MonoBehaviour
 
     private void EditorPositiveNegativeInput_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         float delta = userScrollSensitivity_size;
         if (obj.ReadValue<Vector2>().y > 0f)
         {
@@ -292,6 +322,11 @@ public class EditorManager : MonoBehaviour
 
     private void DeselectAllEditorObjects_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         List<EditorDynamicObject> copy = new List<EditorDynamicObject>(currentSelectedRenderables);
 
         Action selectAction = () =>
@@ -317,6 +352,11 @@ public class EditorManager : MonoBehaviour
 
     private void MouseSnapAlongY_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         snappedMouseCoordinate = EditorMousePosition;
         mouseSnapY = !mouseSnapY;
         mouseSnapX = false;
@@ -324,6 +364,11 @@ public class EditorManager : MonoBehaviour
 
     private void MouseSnapAlongX_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         snappedMouseCoordinate = EditorMousePosition;
         mouseSnapX = !mouseSnapX;
         mouseSnapY = false;
@@ -388,6 +433,11 @@ public class EditorManager : MonoBehaviour
 
     private void ScrollEditorTime_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (IsEditorInPlaybackState)
         {
             return;

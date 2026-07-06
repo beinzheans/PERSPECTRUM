@@ -29,7 +29,17 @@ public abstract class EditorToolManager : MonoBehaviour
     }
     private void ToolPositiveNegativeInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (!IsActive)
+        {
+            return;
+        }
+
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
         {
             return;
         }
