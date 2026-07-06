@@ -173,7 +173,7 @@ public class GameplayManager : MonoBehaviour
         WorldSizeOfPreview = WorldPositionOfPreviewMax - WorldPositionOfPreviewMin;
         ScreenSizeOfPreview = maxScreenCoordinates - minScreenCoordinates;
 
-        WorldToScreenSizeRatioOfPreview = WorldSizeOfPreview / ScreenSizeOfPreview * GameManager.aspectRatioConversionScale;
+        WorldToScreenSizeRatioOfPreview = WorldSizeOfPreview / ScreenSizeOfPreview;
     }
 
     private const float k_BORDERINSETTHICKNESS = 0.025f;
@@ -258,6 +258,7 @@ public class GameplayManager : MonoBehaviour
         mesh.RecalculateBounds();
 
         PlayAreaBorderMesh = mesh;
+
     }
     private void GameInstance_OnGameSettingsChanged()
     {

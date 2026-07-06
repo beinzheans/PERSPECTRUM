@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -79,6 +80,7 @@ public class GameManager : MonoBehaviour
 
     private UniversalRenderPipelineAsset URP_asset;
     public List<Vector2Int> AllPossibleResolutions { get; private set; }
+
     private void Awake()
     {
         if (GameInstance != null)
@@ -244,9 +246,17 @@ public class GameManager : MonoBehaviour
     }
     public void InvokeGameSettingsChanged()
     {
+        StartCoroutine(InvokeGameSettingsChanged_Internal());
+    }
+
+    private IEnumerator InvokeGameSettingsChanged_Internal()
+    {
         SetupGraphicalSettings();
-        Debug.Log($"Settings changed!");
-        OnGameSettingsChanged?.Invoke();
+
+        yield return null; // wait for the current frame to be done (set resolution is done at the end of current frame)
+        yield return new WaitForEndOfFrame(); // wait for the canvas / gui to be updated
+        OnGameSettingsChanged?.Invoke(); // finally invoke the event for the listeners do to their own logic
+
     }
     public void AddGameplayRecordToMapping(GameplayStatisticRecord record)
     {

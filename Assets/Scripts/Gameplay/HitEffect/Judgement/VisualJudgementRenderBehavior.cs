@@ -11,6 +11,11 @@ public class VisualJudgementRenderBehavior : GameplayObjectRenderBehavior<Visual
         judgementUI = GetComponent<JudgementUI>();
     }
 
+    protected override void OnDestroy()
+    {
+        return;
+    }
+
     protected override void OnRenderEvent()
     {
         rectTransform.anchorMin = rectTransform.anchorMax = AssociatedGameplayObject.NormalizedPosition;
