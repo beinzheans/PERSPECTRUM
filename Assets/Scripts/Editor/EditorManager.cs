@@ -86,10 +86,7 @@ public class EditorManager : MonoBehaviour
 
     public bool IsEditorInPlaybackState { get; private set; }
 
-    [SerializeField] private TMP_InputField playbackSpeedInputField;
-    private double playbackSpeed = 1d;
-    public double PlaybackSpeed { get => playbackSpeed; }
-    public event Action OnPlaybackStart;
+    public event Action<double> OnPlaybackStart;
     public event Action OnPlaybackStopped;
 
     public event Action<AudioClip> OnMusicAudioClipLoaded;
@@ -100,6 +97,8 @@ public class EditorManager : MonoBehaviour
 
     public event Func<EditorChartMetadata> OnRequestChartMetadata;
     public event Action<EditorChartMetadata> OnChartMetadataLoaded;
+
+    [SerializeField] private RawImage gridCursorVisualizationImage;
 
     private void Awake()
     {
@@ -159,21 +158,6 @@ public class EditorManager : MonoBehaviour
         inputAction.Editor.UndoEditorCommand.performed += UndoEditorCommand_performed;
         inputAction.Editor.RedoEditorCommand.performed += RedoEditorCommand_performed;
 
-        playbackSpeedInputField.onValueChanged.AddListener((x) =>
-        {
-            bool parseResult = double.TryParse(x, out double speed);
-
-            if (!parseResult || speed <= 0d)
-            {
-                GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid playback speed");
-                playbackSpeed = 1d;
-                return;
-            }
-
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Changed playback speed");
-            playbackSpeed = speed;
-        }
-        );
         StartEditor();
     }
 
@@ -410,6 +394,9 @@ public class EditorManager : MonoBehaviour
             MathHelper.GetSnappedPositionOnGrid(EditorMousePosition, k_SCREENGRIDSIZE, 1f, 1f, out Vector2 snappedMousePosition);
             EditorMousePosition = snappedMousePosition;
         }
+
+        gridCursorVisualizationImage.rectTransform.anchorMin = gridCursorVisualizationImage.rectTransform.anchorMax = MathHelper.ClampVectorByComponent(EditorMousePosition, 0f, 1f);
+        gridCursorVisualizationImage.rectTransform.anchoredPosition = Vector2.zero;
     }
 
     private void ScrollEditorTime_performed(InputAction.CallbackContext obj)
@@ -587,10 +574,10 @@ public class EditorManager : MonoBehaviour
         OnTimelineMarkerActive?.Invoke(marker);
     }
 
-    public void InvokeEditorStartPlayback()
+    public void InvokeEditorStartPlayback(double playbackSpeed)
     {
         IsEditorInPlaybackState = true;
-        OnPlaybackStart?.Invoke();
+        OnPlaybackStart?.Invoke(playbackSpeed);
     }
 
     public void InvokeEditorStopPlayback()
