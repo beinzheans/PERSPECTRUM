@@ -271,7 +271,7 @@ public class GameplayManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        Cursor.visible = true;
+        GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
         GameplayInstance = null;

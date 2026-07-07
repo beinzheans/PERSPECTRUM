@@ -325,7 +325,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""2fd69012-04d5-4a53-89a0-6c53e9ba758a"",
-                    ""path"": ""<Mouse>/rightButton"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -545,7 +545,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""binding"",
                     ""id"": ""70019f40-9a61-457b-a530-d919b7f3e1bd"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -556,7 +556,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""ea24acc8-6134-426b-86c2-867694e47a75"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -589,7 +589,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""binding"",
                     ""id"": ""cb35e561-1c20-46d9-9e2e-6e0e1f8be741"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -622,7 +622,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""binding"",
                     ""id"": ""846dff28-ca54-41af-b19d-102db5b959ea"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -798,7 +798,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""55ee7281-aee4-43d2-8a50-7fc0985f638f"",
-                    ""path"": ""<Mouse>/position"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",

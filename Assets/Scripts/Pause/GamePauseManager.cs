@@ -112,13 +112,13 @@ public class GamePauseManager : MonoBehaviour
 
     private void SetupPauseMenu()
     {
-        originalMouseStatus = Cursor.visible;
+        originalMouseStatus = GameVirtualCursor.GameVirtualCursorInstance.MouseVisibleState;
 
         gameManager.PauseCanvas.gameObject.SetActive(true);
 
         AddListeners();
         gameManager.InvokeGamePauseMenuEnable();
-        Cursor.visible = true;
+        GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
     }
 
     private void RemovePauseMenu()
@@ -126,7 +126,9 @@ public class GamePauseManager : MonoBehaviour
         RemoveListeners();
         gameManager.PauseCanvas.gameObject.SetActive(false);
         gameManager.InvokeGamePauseMenuDisable();
-        Cursor.visible = originalMouseStatus;
+
+        if (originalMouseStatus) GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
+        else GameVirtualCursor.GameVirtualCursorInstance.HideVirtualMouse();
     }
 
     private ConfirmAction returnMainMenuConfirmAction;

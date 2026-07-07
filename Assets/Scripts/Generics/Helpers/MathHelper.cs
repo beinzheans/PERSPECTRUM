@@ -10,7 +10,7 @@ using UnityEngine.Splines;
 public static class MathHelper
 {
     /// <summary>
-    /// Get a normalized point w.r.t toPoint a reference rect given a screen point, where the bottom-left corner is (0, 0). <br></br>
+    /// Get a normalized point w.r.t to a reference rect given a screen point, where the bottom-left corner is (0, 0). <br></br>
     /// Gracefully handles division by zero (where the reference has size 0). Returns true if conversion result is successful.
     /// </summary>
     /// <param name="rawPoint"></param>
@@ -55,6 +55,22 @@ public static class MathHelper
 
         return new Vector2(x, y);
     }
+
+    /// <summary>
+    /// Performs clamp operations on each component of a vector
+    /// </summary>
+    /// <param name="rawVector"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Vector2 ClampVectorByComponent(Vector2 rawVector, float xMin, float xMax, float yMin, float yMaX)
+    {
+        float x = Mathf.Clamp(rawVector.x, xMin, xMax);
+        float y = Mathf.Clamp(rawVector.y, yMin, yMaX);
+
+        return new Vector2(x, y);
+    }
+
 
     private static Vector3[] worldCornerBuffer = new Vector3[4];
     /// <summary>

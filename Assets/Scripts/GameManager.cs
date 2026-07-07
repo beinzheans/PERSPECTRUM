@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     public readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
     {
         TypeNameHandling = TypeNameHandling.Auto,
+        DefaultValueHandling = DefaultValueHandling.Populate
     };
 
 
@@ -181,7 +183,7 @@ public class GameManager : MonoBehaviour
         CreateInputActionModifierCache();
         string defaultKeybindJson = InputActions.SaveBindingOverridesAsJson();
 
-        DefaultGlobalSettings = new GlobalSettings(0d, false, 0.25f, 0.5f, defaultKeybindJson,
+        DefaultGlobalSettings = new GlobalSettings(0d, 1f, false, 0.25f, 0.5f, defaultKeybindJson,
                                                   new GameSettings(3d, 1d),
                                                   new EditorSettings(1d, 1d),
                                                   new GraphicSettings(new Vector2Int(Display.main.systemWidth, Display.main.systemHeight), true, AntiAliasingMSAA.Off, 1f, true, 0),
@@ -357,14 +359,22 @@ public class GameManager : MonoBehaviour
 [Serializable]
 public class GlobalSettings
 {
+    [DefaultValue(0f)]
     public double AudioOffsetMs { get; private set; }
 
+    [DefaultValue(1f)]
+    public float MouseSensitivityScaleFactor { get; private set; }
+
+    [DefaultValue(false)]
     public bool UsePrescheduledHitsounds { get; private set; }
 
+    [DefaultValue(0.25f)]
     public float SongVolume { get; private set; }
+    [DefaultValue(0.5f)]
     public float HitsoundVolume { get; private set; }
 
     public string KeybindJson { get; private set; }
+
     public GameSettings GameSettings { get; private set; }
     public EditorSettings EditorSettings { get; private set; }
     public GraphicSettings GraphicSettings { get; private set; }
@@ -372,9 +382,10 @@ public class GlobalSettings
 
 
     // we are going to trust that the settings file has valid inputs. Lol
-    public GlobalSettings(double audioOffsetMs, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, string keybindJson, GameSettings gameSettings, EditorSettings editorSettings, GraphicSettings graphicSettings, GameEvents gameEvents)
+    public GlobalSettings(double audioOffsetMs, float mouseSensitivityScaleFactor, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, string keybindJson, GameSettings gameSettings, EditorSettings editorSettings, GraphicSettings graphicSettings, GameEvents gameEvents)
     {
         AudioOffsetMs = audioOffsetMs;
+        MouseSensitivityScaleFactor = mouseSensitivityScaleFactor;
         UsePrescheduledHitsounds = usePrescheduledHitsounds;
         SongVolume = songVolume;
         HitsoundVolume = hitsoundVolume;
@@ -416,7 +427,10 @@ public class GlobalSettings
 [Serializable]
 public class GameSettings
 {
+    [DefaultValue(3d)]
     public double GameScrollSpeed { get; private set; }
+
+    [DefaultValue(1d)]
     public double GameLookaheadTime { get; private set; }
     public GameSettings(double gameScrollSpeed, double gameLookaheadTime)
     {
@@ -428,7 +442,10 @@ public class GameSettings
 [Serializable]
 public class EditorSettings
 {
+    [DefaultValue(1d)]
     public double BigScrollTimeInterval { get; private set; }
+
+    [DefaultValue(1d)]
     public double EditorLookaheadTime { get; private set; }
 
     public EditorSettings(double bigScrollTimeInterval, double editorLookaheadTime)
@@ -445,13 +462,23 @@ public class GraphicSettings
     /// x is width, y is height
     /// </summary>
     public Vector2Int CurrentResolution { get; private set; }
+
+    [DefaultValue(true)]
     public bool IsUseFullScreen { get; private set; }
+
+    [DefaultValue(AntiAliasingMSAA.Off)]
     public AntiAliasingMSAA AntiAliasingMSAA { get; private set; }
+
+    [DefaultValue(1f)]
     public float RenderScale { get; private set; }
+
+    [DefaultValue(true)]
     public bool IsUseVsync { get; private set; }
     /// <summary>
     /// Set to non-positive for no limit (unless if VSync is on), positive ints for FPS limit (overrides VSync).
     /// </summary>
+    
+    [DefaultValue(0)]
     public int FrameRateLimit { get; private set; }
 
     public GraphicSettings(Vector2Int currentResolution, bool isUseFullscreen, AntiAliasingMSAA antiAliasingMSAA, float renderScale, bool isUseVsync, int frameRateLimit)
@@ -467,7 +494,10 @@ public class GraphicSettings
 [Serializable]
 public class GameEvents
 {
+    [DefaultValue(false)]
     public bool HasAdjustedOffset { get; private set; }
+
+    [DefaultValue(false)]
     public bool HasPlayedTutorial { get; private set; }
     public GameEvents(bool hasAdjustedOffset, bool isFirstTimePlayingChart)
     {

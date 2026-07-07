@@ -96,9 +96,6 @@ public class EditorManager : MonoBehaviour
 
     public bool IsEditorSnapMouseToGrid { get; private set; }
 
-    [SerializeField] private RawImage editorSpecialCursorImage;
-
-    public bool IsEditorShowingSpecialCursor { get; private set; }
     private byte[] currentEditorAudioClipByteArray = new byte[0];
 
     public event Func<EditorChartMetadata> OnRequestChartMetadata;
@@ -122,7 +119,6 @@ public class EditorManager : MonoBehaviour
         inputAction.Editor.UndoEditorCommand.performed -= UndoEditorCommand_performed;
         inputAction.Editor.RedoEditorCommand.performed -= RedoEditorCommand_performed;
 
-        Cursor.visible = true;
         EditorInstance = null;
     }
     private void Start()
@@ -414,21 +410,6 @@ public class EditorManager : MonoBehaviour
             MathHelper.GetSnappedPositionOnGrid(EditorMousePosition, k_SCREENGRIDSIZE, 1f, 1f, out Vector2 snappedMousePosition);
             EditorMousePosition = snappedMousePosition;
         }
-
-        if (EditorMousePosition.x < 0f || EditorMousePosition.x > 1f || EditorMousePosition.y < 0f || EditorMousePosition.y > 1f)
-        {
-            InvokeEditorHideSpecialCursor();
-        }
-        else
-        {
-            InvokeEditorShowSpecialCursor();
-        }
-
-        if (IsEditorShowingSpecialCursor)
-        {
-            editorSpecialCursorImage.rectTransform.anchorMin = editorSpecialCursorImage.rectTransform.anchorMax = EditorMousePosition;
-            editorSpecialCursorImage.rectTransform.anchoredPosition = Vector2.zero;
-        }
     }
 
     private void ScrollEditorTime_performed(InputAction.CallbackContext obj)
@@ -627,31 +608,6 @@ public class EditorManager : MonoBehaviour
     public void InvokeEditorSnapMouseToGrid(bool snapState)
     {
         IsEditorSnapMouseToGrid = snapState;
-    }
-
-    public void InvokeEditorShowSpecialCursor()
-    {
-        if (IsEditorShowingSpecialCursor)
-        {
-            return;
-        }
-
-        IsEditorShowingSpecialCursor = true;
-
-        Cursor.visible = false;
-        editorSpecialCursorImage.gameObject.SetActive(true);
-    }
-
-    public void InvokeEditorHideSpecialCursor()
-    {
-        if (!IsEditorShowingSpecialCursor)
-        {
-            return;
-        }
-
-        IsEditorShowingSpecialCursor = false;
-        Cursor.visible = true;
-        editorSpecialCursorImage.gameObject.SetActive(false);
     }
 
     public void InvokeOnEditorMetadataLoaded(EditorChartMetadata metadata)

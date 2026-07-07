@@ -70,7 +70,7 @@ public class GraphicsPauseModule : BasePauseModule
             float value = math.remap(0f, 1f, 0.5f, 1f, x);
 
             GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale, value);
-        }, GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale);
+        }, math.remap(0.5f, 1f, 0f, 1f, GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale));
 
         pauseMenuGroups[k_VSYNCINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync, x), GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync);
 
@@ -83,7 +83,7 @@ public class GraphicsPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit, Mathf.Max(result, 30));
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit, result);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit.ToString());
     }
     private List<Vector2Int> GetAllScreenResolutions()
