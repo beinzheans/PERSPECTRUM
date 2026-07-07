@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -28,16 +30,47 @@ public class GamePopupManager : MonoBehaviour
     private GameManager gameInstance;
 
     private TimerIntervalAction fadeOutTimer;
+
+    private Dictionary<string, string> informationMessageDisplay_KeyToStringValueMapping = new();
+
     private void Start()
     {
         HidePanel();
         gameInstance = GameManager.GameInstance;
-
+        gameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
         gameInstance.OnConfirmActionNeeded += EditorInstance_OnConfirmActionNeeded;
         gameInstance.OnInformationDisplayNeeded += EditorInstance_OnInformationDisplayNeeded;
 
         confirmButton.onClick.AddListener(() => UI_OnConfirmButtonPressed());
         denyButton.onClick.AddListener(() => UI_OnDenyButtonPressed());
+
+        UpdateInformationDisplaySpecialKeyMapping();
+    }
+
+    private void GameInstance_OnGameSettingsChanged()
+    {
+        UpdateInformationDisplaySpecialKeyMapping();
+    }
+
+    private const string k_HITBOX_A_KEYBIND_KEY = @"{HITBOX_A_KEY}";
+    private const string k_HITBOX_B_KEYBIND_KEY = @"{HITBOX_B_KEY}";
+
+    private void UpdateInformationDisplaySpecialKeyMapping()
+    {
+        informationMessageDisplay_KeyToStringValueMapping[k_HITBOX_A_KEYBIND_KEY] = gameInstance.InputActions.Gameplay.SwitchAInput.GetBindingDisplayString();
+        informationMessageDisplay_KeyToStringValueMapping[k_HITBOX_B_KEYBIND_KEY] = gameInstance.InputActions.Gameplay.SwitchBInput.GetBindingDisplayString();
+    }
+
+    private string ParseInformationDisplayMessage(string message)
+    {
+        StringBuilder stringBuilder = new StringBuilder(message);
+
+        foreach (var (key, val) in informationMessageDisplay_KeyToStringValueMapping)
+        {
+            stringBuilder.Replace(key, val);
+        }
+
+        return stringBuilder.ToString();
     }
 
     private const string k_FadeInAnimationString = "FadeIn";
@@ -45,7 +78,7 @@ public class GamePopupManager : MonoBehaviour
 
     private void EditorInstance_OnInformationDisplayNeeded(string obj, double time)
     {
-        infoMessageText.text = obj;
+        infoMessageText.text = ParseInformationDisplayMessage(obj);
 
         FadeInInformationPanel(time);
     }

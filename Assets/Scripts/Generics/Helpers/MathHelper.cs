@@ -771,8 +771,4 @@ public static class MathHelper
             return new Vector2(-GameManager.aspectRatioReciprocalFloat * pos.y + 25f / 32f, GameManager.aspectRatioFloat * pos.x - 7f / 18f);
         }
     }
-
-    private const string k_DISPLAYMESSAGEKEY_TYPEAKEYBIND = @"{TYPE_A_KEYBIND}";
-    private const string k_DISPLAYMESSAGEKEY_TYPEBKEYBIND = @"{TYPE_B_KEYBIND}";
-
 }

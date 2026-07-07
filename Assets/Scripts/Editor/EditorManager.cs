@@ -41,14 +41,12 @@ public class EditorManager : MonoBehaviour
     public EditorChart CurrentEditorChart { get; private set; }
     public double EditorPreviewTime { get; private set; }
     public float EditorPlaceDeleteSize { get; private set; }
-    [SerializeField] private double userScrollSensitivity_time;
     public double CurrentBPM { get; private set; }
     private double autoScrollSensitivity_time;
     [SerializeField] private float userScrollSensitivity_size;
 
 
     [SerializeField] private int numberOfBeatSubdivisions;
-    public double ScrollSensitivity_Time { get => userScrollSensitivity_time; }
     public float ScrollSensitivity_Size { get => userScrollSensitivity_size; }
     public double LookAheadTime { get => GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime; }
     public int NumberOfBeatSubdivisions { get => numberOfBeatSubdivisions; }
@@ -242,7 +240,7 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        double delta = userScrollSensitivity_time;
+        double delta = GameManager.GameInstance.GlobalSettings.EditorSettings.BigScrollTimeInterval;
         if (obj.ReadValue<Vector2>().y > 0f)
         {
             delta *= 1d;
@@ -252,7 +250,7 @@ public class EditorManager : MonoBehaviour
             delta *= -1d;
         }
 
-        UpdateEditorPreviewTimeByDelta(delta, true);
+        UpdateEditorPreviewTimeByDelta(delta, false);
     }
 
     private void ScrollEditorBeatSubdivision_performed(InputAction.CallbackContext obj)
