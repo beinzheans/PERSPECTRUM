@@ -1,0 +1,150 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
+
+/// <summary>
+/// A class to create a virtual cursor based on the hardware mouse.
+/// </summary>
+public class GameVirtualCursor : MonoBehaviour
+{
+    public static GameVirtualCursor GameVirtualCursorInstance;
+    [SerializeField] private RectTransform mouseCursorRectTransform;
+    [SerializeField] private Canvas mouseCanvas;
+
+    private RectTransform mouseCanvasRectTransform;
+
+    public const string k_VIRTUALMOUSEKEY = "VirtualMouse";
+
+    /// <summary>
+    /// The tag used to identify the virtual mouse. This is used inside the Input Action Asset
+    /// </summary>
+    public const string k_VIRTUALMOUSE_TAG = "VirtualMouseTag";
+    public Mouse VirtualMouse { get; private set; }
+    private Mouse hardwareMouse;
+
+    public Vector2 VirtualMousePosition { get; private set; }
+    public bool MouseVisibleState { get; private set; }
+    private void Awake()
+    {
+        if (GameVirtualCursorInstance == null)
+        {
+            GameVirtualCursorInstance = this;
+            DontDestroyOnLoad(gameObject);
+            return;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (VirtualMouse == null) // nothing to remove
+        {
+            return;
+        }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        InputSystem.RemoveDevice(VirtualMouse);
+        InputSystem.RemoveDeviceUsage(VirtualMouse, k_VIRTUALMOUSE_TAG);
+    }
+    private void Start()
+    {
+        hardwareMouse = Mouse.current; // cache hardware mouse, since virtual mouse & hardware mouse may conflict
+
+        VirtualMouse = InputSystem.AddDevice<Mouse>(k_VIRTUALMOUSEKEY);
+
+        InputSystem.AddDeviceUsage(VirtualMouse, k_VIRTUALMOUSE_TAG);
+
+        mouseCursorRectTransform.anchorMin = mouseCursorRectTransform.anchorMax = Vector2.zero; // set to bottom-left anchor, so (0, 0) is the bottom-left corner
+        mouseCanvasRectTransform = mouseCanvas.GetComponent<RectTransform>();
+        Vector2 centre = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(0.5f, 0.5f), mouseCanvasRectTransform);
+        mouseCursorRectTransform.anchoredPosition = centre;
+        VirtualMousePosition = centre;
+
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
+
+        ShowVirtualMouse();
+    }
+
+    private void Update()
+    {
+        UpdateVirtualMouse();
+    }
+
+    private const float k_DEFAULTMOUSESENSITIVITY = 1f; // testing value
+    private void UpdateVirtualMouse()
+    {
+        Vector2 delta = hardwareMouse.delta.ReadValue();
+
+        float sensitivity = GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor * k_DEFAULTMOUSESENSITIVITY; // even though the execution order is earlier, everything is already instantiatied in GameManager.
+
+        Vector2 mouseDisplacement = delta * sensitivity;
+
+        VirtualMousePosition += mouseDisplacement;
+
+        VirtualMousePosition = MathHelper.ClampVectorByComponent(VirtualMousePosition, 0f, Screen.width, 0f, Screen.height);
+
+        SetEventSystem();
+        UpdateVirtualCursorPosition();
+    }
+
+    private void SetEventSystem()
+    {
+        bool leftMouseButton = hardwareMouse.leftButton.isPressed;
+        bool rightMouseButton = hardwareMouse.rightButton.isPressed;
+        bool middleMouseButton = hardwareMouse.middleButton.isPressed;
+        bool forwardMouseButton = hardwareMouse.forwardButton.isPressed;
+        bool backMouseButton = hardwareMouse.backButton.isPressed;
+
+        int clickCount = hardwareMouse.clickCount.ReadValue();
+        Vector2 scroll = hardwareMouse.scroll.ReadValue();
+        MouseState mouseState = new MouseState()
+        {
+            position = VirtualMousePosition,
+            clickCount = (ushort)clickCount,
+            scroll = scroll
+        };
+
+        mouseState.WithButton(MouseButton.Left, leftMouseButton);
+        mouseState.WithButton(MouseButton.Right, rightMouseButton);
+        mouseState.WithButton(MouseButton.Middle, middleMouseButton);
+        mouseState.WithButton(MouseButton.Forward, forwardMouseButton);
+        mouseState.WithButton(MouseButton.Back, backMouseButton);
+
+        InputSystem.QueueStateEvent(VirtualMouse, mouseState);
+    }
+
+    private void UpdateVirtualCursorPosition()
+    {
+        MathHelper.GetNormalizedPointInsideReferenceUI(VirtualMousePosition, mouseCanvasRectTransform, out Vector2 normalizedPoint);
+        mouseCursorRectTransform.anchorMax = mouseCursorRectTransform.anchorMin = normalizedPoint;
+        mouseCursorRectTransform.anchoredPosition = Vector2.zero;
+    }
+
+    public void HideVirtualMouse()
+    {
+        if (mouseCursorRectTransform == null)
+        {
+            return;
+        }
+
+        mouseCursorRectTransform.gameObject.SetActive(false);
+        MouseVisibleState = false;
+    }
+
+    public void ShowVirtualMouse()
+    {
+        if (mouseCursorRectTransform == null)
+        {
+            return;
+        }
+
+        mouseCursorRectTransform.gameObject.SetActive(true);
+        MouseVisibleState = true;
+    }
+}

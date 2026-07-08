@@ -56,13 +56,13 @@ public class GameplayUICursor : MonoBehaviour
 
     private void GameplayManager_OnGameplayEnded()
     {
-        Cursor.visible = true;
+        GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
         cursorRawImage.gameObject.SetActive(false);
     }
 
     private void GameplayManager_OnGameplayStarted()
     {
-        Cursor.visible = false;
+        GameVirtualCursor.GameVirtualCursorInstance.HideVirtualMouse();
         cursorRawImage.gameObject.SetActive(true);
     }
     private void Update()

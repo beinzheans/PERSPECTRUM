@@ -17,16 +17,8 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
 
     protected override void OnRenderEvent()
     {
-        Vector2 screenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.NormalizedPosition, GameplayManager.GameplayInstance.GameplayRectTransform);
-
-        Vector3 spawnPoint = GameplayManager.GameplayInstance.GameplayCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, GameplayManager.k_HITPLANEDEPTH));
-        float zTimeDisplacement = (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
-
-        Vector2 screenSize = MathHelper.GetPixelSizeOfNormalizedSizeVector(AssociatedGameplayObject.NormalizedSize * Vector2.one, GameplayManager.GameplayInstance.GameplayRectTransform);
-        Vector3 worldSize = screenSize * GameplayManager.GameplayInstance.WorldToScreenSizeRatioOfPreview;
-
-        transform.position = spawnPoint + new Vector3(0f, 0f, zTimeDisplacement);
-        transform.localScale = worldSize + new Vector3(0f, 0f, 1f);
+        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        SetPosition();
         float hitboxIDFloat;
 
         if (AssociatedGameplayObject.HitboxType == HitboxType.A) hitboxIDFloat = 0f;
@@ -39,8 +31,27 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
         meshRenderer.SetPropertyBlock(propertyBlock);
     }
 
+    private void SetPosition()
+    {
+        Vector2 screenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.NormalizedPosition, GameplayManager.GameplayInstance.GameplayRectTransform);
+
+        Vector3 spawnPoint = GameplayManager.GameplayInstance.GameplayCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, GameplayManager.k_HITPLANEDEPTH));
+        float zTimeDisplacement = (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+
+        Vector2 screenSize = MathHelper.GetPixelSizeOfNormalizedSizeVector(AssociatedGameplayObject.NormalizedSize * Vector2.one, GameplayManager.GameplayInstance.GameplayRectTransform);
+        Vector3 worldSize = screenSize * GameplayManager.GameplayInstance.WorldToScreenSizeRatioOfPreview * GameManager.aspectRatioConversionScale;
+
+        transform.position = spawnPoint + new Vector3(0f, 0f, zTimeDisplacement);
+        transform.localScale = worldSize + new Vector3(0f, 0f, 1f);
+    }
+    private void GameInstance_OnGameSettingsChanged()
+    {
+        SetPosition();
+    }
+
     protected override void OnUnrenderEvent()
     {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
         return;
     }
 
@@ -58,6 +69,11 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
         // use (25^x - 1) / 24 graph for exponential curve
 
         return (float)((math.pow(25d, progress) - 1) / 24d);
+    }
+
+    protected override void OnDestroy()
+    {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
     }
 
 }

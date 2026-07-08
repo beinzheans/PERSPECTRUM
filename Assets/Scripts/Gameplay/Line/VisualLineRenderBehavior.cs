@@ -11,6 +11,12 @@ public class VisualLineRenderBehavior : GameplayObjectRenderBehavior<VisualLine>
 
     protected override void OnRenderEvent()
     {
+        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        SetPosition();
+    }
+
+    private void SetPosition()
+    {
         Vector2 fromScreenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.InitialPosition, GameplayManager.GameplayInstance.GameplayRectTransform);
         Vector2 toScreenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.TerminalPosition, GameplayManager.GameplayInstance.GameplayRectTransform);
 
@@ -26,15 +32,26 @@ public class VisualLineRenderBehavior : GameplayObjectRenderBehavior<VisualLine>
         Vector3 size = new Vector3(k_LINETHICKNESS, k_LINETHICKNESS, distance);
         transform.SetPositionAndRotation(position, rotation);
         transform.localScale = size;
+
+    }
+    private void GameInstance_OnGameSettingsChanged()
+    {
+        SetPosition();
     }
 
     protected override void OnUnrenderEvent()
     {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
         return;
     }
 
     protected override void OnUpdateEvent()
     {
         return;
+    }
+
+    protected override void OnDestroy()
+    {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
     }
 }

@@ -201,7 +201,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""MirrorObjects"",
+                    ""name"": ""MoveSelectedObjects"",
                     ""type"": ""Button"",
                     ""id"": ""89f285b0-902c-4b2e-8f35-fcffb757851a"",
                     ""expectedControlType"": """",
@@ -325,7 +325,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""2fd69012-04d5-4a53-89a0-6c53e9ba758a"",
-                    ""path"": ""<Mouse>/rightButton"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -450,7 +450,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MirrorObjects"",
+                    ""action"": ""MoveSelectedObjects"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -461,7 +461,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""MirrorObjects"",
+                    ""action"": ""MoveSelectedObjects"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -472,7 +472,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""MirrorObjects"",
+                    ""action"": ""MoveSelectedObjects"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -545,7 +545,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""binding"",
                     ""id"": ""70019f40-9a61-457b-a530-d919b7f3e1bd"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -556,7 +556,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""ea24acc8-6134-426b-86c2-867694e47a75"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -589,7 +589,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""binding"",
                     ""id"": ""cb35e561-1c20-46d9-9e2e-6e0e1f8be741"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -622,7 +622,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""binding"",
                     ""id"": ""846dff28-ca54-41af-b19d-102db5b959ea"",
-                    ""path"": ""<Mouse>/scroll"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -798,7 +798,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""55ee7281-aee4-43d2-8a50-7fc0985f638f"",
-                    ""path"": ""<Mouse>/position"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -809,7 +809,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""e7e714ba-658b-4897-99b1-188cf533fd2b"",
-                    ""path"": ""<Keyboard>/d"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -875,7 +875,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Editor_CopyObjects = m_Editor.FindAction("CopyObjects", throwIfNotFound: true);
         m_Editor_PasteObjects = m_Editor.FindAction("PasteObjects", throwIfNotFound: true);
         m_Editor_CutObjects = m_Editor.FindAction("CutObjects", throwIfNotFound: true);
-        m_Editor_MirrorObjects = m_Editor.FindAction("MirrorObjects", throwIfNotFound: true);
+        m_Editor_MoveSelectedObjects = m_Editor.FindAction("MoveSelectedObjects", throwIfNotFound: true);
         m_Editor_ToolPositiveNegativeInput = m_Editor.FindAction("ToolPositiveNegativeInput", throwIfNotFound: true);
         m_Editor_EditorPositiveNegativeInput = m_Editor.FindAction("EditorPositiveNegativeInput", throwIfNotFound: true);
         m_Editor_UndoEditorCommand = m_Editor.FindAction("UndoEditorCommand", throwIfNotFound: true);
@@ -980,7 +980,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Editor_CopyObjects;
     private readonly InputAction m_Editor_PasteObjects;
     private readonly InputAction m_Editor_CutObjects;
-    private readonly InputAction m_Editor_MirrorObjects;
+    private readonly InputAction m_Editor_MoveSelectedObjects;
     private readonly InputAction m_Editor_ToolPositiveNegativeInput;
     private readonly InputAction m_Editor_EditorPositiveNegativeInput;
     private readonly InputAction m_Editor_UndoEditorCommand;
@@ -1046,9 +1046,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @CutObjects => m_Wrapper.m_Editor_CutObjects;
         /// <summary>
-        /// Provides access to the underlying input action "Editor/MirrorObjects".
+        /// Provides access to the underlying input action "Editor/MoveSelectedObjects".
         /// </summary>
-        public InputAction @MirrorObjects => m_Wrapper.m_Editor_MirrorObjects;
+        public InputAction @MoveSelectedObjects => m_Wrapper.m_Editor_MoveSelectedObjects;
         /// <summary>
         /// Provides access to the underlying input action "Editor/ToolPositiveNegativeInput".
         /// </summary>
@@ -1131,9 +1131,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @CutObjects.started += instance.OnCutObjects;
             @CutObjects.performed += instance.OnCutObjects;
             @CutObjects.canceled += instance.OnCutObjects;
-            @MirrorObjects.started += instance.OnMirrorObjects;
-            @MirrorObjects.performed += instance.OnMirrorObjects;
-            @MirrorObjects.canceled += instance.OnMirrorObjects;
+            @MoveSelectedObjects.started += instance.OnMoveSelectedObjects;
+            @MoveSelectedObjects.performed += instance.OnMoveSelectedObjects;
+            @MoveSelectedObjects.canceled += instance.OnMoveSelectedObjects;
             @ToolPositiveNegativeInput.started += instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.performed += instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.canceled += instance.OnToolPositiveNegativeInput;
@@ -1196,9 +1196,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @CutObjects.started -= instance.OnCutObjects;
             @CutObjects.performed -= instance.OnCutObjects;
             @CutObjects.canceled -= instance.OnCutObjects;
-            @MirrorObjects.started -= instance.OnMirrorObjects;
-            @MirrorObjects.performed -= instance.OnMirrorObjects;
-            @MirrorObjects.canceled -= instance.OnMirrorObjects;
+            @MoveSelectedObjects.started -= instance.OnMoveSelectedObjects;
+            @MoveSelectedObjects.performed -= instance.OnMoveSelectedObjects;
+            @MoveSelectedObjects.canceled -= instance.OnMoveSelectedObjects;
             @ToolPositiveNegativeInput.started -= instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.performed -= instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.canceled -= instance.OnToolPositiveNegativeInput;
@@ -1481,12 +1481,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnCutObjects(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "MirrorObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MoveSelectedObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMirrorObjects(InputAction.CallbackContext context);
+        void OnMoveSelectedObjects(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "ToolPositiveNegativeInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

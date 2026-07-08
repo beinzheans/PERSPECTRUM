@@ -32,6 +32,11 @@ public class EditorCopyPasteManager : MonoBehaviour
 
     private void CutObjects_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         List<EditorDynamicObject> previousCopy = currentCopy;
         List<EditorDynamicObject> tempCopy = new List<EditorDynamicObject>(editorManager.CurrentSelectedRenderables);
 
@@ -63,6 +68,11 @@ public class EditorCopyPasteManager : MonoBehaviour
 
     private void PasteObjects_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         GetCopyOfSelectedObjects(out EditorDynamicObject[] pasteObjs);
         Action pasteCommand = () =>
         {
@@ -89,6 +99,11 @@ public class EditorCopyPasteManager : MonoBehaviour
 
     private void CopyObjects_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         List<EditorDynamicObject> previousCopy = currentCopy;
         List<EditorDynamicObject> tempCopy = new List<EditorDynamicObject>(editorManager.CurrentSelectedRenderables);
 

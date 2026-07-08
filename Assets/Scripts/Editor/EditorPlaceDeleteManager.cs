@@ -27,6 +27,11 @@ public class EditorPlaceDeleteManager : EditorUIBehavior
 
     private void DeleteSelectedEditorObject_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         List<EditorDynamicObject> selectedObjs = new List<EditorDynamicObject>(editorManager.CurrentSelectedRenderables);
 
         Action deleteAction = () =>
@@ -53,6 +58,11 @@ public class EditorPlaceDeleteManager : EditorUIBehavior
 
     private void PlaceEditorObject_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (editorManager.EditorMousePosition.x < 0f || editorManager.EditorMousePosition.x > 1f || editorManager.EditorMousePosition.y < 0f || editorManager.EditorMousePosition.y > 1f)
         {
             return;

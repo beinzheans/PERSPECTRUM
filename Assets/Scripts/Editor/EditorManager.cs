@@ -1,8 +1,8 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SFB;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -41,14 +41,12 @@ public class EditorManager : MonoBehaviour
     public EditorChart CurrentEditorChart { get; private set; }
     public double EditorPreviewTime { get; private set; }
     public float EditorPlaceDeleteSize { get; private set; }
-    [SerializeField] private double userScrollSensitivity_time;
     public double CurrentBPM { get; private set; }
     private double autoScrollSensitivity_time;
     [SerializeField] private float userScrollSensitivity_size;
 
 
     [SerializeField] private int numberOfBeatSubdivisions;
-    public double ScrollSensitivity_Time { get => userScrollSensitivity_time; }
     public float ScrollSensitivity_Size { get => userScrollSensitivity_size; }
     public double LookAheadTime { get => GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime; }
     public int NumberOfBeatSubdivisions { get => numberOfBeatSubdivisions; }
@@ -86,23 +84,19 @@ public class EditorManager : MonoBehaviour
 
     public bool IsEditorInPlaybackState { get; private set; }
 
-    [SerializeField] private TMP_InputField playbackSpeedInputField;
-    private double playbackSpeed = 1d;
-    public double PlaybackSpeed { get => playbackSpeed; }
-    public event Action OnPlaybackStart;
+    public event Action<double> OnPlaybackStart;
     public event Action OnPlaybackStopped;
 
     public event Action<AudioClip> OnMusicAudioClipLoaded;
 
     public bool IsEditorSnapMouseToGrid { get; private set; }
 
-    [SerializeField] private RawImage editorSpecialCursorImage;
-
-    public bool IsEditorShowingSpecialCursor { get; private set; }
     private byte[] currentEditorAudioClipByteArray = new byte[0];
 
     public event Func<EditorChartMetadata> OnRequestChartMetadata;
     public event Action<EditorChartMetadata> OnChartMetadataLoaded;
+
+    [SerializeField] private RawImage gridCursorVisualizationImage;
 
     private void Awake()
     {
@@ -122,7 +116,6 @@ public class EditorManager : MonoBehaviour
         inputAction.Editor.UndoEditorCommand.performed -= UndoEditorCommand_performed;
         inputAction.Editor.RedoEditorCommand.performed -= RedoEditorCommand_performed;
 
-        Cursor.visible = true;
         EditorInstance = null;
     }
     private void Start()
@@ -163,36 +156,36 @@ public class EditorManager : MonoBehaviour
         inputAction.Editor.UndoEditorCommand.performed += UndoEditorCommand_performed;
         inputAction.Editor.RedoEditorCommand.performed += RedoEditorCommand_performed;
 
-        playbackSpeedInputField.onValueChanged.AddListener((x) =>
-        {
-            bool parseResult = double.TryParse(x, out double speed);
-
-            if (!parseResult || speed <= 0d)
-            {
-                GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid playback speed");
-                playbackSpeed = 1d;
-                return;
-            }
-
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Changed playback speed");
-            playbackSpeed = speed;
-        }
-        );
         StartEditor();
     }
 
     private void RedoEditorCommand_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         RedoEditorCommand();
     }
 
     private void UndoEditorCommand_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         UndoEditorCommand();
     }
 
     private void SelectAllVisibleEditorObjects_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         for (int i = 0; i < EditorRenderables.Count; i++)
         {
             if (EditorRenderables[i] is not EditorDynamicObject editorObj)
@@ -237,12 +230,17 @@ public class EditorManager : MonoBehaviour
 
     private void ScrollEditorTime_BigScroll_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (IsEditorInPlaybackState)
         {
             return;
         }
 
-        double delta = userScrollSensitivity_time;
+        double delta = GameManager.GameInstance.GlobalSettings.EditorSettings.BigScrollTimeInterval;
         if (obj.ReadValue<Vector2>().y > 0f)
         {
             delta *= 1d;
@@ -252,11 +250,16 @@ public class EditorManager : MonoBehaviour
             delta *= -1d;
         }
 
-        UpdateEditorPreviewTimeByDelta(delta, true);
+        UpdateEditorPreviewTimeByDelta(delta, false);
     }
 
     private void ScrollEditorBeatSubdivision_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (obj.ReadValue<Vector2>().y > 0f)
         {
             numberOfBeatSubdivisions++;
@@ -276,6 +279,11 @@ public class EditorManager : MonoBehaviour
 
     private void EditorPositiveNegativeInput_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         float delta = userScrollSensitivity_size;
         if (obj.ReadValue<Vector2>().y > 0f)
         {
@@ -292,6 +300,11 @@ public class EditorManager : MonoBehaviour
 
     private void DeselectAllEditorObjects_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         List<EditorDynamicObject> copy = new List<EditorDynamicObject>(currentSelectedRenderables);
 
         Action selectAction = () =>
@@ -317,6 +330,11 @@ public class EditorManager : MonoBehaviour
 
     private void MouseSnapAlongY_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         snappedMouseCoordinate = EditorMousePosition;
         mouseSnapY = !mouseSnapY;
         mouseSnapX = false;
@@ -324,6 +342,11 @@ public class EditorManager : MonoBehaviour
 
     private void MouseSnapAlongX_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         snappedMouseCoordinate = EditorMousePosition;
         mouseSnapX = !mouseSnapX;
         mouseSnapY = false;
@@ -370,24 +393,17 @@ public class EditorManager : MonoBehaviour
             EditorMousePosition = snappedMousePosition;
         }
 
-        if (EditorMousePosition.x < 0f || EditorMousePosition.x > 1f || EditorMousePosition.y < 0f || EditorMousePosition.y > 1f)
-        {
-            InvokeEditorHideSpecialCursor();
-        }
-        else
-        {
-            InvokeEditorShowSpecialCursor();
-        }
-
-        if (IsEditorShowingSpecialCursor)
-        {
-            editorSpecialCursorImage.rectTransform.anchorMin = editorSpecialCursorImage.rectTransform.anchorMax = EditorMousePosition;
-            editorSpecialCursorImage.rectTransform.anchoredPosition = Vector2.zero;
-        }
+        gridCursorVisualizationImage.rectTransform.anchorMin = gridCursorVisualizationImage.rectTransform.anchorMax = MathHelper.ClampVectorByComponent(EditorMousePosition, 0f, 1f);
+        gridCursorVisualizationImage.rectTransform.anchoredPosition = Vector2.zero;
     }
 
     private void ScrollEditorTime_performed(InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         if (IsEditorInPlaybackState)
         {
             return;
@@ -556,10 +572,10 @@ public class EditorManager : MonoBehaviour
         OnTimelineMarkerActive?.Invoke(marker);
     }
 
-    public void InvokeEditorStartPlayback()
+    public void InvokeEditorStartPlayback(double playbackSpeed)
     {
         IsEditorInPlaybackState = true;
-        OnPlaybackStart?.Invoke();
+        OnPlaybackStart?.Invoke(playbackSpeed);
     }
 
     public void InvokeEditorStopPlayback()
@@ -577,31 +593,6 @@ public class EditorManager : MonoBehaviour
     public void InvokeEditorSnapMouseToGrid(bool snapState)
     {
         IsEditorSnapMouseToGrid = snapState;
-    }
-
-    public void InvokeEditorShowSpecialCursor()
-    {
-        if (IsEditorShowingSpecialCursor)
-        {
-            return;
-        }
-
-        IsEditorShowingSpecialCursor = true;
-
-        Cursor.visible = false;
-        editorSpecialCursorImage.gameObject.SetActive(true);
-    }
-
-    public void InvokeEditorHideSpecialCursor()
-    {
-        if (!IsEditorShowingSpecialCursor)
-        {
-            return;
-        }
-
-        IsEditorShowingSpecialCursor = false;
-        Cursor.visible = true;
-        editorSpecialCursorImage.gameObject.SetActive(false);
     }
 
     public void InvokeOnEditorMetadataLoaded(EditorChartMetadata metadata)
@@ -648,7 +639,7 @@ public class EditorManager : MonoBehaviour
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
     }
 
-    public async Task LoadEditorChart()
+    public void LoadEditorChart()
     {
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Load From File", "", GameManager.k_FILEEXTENSION, false);
 
@@ -660,6 +651,41 @@ public class EditorManager : MonoBehaviour
 
         GamePersistenceManager.LoadChartFile(paths[0], out string chartJson, out string metadataJson, out byte[] audioBytes);
 
+        JObject chartJObject = JObject.Parse(chartJson);
+        JObject metadataJObject = JObject.Parse(metadataJson);
+
+        bool validResult = GameVersionConverter.CompareChartMetadataWithCurrentVersion(in metadataJObject, out int compareResult);
+
+        if (!validResult)
+        {
+            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
+                                                                                                                                               "Do you want to continue?");
+            GameManager.GameInstance.InvokeConfirmActionNeeded(invalidConfirmAction);
+        }
+        else if (compareResult == 1)
+        {
+            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
+                                                                                                                                                    "Do you want to continue?");
+            GameManager.GameInstance.InvokeConfirmActionNeeded(outdatedGameConfirmAction);
+        }
+        else if (compareResult == -1)
+        {
+            bool result = GameVersionConverter.ConvertChartVersionToCurrentGameVersion(in chartJObject, in metadataJObject, out JObject convertedChartJObject, out JObject convertedmetadataJObject);
+            chartJson = convertedChartJObject.ToString();
+            metadataJson = convertedmetadataJObject.ToString();
+
+            ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has a version mismatch, the game has attempted to resolve it.\n" +
+                                                                                                                                               "Do you want to continue?");
+            GameManager.GameInstance.InvokeConfirmActionNeeded(convertConfirmAction);
+        }
+        else
+        {
+            ConvertToEditorChart(chartJson, metadataJson, audioBytes);
+        }
+    }
+
+    private async void ConvertToEditorChart(string chartJson, string metadataJson, byte[] audioBytes)
+    {
         try
         {
             EditorChart loadedChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, GameManager.GameInstance.JsonSerializerSettings);
@@ -832,7 +858,7 @@ public struct BaseChartMetadata : IEquatable<BaseChartMetadata>
     [JsonProperty(GameManager.k_CHARTDIFFICULTYKEY)]
     public int ChartDifficulty { get; private set; }
 
-    [JsonProperty(GameManager.k_METADATABASEDATAKEY)]
+    [JsonProperty(GameManager.k_CHARTVERSIONKEY)]
     public string Version { get; private set; }
 
     [JsonProperty(GameManager.k_CHARTGUIDKEY)]
@@ -843,20 +869,19 @@ public struct BaseChartMetadata : IEquatable<BaseChartMetadata>
         return obj is BaseChartMetadata metadata && Equals(metadata);
     }
 
-    public bool Equals(BaseChartMetadata other)
+    public bool Equals(BaseChartMetadata other) // don't use version for equals. Because when we convert, we directly change the versions field too.
     {
         return ChartName == other.ChartName &&
                ChartMapper == other.ChartMapper &&
                SongName == other.SongName &&
                SongArtist == other.SongArtist &&
                ChartDifficulty == other.ChartDifficulty &&
-               Version == other.Version &&
                GUID == other.GUID;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(ChartName, ChartMapper, SongName, SongArtist, ChartDifficulty, Version); // don't use GUID for hash code
+        return HashCode.Combine(ChartName, ChartMapper, SongName, SongArtist, ChartDifficulty); // don't use GUID nor version for hash code
     }
 }
 

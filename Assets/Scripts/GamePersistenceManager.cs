@@ -259,9 +259,11 @@ public static class GamePersistenceManager
 
             JObject metadataJObject = JObject.Parse(metadataJson);
 
-            if (!GameVersionConverter.IsChartMetadataUpToDate(metadataJObject))
+            bool validResult = GameVersionConverter.CompareChartMetadataWithCurrentVersion(in metadataJObject, out int compareResult);
+
+            if (!validResult || compareResult != 0)
             {
-                File.Delete(gamePath); // delete old tutorial if not up to date
+                File.Delete(gamePath);
             }
             else
             {

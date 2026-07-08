@@ -10,7 +10,7 @@ using UnityEngine.Splines;
 public static class MathHelper
 {
     /// <summary>
-    /// Get a normalized point w.r.t toPoint a reference rect given a screen point, where the bottom-left corner is (0, 0). <br></br>
+    /// Get a normalized point w.r.t to a reference rect given a screen point, where the bottom-left corner is (0, 0). <br></br>
     /// Gracefully handles division by zero (where the reference has size 0). Returns true if conversion result is successful.
     /// </summary>
     /// <param name="rawPoint"></param>
@@ -55,6 +55,22 @@ public static class MathHelper
 
         return new Vector2(x, y);
     }
+
+    /// <summary>
+    /// Performs clamp operations on each component of a vector
+    /// </summary>
+    /// <param name="rawVector"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Vector2 ClampVectorByComponent(Vector2 rawVector, float xMin, float xMax, float yMin, float yMaX)
+    {
+        float x = Mathf.Clamp(rawVector.x, xMin, xMax);
+        float y = Mathf.Clamp(rawVector.y, yMin, yMaX);
+
+        return new Vector2(x, y);
+    }
+
 
     private static Vector3[] worldCornerBuffer = new Vector3[4];
     /// <summary>
@@ -628,9 +644,9 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Compares two version numbers to see which is the latest, assuming <paramref name="a"/> and <paramref name="b"/> follow the same formatting. <br></br>
+    /// Compares two version numbers to see which is the latest, assuming <paramref name="a"/> and <paramref name="b"/> has a valid version number (see <see cref="IsStringMatchVersioningFormat(string)"/>). <br></br>
     /// Returns 1 if <paramref name="a"/> is later than <paramref name="b"/>. <br></br>
-    /// Returns 0 if <paramref name="a"/> is the same as <paramref name="b"/>, or if either is in the wrong format.<br></br>
+    /// Returns 0 if <paramref name="a"/> is the same as <paramref name="b"/> or if the format is invalid. <br></br>
     /// Returns -1 if <paramref name="a"/> is earlier than <paramref name="b"/>.
     /// </summary>
     /// <param name="a"></param>
@@ -681,6 +697,12 @@ public static class MathHelper
     private static string versioningRegex = @"[0-9]+.[0-9]+.[0-9]+";
     public static bool TryConvertStringToVersioning(string s, out int major, out int minor, out int revision)
     {
+        if (string.IsNullOrWhiteSpace(s))
+        {
+            major = minor = revision = 0;
+            return false;
+        }
+
         if (!Regex.IsMatch(s, versioningRegex))
         {
             major = minor = revision = 0;
@@ -697,6 +719,11 @@ public static class MathHelper
 
     public static bool IsStringMatchVersioningFormat(string s)
     {
+        if (string.IsNullOrWhiteSpace(s))
+        {
+            return false;
+        }
+
         return Regex.IsMatch(s, versioningRegex);
     }
 
@@ -718,5 +745,30 @@ public static class MathHelper
         float denom = 1f + math.exp(-10f * (x - 0.5f));
 
         return num / denom - k_AUDIOPANNINGMAX;
+    }
+
+    public static Vector2 GetMirroredPosition(in Vector2 pos, MoveSelectedMode mode)
+    {
+        return new Vector2(mode.HasFlag(MoveSelectedMode.Vertical) ? 1f - pos.x : pos.x, mode.HasFlag(MoveSelectedMode.Horizontal) ? 1f - pos.y : pos.y);
+    }
+
+    public static Vector2 GetRotatedPosition(in Vector2 pos, MoveSelectedMode mode)
+    {
+        if (!(mode.HasFlag(MoveSelectedMode.Rotate_90_Clockwise) ^ mode.HasFlag(MoveSelectedMode.Rotate_90_Anticlockwise)))
+        {
+            return pos; // do nothing, we only care if exactly one rotation is done
+        }
+
+        // we precompute the matrix transformation, hence the "magic numbers", though they are just a result of precompute matrix.
+        // note we use normal math convention, so anticlockwise is positive, so consider this if you want to derive it yourself
+
+        if (mode.HasFlag(MoveSelectedMode.Rotate_90_Clockwise))
+        {
+            return new Vector2(GameManager.aspectRatioReciprocalFloat * pos.y + 7f / 32f, -GameManager.aspectRatioFloat * pos.x + 25f / 18f);
+        }
+        else
+        {
+            return new Vector2(-GameManager.aspectRatioReciprocalFloat * pos.y + 25f / 32f, GameManager.aspectRatioFloat * pos.x - 7f / 18f);
+        }
     }
 }

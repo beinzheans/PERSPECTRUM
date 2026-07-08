@@ -16,12 +16,9 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
     }
     protected override void OnRenderEvent()
     {
-        meshFilter.mesh = GameplayManager.GameplayInstance.PlayAreaBorderMesh;
-
-        Vector3 zTimeDisplacement = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH + (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
-
-        transform.localScale = GameplayManager.GameplayInstance.CurrentPlayAreaBorderScale;
-        transform.SetPositionAndRotation(GameplayManager.GameplayInstance.GameplayCamera.transform.position + zTimeDisplacement + GameplayManager.GameplayInstance.CurrentPlayAreaDisplacement, GameplayManager.GameplayInstance.CurrentPlayAreaRotation);
+        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        SetPosition();
+        meshFilter.sharedMesh = GameplayManager.GameplayInstance.PlayAreaBorderMesh;
 
         float hitboxType_float;
 
@@ -35,8 +32,23 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
         meshRenderer.SetPropertyBlock(propertyBlock);
     }
 
+    private void SetPosition()
+    {
+        Vector3 zTimeDisplacement = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH + (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
+
+        transform.localScale = GameplayManager.GameplayInstance.CurrentPlayAreaBorderScale;
+        transform.SetPositionAndRotation(GameplayManager.GameplayInstance.GameplayCamera.transform.position + zTimeDisplacement + GameplayManager.GameplayInstance.CurrentPlayAreaDisplacement, GameplayManager.GameplayInstance.CurrentPlayAreaRotation);
+    }
+
+    private void GameInstance_OnGameSettingsChanged()
+    {
+        SetPosition();
+        meshFilter.sharedMesh = GameplayManager.GameplayInstance.PlayAreaBorderMesh;
+    }
+
     protected override void OnUnrenderEvent()
     {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
         return;
     }
 
@@ -53,6 +65,10 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
         double progress = (math.max(0d, (GameplayManager.GameplayInstance.CurrentGameplayTime + lookaheadTime - AssociatedGameplayObject.RenderTime) / lookaheadTime));
 
         return (float)progress; // use linear function
+    }
+    protected override void OnDestroy()
+    {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
     }
 
 }

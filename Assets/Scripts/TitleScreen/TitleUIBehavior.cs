@@ -1,7 +1,14 @@
+using TMPro;
 using UnityEngine;
 
 public class TitleUIBehavior : MonoBehaviour
 {
+    [SerializeField] private TMP_Text gameVersionText;
+
+    private void Start()
+    {
+        gameVersionText.text = $"Version {GameManager.GameInstance.CurrentVersion}";
+    }
     public void UI_OnPlayButtonPressed()
     {
         if (!GameManager.GameInstance.GlobalSettings.GameEvents.HasAdjustedOffset)

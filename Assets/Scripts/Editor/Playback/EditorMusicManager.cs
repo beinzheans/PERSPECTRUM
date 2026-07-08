@@ -33,7 +33,7 @@ public class EditorMusicManager : MonoBehaviour
         musicAudioSource.Stop();
     }
 
-    private void EditorManager_OnPlaybackStart()
+    private void EditorManager_OnPlaybackStart(double playbackSpeed)
     {
         if (musicAudioSource.clip == null)
         {
@@ -41,7 +41,7 @@ public class EditorMusicManager : MonoBehaviour
             return;
         }
 
-        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, GameManager.GameInstance.GlobalSettings.SongVolume, editorManager.EditorPreviewTime, editorManager.PlaybackSpeed, 0f);
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, GameManager.GameInstance.GlobalSettings.SongVolume, editorManager.EditorPreviewTime, playbackSpeed, 0f);
     }
 
     private void EditorManager_OnMusicAudioClipLoaded(AudioClip obj)

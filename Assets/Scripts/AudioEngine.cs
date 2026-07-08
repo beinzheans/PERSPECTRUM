@@ -24,7 +24,6 @@ public class AudioEngine : MonoBehaviour
         if (AudioInstance == null)
         {
             AudioInstance = this;
-            DontDestroyOnLoad(gameObject);
             InstantiateAudioPool();
             return;
         }

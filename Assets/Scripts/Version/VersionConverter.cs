@@ -30,7 +30,7 @@ public abstract class VersionConverter
 
         if (OnConvertChartEvent(ref convertedChartJObject, ref convertedMetadataJObject))
         {
-            convertedMetadataJObject[GameManager.k_METADATABASEDATAKEY] = OutVersion;
+            convertedMetadataJObject[GameManager.k_METADATABASEDATAKEY][GameManager.k_CHARTVERSIONKEY] = OutVersion;
             return true;
         }
         else
@@ -46,7 +46,7 @@ public abstract class VersionConverter
     /// <returns></returns>
     public bool IsChartMetadataValid(in JObject metadataJObject)
     {
-        string version = metadataJObject[GameManager.k_METADATABASEDATAKEY]?.ToString();
+        string version = metadataJObject[GameManager.k_METADATABASEDATAKEY][GameManager.k_CHARTVERSIONKEY]?.ToString();
 
 
         return !string.IsNullOrWhiteSpace(version) && version == InVersion;
@@ -62,18 +62,4 @@ public abstract class VersionConverter
     protected abstract bool OnConvertChartEvent(ref JObject chartJObject, ref JObject metadataJObject);
 }
 
-/// <summary>
-/// Converts a 1.0.0 chart to 1.1.0 chart by appending a N.A. (negative) difficulty.
-/// </summary>
-public class VersionConvert_1_0_0_to_1_1_0 : VersionConverter
-{
-    public override string InVersion => "1.0.0";
-
-    public override string OutVersion => "1.1.0";
-
-    protected override bool OnConvertChartEvent(ref JObject chartJObject, ref JObject metadataJObject)
-    {
-        metadataJObject.Add(new JProperty("ChartDifficulty", "-1"));
-        return true;
-    }
-}
+// Add converters inheriting the above parent class here.

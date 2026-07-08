@@ -53,4 +53,5 @@ public abstract class GameplayObjectRenderBehavior<T> : MonoBehaviour where T : 
     /// </summary>
     protected abstract void OnUpdateEvent();
 
+    protected abstract void OnDestroy();
 }

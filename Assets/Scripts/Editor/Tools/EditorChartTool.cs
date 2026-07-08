@@ -45,8 +45,8 @@ public class EditorChartTool : EditorUIBehavior
                 EditorManager.EditorInstance.SaveEditorChart();
                 break;
             case ChartOptions.LOAD_EDITOR_CHART:
-                ConfirmAction loadAction = new(async () => await EditorManager.EditorInstance.LoadEditorChart(), () => { }, "Are you sure you want to load a new chart?\n" +
-                                                                                                                            "All unsaved progress will be lost.");
+                ConfirmAction loadAction = new(() => EditorManager.EditorInstance.LoadEditorChart(), () => { }, "Are you sure you want to load a new chart?\n" +
+                                                                                                                "All unsaved progress will be lost.");
 
                 GameManager.GameInstance.InvokeConfirmActionNeeded(loadAction);
                 break;

@@ -36,11 +36,12 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
         playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
 
-        playareaBorderMeshFilter_Back.mesh = playareaBorderMeshFilter_earlyHitPlane.mesh = playareaBorderMeshFilter_Front.mesh = gameplayManager.PlayAreaBorderMesh;
+        playareaBorderMeshFilter_Back.sharedMesh = playareaBorderMeshFilter_earlyHitPlane.sharedMesh = playareaBorderMeshFilter_Front.sharedMesh = gameplayManager.PlayAreaBorderMesh;
 
         gameplayManager.AssignGameplayBorderScale(Vector3.one);
         gameplayManager.AssignGameplayDisplacementRotation(Vector3.zero, Quaternion.identity);
 
+        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
         gameplayManager.OnHitboxMatchedHit += GameplayManager_OnHitboxMatchedHit;
         gameplayManager.OnHitboxMismatchedHit += GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnHitboxMiss += GameplayManager_OnHitboxMiss;
@@ -48,6 +49,26 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
     }
+
+    private void OnDestroy()
+    {
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
+        gameplayManager.OnHitboxMatchedHit -= GameplayManager_OnHitboxMatchedHit;
+        gameplayManager.OnHitboxMismatchedHit -= GameplayManager_OnHitboxMismatchedHit;
+        gameplayManager.OnHitboxMiss -= GameplayManager_OnHitboxMiss;
+        gameplayManager.OnGameplayMetronomeFired -= GameplayManager_OnGameplayMetronomeFired;
+        gameplayManager.OnGameplayTimeUpdated -= GameplayManager_OnGameplayTimeUpdated;
+        gameplayManager.OnGameplayRestarted -= GameplayManager_OnGameplayRestarted;
+
+    }
+    private void GameInstance_OnGameSettingsChanged()
+    {
+        playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
+        playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
+
+        playareaBorderMeshFilter_Back.sharedMesh = playareaBorderMeshFilter_earlyHitPlane.sharedMesh = playareaBorderMeshFilter_Front.sharedMesh = gameplayManager.PlayAreaBorderMesh;
+    }
+
     private void GameplayManager_OnGameplayRestarted()
     {
         previousPulseTime = 0d;
@@ -64,8 +85,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     // we bounce the border when we hit, shrink the border when miss, ignore if hit bomb
     // pulseInterval will be used for the bounce timer so it is dynamic to BPM too
 
-    private readonly Vector3 k_BOUNCEMAXSIZE = new Vector3(1.015f, 1.015f, 1f);
-    private readonly Vector3 k_SHRINKMINSIZE = new Vector3(0.985f, 0.985f, 1f);
+    private readonly Vector3 k_BOUNCEMAXSIZE = new Vector3(1.020f, 1.020f, 1f);
+    private readonly Vector3 k_SHRINKMINSIZE = new Vector3(0.980f, 0.980f, 1f);
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
     {
         ShrinkBorders();
@@ -167,7 +188,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     }
 
     private const float k_PlayareaMaxRotationDegree = 1.5f;
-    private const float k_PlayareaMaxDisplacement = 0.1f;
+    private const float k_PlayareaMaxDisplacement = 0.075f;
     private void Update()
     {
         Vector2 mousePosition = gameplayManager.GameplayMousePosition;

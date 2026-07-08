@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -6,6 +7,9 @@ using UnityEngine;
 /// </summary>
 public class EditorPlaybackManager : EditorUIBehavior
 {
+    [SerializeField] private TMP_InputField playbackSpeedInputField;
+
+    private double playbackSpeed = 1d;
     private EditorManager editorManager;
     private PlayerInputActions inputActions;
     private bool playbackState;
@@ -31,6 +35,21 @@ public class EditorPlaybackManager : EditorUIBehavior
         UI_OnButtonPress(0);
         editorManager = EditorManager.EditorInstance;
         inputActions = GameManager.GameInstance.InputActions;
+        playbackSpeedInputField.onValueChanged.AddListener((x) =>
+        {
+            bool parseResult = double.TryParse(x, out double speed);
+
+            if (!parseResult || speed <= 0d)
+            {
+                GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid playback speed");
+                playbackSpeed = 1d;
+                return;
+            }
+
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Changed playback speed");
+            playbackSpeed = speed;
+        }
+);
 
         inputActions.Editor.EditorStartPlayback.performed += EditorStartPlayback_performed;
         editorManager.OnTimelineMarkerActive += EditorManager_OnTimelineMarkerActive;
@@ -58,6 +77,11 @@ public class EditorPlaybackManager : EditorUIBehavior
     }
     private void EditorStartPlayback_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
         playbackState = !playbackState;
 
         if (playbackState)
@@ -84,23 +108,22 @@ public class EditorPlaybackManager : EditorUIBehavior
                 break;
         }
 
-        if (editorManager.PlaybackSpeed < 0d || MathHelper.IsTwoDoublesEqualWithEpsilion(editorManager.PlaybackSpeed, 0d))
+        if (playbackSpeed < 0d || MathHelper.IsTwoDoublesEqualWithEpsilion(playbackSpeed, 0d))
         {
             return;
         }
 
-        double playbackSpeed = editorManager.PlaybackSpeed;
         Action<double> executeAction = (x) => editorManager.UpdateEditorPreviewTimeByDelta(x * playbackSpeed, false); // local variable so we can't change it while we're playback
         Action endAction = () => { };
         playbackAction = new TimerStopwatchAction(this, executeAction, endAction, 0d, double.MaxValue, true);
 
-        editorManager.InvokeEditorStartPlayback();
+        editorManager.InvokeEditorStartPlayback(playbackSpeed);
         DSPTimerEngine.TimerInstance.AddActionToTimer(playbackAction);
     }
 
     private void OnPlaybackStop()
     {
-        if (editorManager.PlaybackSpeed < 0d || MathHelper.IsTwoDoublesEqualWithEpsilion(editorManager.PlaybackSpeed, 0d))
+        if (playbackSpeed < 0d || MathHelper.IsTwoDoublesEqualWithEpsilion(playbackSpeed, 0d))
         {
             return;
         }

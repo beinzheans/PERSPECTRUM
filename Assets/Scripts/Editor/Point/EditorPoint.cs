@@ -16,13 +16,17 @@ public class EditorPoint : EditorDynamicObject
         return new EditorPoint(NormalizedPosition, RenderTime);
     }
 
-    public override void Mirror(MirrorAxis axis)
+    public override void Move_Mirror(MoveSelectedMode axis)
     {
-        Vector2 mirrorVector = new Vector2(axis.HasFlag(MirrorAxis.Vertical) ? 1f - NormalizedPosition.x : NormalizedPosition.x, axis.HasFlag(MirrorAxis.Horizontal) ? 1f - NormalizedPosition.y : NormalizedPosition.y);
-        NormalizedPosition = mirrorVector;
+        NormalizedPosition = MathHelper.GetMirroredPosition(NormalizedPosition, axis);
         EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 
+    public override void Move_Rotate(MoveSelectedMode moveMode)
+    {
+        NormalizedPosition = MathHelper.GetRotatedPosition(NormalizedPosition, moveMode);
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
+    }
     public override bool GetPosition(out Vector2 position)
     {
         position = NormalizedPosition;
