@@ -3526,7 +3526,7 @@ GameObject:
   m_Component:
   - component: {fileID: 365313117}
   m_Layer: 5
-  m_Name: Editor_TimingToolkitUI
+  m_Name: Editor_ControlToolkitUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13133,7 +13133,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   editorRootContainer: {fileID: 1663222213}
   previewUIContainer: {fileID: 471277512}
-  userScrollSensitivity_time: 1
   userScrollSensitivity_size: 0.01
   numberOfBeatSubdivisions: 4
   TextLabels:
@@ -20525,7 +20524,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Timing Toolkit
+  m_text: Control Toolkit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
