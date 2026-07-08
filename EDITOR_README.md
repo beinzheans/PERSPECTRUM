@@ -44,7 +44,7 @@ The Object Toolkit panel (left panel) provides all tools necessary to create new
    - **B**: Blue Note. The player must become Blue to match this note.
    - **Bomb**: Bomb Note. The player must dodge this note.
    - **Point**: Editor Point.
-   - **Line**: Editor Line.
+   - **Line**: Editor Line. A line is defined between two [Editor Objects (except for the line type)](#editor-object)
    - **Marker**: Editor Marker. Editor Markers are a key part in splitting your chart into different sections with a designated BPM. This influences the behavior of the [Timeline Panel](#timeline-panel).
 
    Refer to the [Control Scheme](#control-scheme) for help on creating [Editor Objects](#editor-object).
@@ -137,7 +137,7 @@ The Control Toolkit Panel (right panel) aims to help charters to control the beh
  
 ## Control Scheme
 
-The section below will detail the control scheme of the Editor. **These keys are NOT rebindable in this version.**
+Below are the details the control scheme of the Editor. **These keys are NOT rebindable in this version.**
 
 ### Editor Object Controls
 
@@ -150,13 +150,15 @@ The section below will detail the control scheme of the Editor. **These keys are
 | `Left Click` | Select Objects | Selects a visualized [Editor Object](#editor-object) on the [Editor Preview Panel](#editor-preview-panel). The selected [Editor Objects](#editor-object) are highlighted green. | <img width="400" height="225" alt="2026-07-08 09-32-53" src="https://github.com/user-attachments/assets/34006efd-3893-4534-baf0-35d146b70c9b" /> |
 | `X` | Delete Selected | Deletes all currently selected [Editor Objects](#editor-object).<br><br>**Markers** can not be deleted since they can not be selected. For help on deleting markers, refer to [All Editor Tools](#all-editor-tools) | <img width="400" height="225" alt="2026-07-08 09-43-05" src="https://github.com/user-attachments/assets/03d0e1d8-b5a3-4fbf-bdeb-c9bdf3e7c0e7" /> |
 | `A` | Select All | Selects all currently visualized [Editor Objects](#editor-object) on the [Editor Preview Panel](#editor-preview-panel). | <img width="400" height="225" alt="2026-07-08 09-58-58" src="https://github.com/user-attachments/assets/3b5116be-d40b-498f-8fa1-6b2f2e7bfb71" /> |
+| `Q` | Tool Decrement Input | Invokes a decrement event to the currently active tool. See [All Editor Tools](#all-editor-tools) to see specific implementations. | N. A. |
+| `E` | Tool Increment Input | Invokes an increment event to the current active tool. See [All Editor Tools](#all-editor-tools) to see specific implementations. | N. A. |
 | `Ctrl`-`A` | Deselect All | Deselects all currently selected [Editor Objects](#editor-object), even if it is not visualized on the [Editor Preview Panel](#editor-preview-panel). | <img width="400" height="225" alt="2026-07-08 10-03-19" src="https://github.com/user-attachments/assets/86456593-088d-44fc-ac00-e30ea0df875c" /> |
 | `Ctrl`-`M` | Move | Moves all currently selected [Editor Objects](#editor-object) according to the [Selection Tool](#2-selection-tool-section) options. | <img width="400" height="225" alt="2026-07-0810-30-53-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/041384cd-2355-4811-851e-5c705fbbcf57" /> |
 | `Alt`-`X` | Fix Horizontal Axis | Forces the [Editor Preview Cursor](#editor-preview-panel) to move only along the horizontal axis |<img width="400" height="225" alt="2026-07-0810-48-54-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/500efee8-c504-4d6a-848d-add5e095b421" /> |
 | `Alt`-`Y` | Fix Vertical Axis | Forces the [Editor Preview Cursor](#editor-preview-panel) to move only along the vertical axis | <img width="400" height="225" alt="2026-07-0810-49-06-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/947c11b9-9f53-4587-83a5-e13211e71b0a" /> |
 | `Ctrl`-`C` | Copy | Copies all currently selected [Editor Objects](#editor-object). This deselects all currently selected [Editor Objects](#editor-object). | <img width="400" height="225" alt="2026-07-08 10-08-22" src="https://github.com/user-attachments/assets/d912af8e-84c4-4e29-9751-5af6768fee82" /> |
 | `Ctrl`-`X` | Cut | Cuts all currently selected [Editor Objects](#editor-objects). This deletes all currently selected [Editor Objects](#editor-object). | <img width="400" height="225" alt="2026-07-08 10-10-57" src="https://github.com/user-attachments/assets/8b743c87-c0d7-4ba1-bd6e-204f423ce7de" /> |
-| `Ctrl`-`V` | Paste | Pastes the selected [Editor Objects](#editor-object) performed in the Copy or Cut. | <img width="400" height="225" alt="2026-07-08 10-14-08" src="https://github.com/user-attachments/assets/bdc5c831-4535-4e8b-8274-08948c447471" /> |
+| `Ctrl`-`V` | Paste | Pastes the selected [Editor Objects](#editor-object) performed in the Copy or Cut at the [Editor Preview Time](#editor-preview-time) | <img width="400" height="225" alt="2026-07-08 10-14-08" src="https://github.com/user-attachments/assets/bdc5c831-4535-4e8b-8274-08948c447471" /> |
 | `Ctrl`-`Z` | Undo | Undoes the previous control performed. | <img width="400" height="225" alt="2026-07-0810-17-28-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/e9948ab1-65b1-4d67-9cf0-7e1c6de52be2" /> |
 | `Ctrl`-`Shift`-`Z` | Redo | Redoes the previous undo operation performed. | <img width="400" height="225" alt="2026-07-0810-24-35-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/5670e94a-8d85-4e38-b984-df174c651247" /> |
 
@@ -181,3 +183,92 @@ The section below will detail the control scheme of the Editor. **These keys are
 
 
 ## All Editor Tools
+
+Below are the details and usages of the Editor tools.
+
+### Note Tools (Red, Blue, Bomb)
+
+#### 1. Change to Type A
+
+Changes all currently selected notes to [A (Red) notes](#1-editor-objects-section).
+
+#### 2. Change to Type B
+
+Changes all currently selected notes to [B (Blue) notes](#1-editor-objects-section).
+
+#### 3. Change to Bomb
+
+Changes all currently selected notes to [Bomb notes](#1-editor-objects-section).
+
+#### 4. Add Size Delta
+
+Adds a size delta according to the input field value. Keep in mind that sizes range from 0 to 1.
+
+Press on the button to enable this tool. You can decrease or increase the size by a delta defined by the input field using the [Tool Increment/Decrement Input](#control-scheme).
+
+<img width="853" height="480" alt="2026-07-0811-32-02-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/ef60acd5-136b-4e00-8923-0ec5c7dec395" />
+
+
+### Point Tools
+
+#### 1. Set Radius
+
+Sets the radius to be used when [Create Circle](#6-create-circle) is clicked.
+
+#### 2. Set Initial Angle
+
+Sets the initial angle to be used when [Create Circle](#6-create-circle) is clicked.
+
+#### 3. Set Final Angle
+
+Sets the final angle to be used when [Create Circle](#6-create-circle) is clicked.
+
+#### 4. Set Number Of Points
+
+Sets the number of points to sample (generate) when [Create Circle](#6-create-circle) or [Create Arc](#7-create-arc) is clicked.
+
+#### 5. Set Time Offset
+
+Sets the time offset between points when [Create Circle](#6-create-circle) is clicked.
+
+> [!CAUTION]
+> You are not advised to use this. This feature will be improved in later releases to use beat offset instead of time offset.
+> 
+> You can instead make use of the Copy, Cut and Paste if you want to offset the time.
+
+#### 6. Create Circle
+
+Creates a circle with a defined center, radius, initial angle, final angle, number of points and time offset.
+A center is defined by the currently selected [Editor Point(s)](#1-editor-objects-section).
+
+<img width="853" height="480" alt="2026-07-0811-43-44-ezgif com-video-to-gif-converter (1)" src="https://github.com/user-attachments/assets/1a05c9e5-d374-4d2e-9255-446fd3852630" />
+
+
+> [!IMPORTANT]
+> The angles are using standard math convention (polar coordinates). "0" is the positive horizontal axis (to the right, +x-axis). Positive values indicate an anti-clockwise direction. Angles are measured from the positive horizontal axis (to the right, +x-axis).
+
+
+#### 7. Create Arc
+
+Creates an arc with a defined line, focus point and number of points.
+
+<img width="853" height="480" alt="2026-07-0811-48-28-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/2495febc-a5ea-4a88-9488-c1873e2966a7" />
+
+
+#### 8. Convert To Hitbox
+
+Converts all selected [Editor Points](#1-editor-objects-section) to be type A Hitbox (Red Note) using the current [Note Size](#control-scheme). You can then use [Note Tools](#note-tools-red-blue-bomb) for further changes.
+
+### Line Tools
+
+#### 1. Generate Exterior
+
+Fills the exterior of a shape bounded by the currently selected lines with [Bombs](#1-editor-objects-section).
+
+#### 2. Generate Interior
+
+Fills  the interior of a shape bounded by the currently selected lines with [Bombs](#1-editor-objects-section).
+
+#### 3. Subdivide Line
+
+Subdivide the line into `n` points, including the end points of the line.
