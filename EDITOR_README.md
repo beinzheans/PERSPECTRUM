@@ -133,7 +133,7 @@ The Control Toolkit Panel (right panel) aims to help charters to control the beh
    - shows a visualization of the position that [Editor Objects](#editor-object) will be placed at using a transparent cursor.
 
    > [!WARNING]
-   > The Editor Preview Panel uses object-pooling approach to display the visualization of [Editor Objects](#editor-object). Each [Editor Object](#editor-object) will have their respective pools. If you are placing an extreme number of notes, or using a restrictively long [Editor Lookahead Time](#editor-lookahead-time), it is entirely possible that the pool is completely used up. This will not break the Editor but will lag the Editor due to the number of [Editor Objects](#editor-objects) and the warning messages being recorded in the player log.
+   > The Editor Preview Panel uses object-pooling approach to display the visualization of [Editor Objects](#editor-object). Each [Editor Object](#editor-object) will have their respective pools. If you are placing an extreme number of notes, or using a restrictively long [Editor Lookahead Time](#editor-lookahead-time), it is entirely possible that the pool is completely used up. This will not break the Editor but will lag the Editor due to the number of [Editor Objects](#editor-object) and the warning messages being recorded in the player log.
  
 ## Control Scheme
 
@@ -157,7 +157,7 @@ Below are the details the control scheme of the Editor. **These keys are NOT reb
 | `Alt`-`X` | Fix Horizontal Axis | Forces the [Editor Preview Cursor](#editor-preview-panel) to move only along the horizontal axis |<img width="400" height="225" alt="2026-07-0810-48-54-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/500efee8-c504-4d6a-848d-add5e095b421" /> |
 | `Alt`-`Y` | Fix Vertical Axis | Forces the [Editor Preview Cursor](#editor-preview-panel) to move only along the vertical axis | <img width="400" height="225" alt="2026-07-0810-49-06-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/947c11b9-9f53-4587-83a5-e13211e71b0a" /> |
 | `Ctrl`-`C` | Copy | Copies all currently selected [Editor Objects](#editor-object). This deselects all currently selected [Editor Objects](#editor-object). | <img width="400" height="225" alt="2026-07-08 10-08-22" src="https://github.com/user-attachments/assets/d912af8e-84c4-4e29-9751-5af6768fee82" /> |
-| `Ctrl`-`X` | Cut | Cuts all currently selected [Editor Objects](#editor-objects). This deletes all currently selected [Editor Objects](#editor-object). | <img width="400" height="225" alt="2026-07-08 10-10-57" src="https://github.com/user-attachments/assets/8b743c87-c0d7-4ba1-bd6e-204f423ce7de" /> |
+| `Ctrl`-`X` | Cut | Cuts all currently selected [Editor Objects](#editor-object). This deletes all currently selected [Editor Objects](#editor-object). | <img width="400" height="225" alt="2026-07-08 10-10-57" src="https://github.com/user-attachments/assets/8b743c87-c0d7-4ba1-bd6e-204f423ce7de" /> |
 | `Ctrl`-`V` | Paste | Pastes the selected [Editor Objects](#editor-object) performed in the Copy or Cut at the [Editor Preview Time](#editor-preview-time) | <img width="400" height="225" alt="2026-07-08 10-14-08" src="https://github.com/user-attachments/assets/bdc5c831-4535-4e8b-8274-08948c447471" /> |
 | `Ctrl`-`Z` | Undo | Undoes the previous control performed. | <img width="400" height="225" alt="2026-07-0810-17-28-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/e9948ab1-65b1-4d67-9cf0-7e1c6de52be2" /> |
 | `Ctrl`-`Shift`-`Z` | Redo | Redoes the previous undo operation performed. | <img width="400" height="225" alt="2026-07-0810-24-35-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/5670e94a-8d85-4e38-b984-df174c651247" /> |
@@ -265,10 +265,47 @@ Converts all selected [Editor Points](#1-editor-objects-section) to be type A Hi
 
 Fills the exterior of a shape bounded by the currently selected lines with [Bombs](#1-editor-objects-section).
 
+<img width="853" height="480" alt="2026-07-0821-03-20-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/0a812873-f6d0-4406-9c5a-2a1ffaed1998" />
+
+
 #### 2. Generate Interior
 
 Fills  the interior of a shape bounded by the currently selected lines with [Bombs](#1-editor-objects-section).
 
+<img width="853" height="480" alt="2026-07-0821-03-31-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/e9aaff53-43b0-4acb-b2c7-d2466d7abf3e" />
+
+
 #### 3. Subdivide Line
 
 Subdivide the line into `n` points, including the end points of the line.
+
+<img width="853" height="480" alt="2026-07-0821-03-48-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/a4682e95-9db8-4a52-9acd-9c49b78c4360" />
+
+### Marker Tools
+
+#### 1. Set Marker Name
+
+Sets the name of the marker that will be displayed on the [Timeline panel](#timeline-panel).
+
+#### 2. Set Marker BPM
+
+Sets the BPM of the marker.
+
+> [!IMPORTANT]                  
+> The BPM of the marker must be set to a valid value for a marker to be placed.
+
+
+#### 3. Set Message
+
+Sets the message of the marker that will be displayed initially when the marker becomes active. The information panel will not be displayed if the message is not set.
+
+
+#### 4. Set Message Time
+
+Sets the time duration that the message will be displayed for. The information panel will not be displayed if the message time is not set.
+
+#### 5. Delete Current Mrk.
+
+Deletes the current active marker that is displayed on the [Timeline Panel](#timeline-panel).
+
+<img width="853" height="480" alt="2026-07-0821-05-32-ezgif com-video-to-gif-converter" src="https://github.com/user-attachments/assets/af9e7a03-d449-436c-8b60-554305f387ab" />
