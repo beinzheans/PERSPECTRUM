@@ -36,4 +36,11 @@ public class VisualLine : GameplayObject, IEquatable<VisualLine>
     {
         return HashCode.Combine(InitialPosition, TerminalPosition, InitialTime, TerminalTime);
     }
+
+    // we override the line unrender bool. It's because we want to unrender only when it's past terminal time
+    public override bool IsInUnrenderRange(double time)
+    {
+        double minTime = time - GameplayManager.k_POOLUNRENDERTIMETHRESHOLD;
+        return TerminalTime < minTime;
+    }
 }

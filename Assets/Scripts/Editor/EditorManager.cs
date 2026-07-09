@@ -111,7 +111,7 @@ public class EditorManager : MonoBehaviour
         inputAction.Editor.MouseSnapAlongX.performed -= MouseSnapAlongX_performed;
         inputAction.Editor.MouseSnapAlongY.performed -= MouseSnapAlongY_performed;
         inputAction.Editor.DeselectAllEditorObjects.performed -= DeselectAllEditorObjects_performed;
-        inputAction.Editor.EditorPositiveNegativeInput.performed -= EditorPositiveNegativeInput_performed;
+        inputAction.Editor.ScrollEditorNoteSize.performed -= ScrollEditorNoteSize_performed;
         inputAction.Editor.SelectAllVisibleEditorObjects.performed -= SelectAllVisibleEditorObjects_performed;
         inputAction.Editor.UndoEditorCommand.performed -= UndoEditorCommand_performed;
         inputAction.Editor.RedoEditorCommand.performed -= RedoEditorCommand_performed;
@@ -151,7 +151,7 @@ public class EditorManager : MonoBehaviour
         inputAction.Editor.MouseSnapAlongX.performed += MouseSnapAlongX_performed;
         inputAction.Editor.MouseSnapAlongY.performed += MouseSnapAlongY_performed;
         inputAction.Editor.DeselectAllEditorObjects.performed += DeselectAllEditorObjects_performed;
-        inputAction.Editor.EditorPositiveNegativeInput.performed += EditorPositiveNegativeInput_performed;
+        inputAction.Editor.ScrollEditorNoteSize.performed += ScrollEditorNoteSize_performed;
         inputAction.Editor.SelectAllVisibleEditorObjects.performed += SelectAllVisibleEditorObjects_performed;
         inputAction.Editor.UndoEditorCommand.performed += UndoEditorCommand_performed;
         inputAction.Editor.RedoEditorCommand.performed += RedoEditorCommand_performed;
@@ -277,7 +277,7 @@ public class EditorManager : MonoBehaviour
         InvokeEditorPreviewUpdateEvent();
     }
 
-    private void EditorPositiveNegativeInput_performed(InputAction.CallbackContext obj)
+    private void ScrollEditorNoteSize_performed(InputAction.CallbackContext obj)
     {
         if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
         {

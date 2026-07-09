@@ -34,6 +34,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "ScrollEditorNoteSize",
+                    "type": "Value",
+                    "id": "5cb6e7e8-40dd-47bc-bd2b-ff49da36419b",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "MouseSnapAlongX",
                     "type": "Button",
                     "id": "63905d6d-ae0f-427a-af91-34f9dc042bcd",
@@ -128,15 +137,6 @@
                     "type": "Value",
                     "id": "6cf4950e-8304-46c8-9a42-7ff596e9350d",
                     "expectedControlType": "Axis",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "EditorPositiveNegativeInput",
-                    "type": "Value",
-                    "id": "5cb6e7e8-40dd-47bc-bd2b-ff49da36419b",
-                    "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -441,7 +441,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "EditorPositiveNegativeInput",
+                    "action": "ScrollEditorNoteSize",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -452,7 +452,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KB&M",
-                    "action": "EditorPositiveNegativeInput",
+                    "action": "ScrollEditorNoteSize",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -463,7 +463,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KB&M",
-                    "action": "EditorPositiveNegativeInput",
+                    "action": "ScrollEditorNoteSize",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -723,7 +723,7 @@
                 {
                     "name": "",
                     "id": "e7e714ba-658b-4897-99b1-188cf533fd2b",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": ";KB&M",

@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public class GameplayAudioController : MonoBehaviour
@@ -93,13 +94,14 @@ public class GameplayAudioController : MonoBehaviour
 
         float panning = MathHelper.GetAudioPanningFromPosition(obj.NormalizedPosition);
 
+        double hitboxOffset = obj.RenderTime - gameplayManager.CurrentGameplayTime;
         if (obj.HitboxType == HitboxType.A)
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, math.max(0d, hitboxOffset), GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
         else
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, math.max(0d, hitboxOffset), GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
     }
 

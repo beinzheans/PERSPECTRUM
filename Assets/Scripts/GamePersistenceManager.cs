@@ -233,49 +233,6 @@ public static class GamePersistenceManager
         return true;
     }
 
-    public static void ImportTutorialChartToGameStorage()
-    {
-        string streamingAssetPath = Path.Combine(Application.streamingAssetsPath, $"{GameManager.k_TUTORIALCHARTNAME}.{GameManager.k_FILEEXTENSION}");
-
-
-        if (!File.Exists(streamingAssetPath))
-        {
-            return;
-        }
-
-        string fileName = Path.GetFileNameWithoutExtension(streamingAssetPath);
-        string gameDirectory = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName);
-
-        if (!Directory.Exists(gameDirectory))
-        {
-            Directory.CreateDirectory(gameDirectory);
-        }
-
-        string gamePath = Path.Combine(gameDirectory, $"{fileName}.{GameManager.k_FILEEXTENSION}");
-
-        if (File.Exists(gamePath))
-        {
-            LoadChartFile(gamePath, out _, out string metadataJson, out _);
-
-            JObject metadataJObject = JObject.Parse(metadataJson);
-
-            bool validResult = GameVersionConverter.CompareChartMetadataWithCurrentVersion(in metadataJObject, out int compareResult);
-
-            if (!validResult || compareResult != 0)
-            {
-                File.Delete(gamePath);
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        File.Copy(streamingAssetPath, gamePath);
-
-        return;
-    }
-
     public static void ReadEditorChartsInGameStorage(out string[] editorChartPaths)
     {
         string path = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName);

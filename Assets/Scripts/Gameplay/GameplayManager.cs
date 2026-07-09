@@ -265,6 +265,9 @@ public class GameplayManager : MonoBehaviour
         GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
         gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
 
+        RenderSettings.fogStartDistance = k_HITPLANEDEPTH;
+        RenderSettings.fogEndDistance = GameplayFarClipPlane;
+
         CreateGameplayReferencePoints();
         GeneratePlayAreaMesh();
     }
@@ -359,10 +362,23 @@ public class GameplayManager : MonoBehaviour
     {
         EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime; // note it is sorted
         Action<double> timerElaspedAction = (x) => UpdateGameplayTimeByDeltatime(x);
-        Action timerEndAction = () => { InvokeGameplayEndedEvent(); };
+        Action timerEndAction = () => InvokeGameplayEndedEvent();
 
         stopwatchAction = new TimerStopwatchAction(this, timerElaspedAction, timerEndAction, k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, EndTime + k_TIMEOFFSET, true);
         DSPTimerEngine.TimerInstance.AddActionToTimer(stopwatchAction);
+
+        InvokeGameplayStartedEvent();
+    }
+
+    private void InvokeGameplayStartedEvent()
+    {
+        RenderSettings.fog = true;
+        RenderSettings.fogMode = FogMode.Linear;
+        RenderSettings.fogStartDistance = k_HITPLANEDEPTH;
+        RenderSettings.fogEndDistance = GameplayFarClipPlane;
+        RenderSettings.fogColor = gameplayCamera.backgroundColor;
+        Debug.Log($"Started gameplay!");
+        OnGameplayStarted?.Invoke();
     }
 
     private void GetAccuracy()
@@ -382,7 +398,7 @@ public class GameplayManager : MonoBehaviour
     /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
     /// </summary>
     /// <param name="path"></param>
-    public void InvokeGameplayStartedEvent(string path)
+    public void RequestGameplayStartedEvent(string path)
     {
         CurrentPath = path;
         GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] bytes);
@@ -454,7 +470,6 @@ public class GameplayManager : MonoBehaviour
 
         OnGameplayChartLoaded?.Invoke(clip, metadata);
         StartGameplay();
-        OnGameplayStarted?.Invoke();
     }
 
     /// <summary>
@@ -465,7 +480,7 @@ public class GameplayManager : MonoBehaviour
     {
         IsInReplayMode = true;
         CurrentGameplayRecord = record;
-        InvokeGameplayStartedEvent(path);
+        RequestGameplayStartedEvent(path);
     }
 
     public void InvokeGameplayObjectRendered(GameplayObject obj)
@@ -536,7 +551,6 @@ public class GameplayManager : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         OnGameplayRestarted?.Invoke();
         StartGameplay();
-        OnGameplayStarted?.Invoke();
     }
 
     public void InvokeMouseActiveTypeChanged(MouseActiveType newActiveType)

@@ -19,7 +19,7 @@ public abstract class GameplayObject : IEquatable<GameplayObject>
     /// </summary>
     /// <param name="time"></param>
     /// <returns></returns>
-    public bool IsInRenderRange(double time)
+    public virtual bool IsInRenderRange(double time)
     {
         double maxRenderTime = time + GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime + GameplayManager.k_POOLLOOKAHEADTIME;
         return RenderTime > time && RenderTime < maxRenderTime;
@@ -30,7 +30,7 @@ public abstract class GameplayObject : IEquatable<GameplayObject>
     /// </summary>
     /// <param name="time"></param>
     /// <returns></returns>
-    public bool IsInUnrenderRange(double time)
+    public virtual bool IsInUnrenderRange(double time)
     {
         double minTime = time - GameplayManager.k_POOLUNRENDERTIMETHRESHOLD;
         return RenderTime < minTime;
