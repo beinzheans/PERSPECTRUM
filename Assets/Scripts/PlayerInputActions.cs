@@ -120,6 +120,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""ScrollEditorNoteSize"",
+                    ""type"": ""Value"",
+                    ""id"": ""5cb6e7e8-40dd-47bc-bd2b-ff49da36419b"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""MouseSnapAlongX"",
                     ""type"": ""Button"",
                     ""id"": ""63905d6d-ae0f-427a-af91-34f9dc042bcd"",
@@ -214,15 +223,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""type"": ""Value"",
                     ""id"": ""6cf4950e-8304-46c8-9a42-7ff596e9350d"",
                     ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""EditorPositiveNegativeInput"",
-                    ""type"": ""Value"",
-                    ""id"": ""5cb6e7e8-40dd-47bc-bd2b-ff49da36419b"",
-                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -527,7 +527,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""EditorPositiveNegativeInput"",
+                    ""action"": ""ScrollEditorNoteSize"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -538,7 +538,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""EditorPositiveNegativeInput"",
+                    ""action"": ""ScrollEditorNoteSize"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -549,7 +549,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""EditorPositiveNegativeInput"",
+                    ""action"": ""ScrollEditorNoteSize"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -809,7 +809,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""e7e714ba-658b-4897-99b1-188cf533fd2b"",
-                    ""path"": ""<Keyboard>/e"",
+                    ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
@@ -866,6 +866,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Editor_ScrollEditorTime = m_Editor.FindAction("ScrollEditorTime", throwIfNotFound: true);
         m_Editor_ScrollEditorBeatSubdivision = m_Editor.FindAction("ScrollEditorBeatSubdivision", throwIfNotFound: true);
         m_Editor_ScrollEditorTime_BigScroll = m_Editor.FindAction("ScrollEditorTime_BigScroll", throwIfNotFound: true);
+        m_Editor_ScrollEditorNoteSize = m_Editor.FindAction("ScrollEditorNoteSize", throwIfNotFound: true);
         m_Editor_MouseSnapAlongX = m_Editor.FindAction("MouseSnapAlongX", throwIfNotFound: true);
         m_Editor_MouseSnapAlongY = m_Editor.FindAction("MouseSnapAlongY", throwIfNotFound: true);
         m_Editor_PlaceEditorObject = m_Editor.FindAction("PlaceEditorObject", throwIfNotFound: true);
@@ -877,7 +878,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Editor_CutObjects = m_Editor.FindAction("CutObjects", throwIfNotFound: true);
         m_Editor_MoveSelectedObjects = m_Editor.FindAction("MoveSelectedObjects", throwIfNotFound: true);
         m_Editor_ToolPositiveNegativeInput = m_Editor.FindAction("ToolPositiveNegativeInput", throwIfNotFound: true);
-        m_Editor_EditorPositiveNegativeInput = m_Editor.FindAction("EditorPositiveNegativeInput", throwIfNotFound: true);
         m_Editor_UndoEditorCommand = m_Editor.FindAction("UndoEditorCommand", throwIfNotFound: true);
         m_Editor_RedoEditorCommand = m_Editor.FindAction("RedoEditorCommand", throwIfNotFound: true);
         m_Editor_EditorStartPlayback = m_Editor.FindAction("EditorStartPlayback", throwIfNotFound: true);
@@ -971,6 +971,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Editor_ScrollEditorTime;
     private readonly InputAction m_Editor_ScrollEditorBeatSubdivision;
     private readonly InputAction m_Editor_ScrollEditorTime_BigScroll;
+    private readonly InputAction m_Editor_ScrollEditorNoteSize;
     private readonly InputAction m_Editor_MouseSnapAlongX;
     private readonly InputAction m_Editor_MouseSnapAlongY;
     private readonly InputAction m_Editor_PlaceEditorObject;
@@ -982,7 +983,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Editor_CutObjects;
     private readonly InputAction m_Editor_MoveSelectedObjects;
     private readonly InputAction m_Editor_ToolPositiveNegativeInput;
-    private readonly InputAction m_Editor_EditorPositiveNegativeInput;
     private readonly InputAction m_Editor_UndoEditorCommand;
     private readonly InputAction m_Editor_RedoEditorCommand;
     private readonly InputAction m_Editor_EditorStartPlayback;
@@ -1009,6 +1009,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Editor/ScrollEditorTime_BigScroll".
         /// </summary>
         public InputAction @ScrollEditorTime_BigScroll => m_Wrapper.m_Editor_ScrollEditorTime_BigScroll;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/ScrollEditorNoteSize".
+        /// </summary>
+        public InputAction @ScrollEditorNoteSize => m_Wrapper.m_Editor_ScrollEditorNoteSize;
         /// <summary>
         /// Provides access to the underlying input action "Editor/MouseSnapAlongX".
         /// </summary>
@@ -1053,10 +1057,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Editor/ToolPositiveNegativeInput".
         /// </summary>
         public InputAction @ToolPositiveNegativeInput => m_Wrapper.m_Editor_ToolPositiveNegativeInput;
-        /// <summary>
-        /// Provides access to the underlying input action "Editor/EditorPositiveNegativeInput".
-        /// </summary>
-        public InputAction @EditorPositiveNegativeInput => m_Wrapper.m_Editor_EditorPositiveNegativeInput;
         /// <summary>
         /// Provides access to the underlying input action "Editor/UndoEditorCommand".
         /// </summary>
@@ -1104,6 +1104,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ScrollEditorTime_BigScroll.started += instance.OnScrollEditorTime_BigScroll;
             @ScrollEditorTime_BigScroll.performed += instance.OnScrollEditorTime_BigScroll;
             @ScrollEditorTime_BigScroll.canceled += instance.OnScrollEditorTime_BigScroll;
+            @ScrollEditorNoteSize.started += instance.OnScrollEditorNoteSize;
+            @ScrollEditorNoteSize.performed += instance.OnScrollEditorNoteSize;
+            @ScrollEditorNoteSize.canceled += instance.OnScrollEditorNoteSize;
             @MouseSnapAlongX.started += instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.performed += instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.canceled += instance.OnMouseSnapAlongX;
@@ -1137,9 +1140,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ToolPositiveNegativeInput.started += instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.performed += instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.canceled += instance.OnToolPositiveNegativeInput;
-            @EditorPositiveNegativeInput.started += instance.OnEditorPositiveNegativeInput;
-            @EditorPositiveNegativeInput.performed += instance.OnEditorPositiveNegativeInput;
-            @EditorPositiveNegativeInput.canceled += instance.OnEditorPositiveNegativeInput;
             @UndoEditorCommand.started += instance.OnUndoEditorCommand;
             @UndoEditorCommand.performed += instance.OnUndoEditorCommand;
             @UndoEditorCommand.canceled += instance.OnUndoEditorCommand;
@@ -1169,6 +1169,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ScrollEditorTime_BigScroll.started -= instance.OnScrollEditorTime_BigScroll;
             @ScrollEditorTime_BigScroll.performed -= instance.OnScrollEditorTime_BigScroll;
             @ScrollEditorTime_BigScroll.canceled -= instance.OnScrollEditorTime_BigScroll;
+            @ScrollEditorNoteSize.started -= instance.OnScrollEditorNoteSize;
+            @ScrollEditorNoteSize.performed -= instance.OnScrollEditorNoteSize;
+            @ScrollEditorNoteSize.canceled -= instance.OnScrollEditorNoteSize;
             @MouseSnapAlongX.started -= instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.performed -= instance.OnMouseSnapAlongX;
             @MouseSnapAlongX.canceled -= instance.OnMouseSnapAlongX;
@@ -1202,9 +1205,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ToolPositiveNegativeInput.started -= instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.performed -= instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.canceled -= instance.OnToolPositiveNegativeInput;
-            @EditorPositiveNegativeInput.started -= instance.OnEditorPositiveNegativeInput;
-            @EditorPositiveNegativeInput.performed -= instance.OnEditorPositiveNegativeInput;
-            @EditorPositiveNegativeInput.canceled -= instance.OnEditorPositiveNegativeInput;
             @UndoEditorCommand.started -= instance.OnUndoEditorCommand;
             @UndoEditorCommand.performed -= instance.OnUndoEditorCommand;
             @UndoEditorCommand.canceled -= instance.OnUndoEditorCommand;
@@ -1418,6 +1418,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnScrollEditorTime_BigScroll(InputAction.CallbackContext context);
         /// <summary>
+        /// Method invoked when associated input action "ScrollEditorNoteSize" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnScrollEditorNoteSize(InputAction.CallbackContext context);
+        /// <summary>
         /// Method invoked when associated input action "MouseSnapAlongX" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -1494,13 +1501,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToolPositiveNegativeInput(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "EditorPositiveNegativeInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnEditorPositiveNegativeInput(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "UndoEditorCommand" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

@@ -72,7 +72,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     private void GameplayManager_OnGameplayRestarted()
     {
         previousPulseTime = 0d;
-
+        pulseInterval = 0d;
         pulsePropertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, 1f);
 
         playareaBorderMeshRenderer_front.SetPropertyBlock(pulsePropertyBlock);

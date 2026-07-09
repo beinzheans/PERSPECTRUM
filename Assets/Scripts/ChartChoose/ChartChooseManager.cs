@@ -3,6 +3,7 @@ using SFB;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +14,8 @@ public class ChartChooseManager : MonoBehaviour
     [SerializeField] private ChartButtonBehavior chartButtonPrefab;
     [SerializeField] private Button importChartButton;
     [SerializeField] private Button returnMainMenuButton;
+
+    [SerializeField] private TMP_Text importedChartsText;
 
     public event Action<ChartGameplayRecordButtonBehavior> OnChartRecordButtonClicked;
     public event Action<ChartButtonBehavior> OnChartButtonClicked;
@@ -42,6 +45,8 @@ public class ChartChooseManager : MonoBehaviour
         {
             AddChartButton(allPaths[i]);
         }
+
+        importedChartsText.text = $"Imported Charts ({spawnedChartButtonBehaviors.Count})";
     }
 
     private void AddChartButton(string path)
@@ -85,6 +90,8 @@ public class ChartChooseManager : MonoBehaviour
         }
 
         AddChartButton(internalChartPath);
+
+        importedChartsText.text = $"Imported Charts ({spawnedChartButtonBehaviors.Count})";
     }
 
     public void UI_ReturnMainMenuButton()
@@ -116,6 +123,7 @@ public class ChartChooseManager : MonoBehaviour
 
         File.Delete(path);
 
+        importedChartsText.text = $"Imported Charts ({spawnedChartButtonBehaviors.Count})";
         OnChartDeleted?.Invoke();
     }
 

@@ -23,6 +23,7 @@ public abstract class BasePauseModule : MonoBehaviour
     [SerializeField] private RectTransform groupContentRectTransform;
     protected PauseMenuGroupObject[] pauseMenuGroups;
 
+    private bool isModuleActive;
     private void Awake()
     {
         InstantiatePauseGroups();
@@ -45,11 +46,17 @@ public abstract class BasePauseModule : MonoBehaviour
     protected abstract void OnModuleAwake();
     public void InitializeModule()
     {
+        if (isModuleActive)
+        {
+            return;
+        }
+
         for (int i = 0; i < pauseMenuGroupInfo.Length; i++)
         {
             pauseMenuGroups[i].gameObject.SetActive(true);
         }
 
+        isModuleActive = true;
         OnModuleInitialized();
     }
 
@@ -60,10 +67,17 @@ public abstract class BasePauseModule : MonoBehaviour
     protected abstract void OnModuleInitialized();
     public void DeactiviateModule()
     {
+        if (!isModuleActive)
+        {
+            return;
+        }
+
         for (int i = 0; i < pauseMenuGroupInfo.Length; i++)
         {
             pauseMenuGroups[i].RemoveAllListeners();
             pauseMenuGroups[i].gameObject.SetActive(false);
         }
+
+        isModuleActive = false;
     }
 }

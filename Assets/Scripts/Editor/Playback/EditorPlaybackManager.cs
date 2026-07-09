@@ -114,8 +114,7 @@ public class EditorPlaybackManager : EditorUIBehavior
         }
 
         Action<double> executeAction = (x) => editorManager.UpdateEditorPreviewTimeByDelta(x * playbackSpeed, false); // local variable so we can't change it while we're playback
-        Action endAction = () => { };
-        playbackAction = new TimerStopwatchAction(this, executeAction, endAction, 0d, double.MaxValue, true);
+        playbackAction = new TimerStopwatchAction(this, executeAction, () => { }, 0d, double.MaxValue, true);
 
         editorManager.InvokeEditorStartPlayback(playbackSpeed);
         DSPTimerEngine.TimerInstance.AddActionToTimer(playbackAction);

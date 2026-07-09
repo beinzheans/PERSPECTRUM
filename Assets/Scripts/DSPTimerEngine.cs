@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// A class to handle timer logic using <see cref="AudioSettings.dspTime"/> for precision. <br></br>
-/// The timer will internally keep track of time elapsed and allow for other scripts to hook onto this class for timing-based actions.
+/// The timer engine every update loop will first remove any <see cref="TimerAction"/>, then execute <see cref="TimerAction"/> currently active.
 /// </summary>
 public class DSPTimerEngine : MonoBehaviour
 {
@@ -16,6 +16,8 @@ public class DSPTimerEngine : MonoBehaviour
     List<TimerAction> registeredAudioActions = new();
 
     private Queue<TimerAction> audioActionsToRemove = new();
+    private Queue<TimerAction> audioActionsToRegister = new();
+
     private void Awake()
     {
         if (DSPTimerEngine.TimerInstance == null)
@@ -50,6 +52,14 @@ public class DSPTimerEngine : MonoBehaviour
             registeredAudioActions.Remove(remove);
         }
 
+        // add timers before trying to update
+
+        while (audioActionsToRegister.Count > 0)
+        {
+            TimerAction register = audioActionsToRegister.Dequeue();
+            registeredAudioActions.Add(register);
+        }
+
         for (int i = 0; i < registeredAudioActions.Count; i++)
         {
             TimerAction action = registeredAudioActions[i];
@@ -68,16 +78,7 @@ public class DSPTimerEngine : MonoBehaviour
     }
 
     /// <summary>
-    /// Gets the current time elasped from DSP time in seconds since the last reset.
-    /// </summary>
-    /// <returns></returns>
-    public double GetTimer()
-    {
-        return CurrentDSPTime - InitialDSPTime;
-    }
-
-    /// <summary>
-    /// Adds a new non-null <see cref="TimerAction"/> to the timer engine to execute
+    /// Adds a new non-null <see cref="TimerAction"/> to the timer engine to execute.
     /// </summary>
     public void AddActionToTimer(TimerAction action)
     {
@@ -86,7 +87,12 @@ public class DSPTimerEngine : MonoBehaviour
             return;
         }
 
-        registeredAudioActions.Add(action);
+        if (registeredAudioActions.Contains(action))
+        {
+            return;
+        }
+
+        audioActionsToRegister.Enqueue(action);
     }
 
     /// <summary>

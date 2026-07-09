@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.515
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -1349,7 +1349,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f82005b0e923e9f4db3daa2a7c8af8ca, type: 2}
+  - {fileID: 2100000, guid: 87e9d8dd255c5734c8cbd57564bf7bc2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8762,7 +8762,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normalColor: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
-  pulseColor: {r: 0.18431373, g: 0.18431373, b: 0.18431373, a: 1}
+  pulseColor: {r: 0.1882353, g: 0.1882353, b: 0.1882353, a: 1}
 --- !u!114 &1167072940
 MonoBehaviour:
   m_ObjectHideFlags: 0

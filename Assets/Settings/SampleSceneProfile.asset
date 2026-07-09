@@ -90,7 +90,7 @@ MonoBehaviour:
   active: 0
   mode:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   gaussianStart:
     m_OverrideState: 0
     m_Value: 10
@@ -193,8 +193,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   mode:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 1
   quality:
     m_OverrideState: 1
     m_Value: 2

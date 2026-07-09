@@ -190,7 +190,7 @@ public class GameManager : MonoBehaviour
                                                   new GameEvents(false, false));
 
         JsonSerializerSettings.Converters.Add(new Vector2Serializer());
-        k_TUTORIALFILEPATHSTRING = Path.Combine(Application.persistentDataPath, GamePersistenceManager.k_GameChartStorageFolderName, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
+        k_TUTORIALFILEPATHSTRING = Path.Combine(Application.streamingAssetsPath, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
 
         CurrentVersion = Application.version;
         if (!MathHelper.IsStringMatchVersioningFormat(CurrentVersion))
@@ -220,7 +220,6 @@ public class GameManager : MonoBehaviour
         }
 
         SetupGraphicalSettings();
-        GamePersistenceManager.ImportTutorialChartToGameStorage();
         GamePersistenceManager.CreateMetadataToRecordsMapping(out Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping);
         ChartMetadataGUIDToGameplayRecordMapping = mapping;
     }
@@ -293,20 +292,24 @@ public class GameManager : MonoBehaviour
         OnInformationDisplayNeeded?.Invoke(infoMessage, time);
     }
 
+    /// <summary>
+    /// Request to play the chart at the designated <paramref name="path"/>. This will automatically load the scene and invoke <see cref="GameplayManager.RequestGameplayStartedEvent(string)"/>.
+    /// </summary>
+    /// <param name="path"></param>
     public void RequestPlayChartEvent(string path)
     {
         if (!GlobalSettings.GameEvents.HasPlayedTutorial)
         {
             if (path != k_TUTORIALFILEPATHSTRING)
             {
-                ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayStartedEvent(path)), () => { }, "It is recommended to play the tutorial chart first.\n" +
+                ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path)), () => { }, "It is recommended to play the tutorial chart first.\n" +
                                                                                                                                                                                                                          "Do you still want to continue?");
                 InvokeConfirmActionNeeded(loadConfirmAction);
                 return;
             }
         }
 
-        SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayStartedEvent(path));
+        SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path));
     }
 
     public void RequestReplayChartEvent(string path, GameplayStatisticRecord gameplayRecord)
@@ -499,10 +502,10 @@ public class GameEvents
 
     [DefaultValue(false)]
     public bool HasPlayedTutorial { get; private set; }
-    public GameEvents(bool hasAdjustedOffset, bool isFirstTimePlayingChart)
+    public GameEvents(bool hasAdjustedOffset, bool hasPlayedTutorial)
     {
         this.HasAdjustedOffset = hasAdjustedOffset;
-        this.HasPlayedTutorial = isFirstTimePlayingChart;
+        this.HasPlayedTutorial = hasPlayedTutorial;
     }
 }
 

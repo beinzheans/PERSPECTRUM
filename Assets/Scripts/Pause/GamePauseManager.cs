@@ -69,6 +69,8 @@ public class GamePauseManager : MonoBehaviour
             pauseModuleButtons[index].GetComponentInChildren<TMP_Text>().text = pauseModules[index].ModuleName; // this will be fine, we do it once only!
             pauseModuleButtons[index].onClick.AddListener(() => OnPauseModuleButtonClicked(index));
         }
+
+        OnPauseModuleButtonClicked(0); // by default set the first module to be active first
     }
 
     private void OnPauseModuleButtonClicked(int index)
