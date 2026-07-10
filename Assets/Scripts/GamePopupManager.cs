@@ -86,7 +86,9 @@ public class GamePopupManager : MonoBehaviour
     private void FadeInInformationPanel(double aliveTime)
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutTimer);
+        infoPopupPanelAnimation.ResetTrigger(k_FadeOutAnimationString);
         infoPopupPanelAnimation.SetTrigger(k_FadeInAnimationString);
+
         fadeOutTimer = new TimerIntervalAction(this, (x) => FadeOutInformationPanel(), () => { }, aliveTime, -1d);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutTimer);
     }

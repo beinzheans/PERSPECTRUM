@@ -430,25 +430,21 @@ public class GameplayManager : MonoBehaviour
         }
         else if (compareResult == -1)
         {
-            Debug.Log($"Loaded chart is not up to date with game version, prompting confirmation to resolve...");
-            ConfirmAction action = new ConfirmAction(() =>
+            if (!GameVersionConverter.ConvertChartVersionToCurrentGameVersion(in chartJObject, in metadataJObject, out JObject convertedChartJObject, out JObject convertedmetadataJObject))
             {
-                if (!GameVersionConverter.ConvertChartVersionToCurrentGameVersion(in chartJObject, in metadataJObject, out JObject convertedChartJObject, out JObject convertedmetadataJObject))
-                {
-                    Debug.LogWarning($"Loaded chart can not be automatically resolved!");
-                    GameManager.GameInstance.InvokeInformationDisplayNeeded("Can not resolve mismatch! Try opening in the Editor!", 5d);
-                    return;
-                }
+                Debug.LogWarning($"Loaded chart can not be automatically resolved!");
 
-                Debug.Log($"Loaded chart version conflict is automatically resolved");
-                GameManager.GameInstance.InvokeInformationDisplayNeeded("Resolved version mismatch", 1d);
+                ConfirmAction confirmAction = new ConfirmAction(() => StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes),
+                                                                () => SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { }),
+                                                                "The game attempted to resolve version mismatch but failed. Do you still want to try to play this chart?");
 
-                StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes);
-            }, () => SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { }),
-            "The selected chart is outdated.\n" +
-            "The game will attempt to resolve mismatch, do you still want to continue?");
+                GameManager.GameInstance.InvokeConfirmActionNeeded(confirmAction);
+                return;
+            }
 
-            GameManager.GameInstance.InvokeConfirmActionNeeded(action);
+            Debug.Log($"Loaded chart version conflict is automatically resolved");
+
+            StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes);
             return;
         }
 
