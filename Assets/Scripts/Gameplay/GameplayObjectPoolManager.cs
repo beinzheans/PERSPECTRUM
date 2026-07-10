@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -35,9 +36,11 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
 
     private void GameplayManager_OnGameplayRestarted()
     {
-        foreach (var (data, _) in currentActiveObjectsMapping)
+        List<TObjectData> currentActiveObjects = currentActiveObjectsMapping.Keys.ToList();
+
+        for (int i = currentActiveObjects.Count - 1; i >= 0; i--)
         {
-            UnrenderObject_ReturnToPool(data);
+            UnrenderObject_ReturnToPool(currentActiveObjects[i]);
         }
 
         minIndex = 0;
