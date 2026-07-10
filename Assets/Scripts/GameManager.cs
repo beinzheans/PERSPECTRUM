@@ -18,7 +18,8 @@ public class GameManager : MonoBehaviour
     public readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
     {
         TypeNameHandling = TypeNameHandling.Auto,
-        DefaultValueHandling = DefaultValueHandling.Populate
+        DefaultValueHandling = DefaultValueHandling.Populate,
+        MissingMemberHandling = MissingMemberHandling.Error
     };
 
 
@@ -378,9 +379,16 @@ public class GlobalSettings
 
     public string KeybindJson { get; private set; }
 
+    [JsonProperty(Required = Required.Always)]
     public GameSettings GameSettings { get; private set; }
+
+    [JsonProperty(Required = Required.Always)]
     public EditorSettings EditorSettings { get; private set; }
+
+    [JsonProperty(Required = Required.Always)]
     public GraphicSettings GraphicSettings { get; private set; }
+
+    [JsonProperty(Required = Required.Always)]
     public GameEvents GameEvents { get; private set; }
 
 

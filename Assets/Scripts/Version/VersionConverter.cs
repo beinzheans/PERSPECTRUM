@@ -63,3 +63,15 @@ public abstract class VersionConverter
 }
 
 // Add converters inheriting the above parent class here.
+
+public class VersionConverter_1_0_0_to_1_0_1 : VersionConverter
+{
+    public override string InVersion => "1.0.0";
+
+    public override string OutVersion => "1.0.1";
+
+    protected override bool OnConvertChartEvent(ref JObject chartJObject, ref JObject metadataJObject)
+    {
+        return true;
+    }
+}

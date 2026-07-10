@@ -9,6 +9,7 @@ public static class GameVersionConverter
 {
     private static readonly List<VersionConverter> allVersionConverters = new List<VersionConverter>()
     {
+        new VersionConverter_1_0_0_to_1_0_1()
     };
 
     /// <summary>

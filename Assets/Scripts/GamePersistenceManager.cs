@@ -307,7 +307,7 @@ public static class GamePersistenceManager
 
         try
         {
-            settings = JsonConvert.DeserializeObject<GlobalSettings>(json);
+            settings = JsonConvert.DeserializeObject<GlobalSettings>(json, GameManager.GameInstance.JsonSerializerSettings);
 
             return true;
         }

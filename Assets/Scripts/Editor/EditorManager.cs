@@ -674,9 +674,18 @@ public class EditorManager : MonoBehaviour
             chartJson = convertedChartJObject.ToString();
             metadataJson = convertedmetadataJObject.ToString();
 
-            ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has a version mismatch, the game has attempted to resolve it.\n" +
-                                                                                                                                               "Do you want to continue?");
-            GameManager.GameInstance.InvokeConfirmActionNeeded(convertConfirmAction);
+            if (!result)
+            {
+                ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has a version mismatch and the game failed to resolve it.\n" +
+                                                                                                                                                   "Do you want to continue?");
+
+                GameManager.GameInstance.InvokeConfirmActionNeeded(convertConfirmAction);
+            }
+            else
+            {
+                Debug.Log($"Resolved version mismatch automatically");
+                ConvertToEditorChart(chartJson, metadataJson, audioBytes);
+            }
         }
         else
         {
