@@ -182,7 +182,6 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         }
 
         previousPulseTime = fireTime;
-
         pulseInterval = 60d / gameplayManager.CurrentActiveGameplayMarker.BPM;
 
     }

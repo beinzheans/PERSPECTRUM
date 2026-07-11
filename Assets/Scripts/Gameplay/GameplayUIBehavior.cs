@@ -20,6 +20,11 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private TMP_Text gameplay_score;
     [SerializeField] private TMP_Text gameplay_chartDifficulty;
 
+    [Header("Gameplay Resume UI")]
+    [SerializeField] private GameObject gameplayResume_UI;
+    [SerializeField] private Image gameplayResume_background;
+    [SerializeField] private TMP_Text gameplayResume_tickText;
+
     [Header("Endscreen UI")]
     [SerializeField] private GameObject endscreenUI;
     [SerializeField] private TMP_Text chartName;
@@ -39,12 +44,54 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
 
+        gameplayManager.OnGameplayWaitingForResume += GameplayManager_OnGameplayWaitingForResume;
+        gameplayManager.OnGameplayResumeTick += GameplayManager_OnGameplayResumeTick;
+        gameplayManager.OnGameplayResumed += GameplayManager_OnGameplayResumed;
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
         gameplayManager.OnHitboxMatchedHit += GameplayManager_OnHitboxHit;
         gameplayManager.OnHitboxMiss += GameplayManager_OnHitboxMiss;
         gameplayManager.OnHitboxMismatchedHit += GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnHitboxBombHit += GameplayManager_OnHitboxBombHit;
+    }
+
+
+    private int tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
+    private const float k_GAMERESUMEBACKGROUNDALPHA = 0.5f;
+    private void GameplayManager_OnGameplayResumeTick()
+    {
+        if (tick == 0)
+        {
+            return;
+        }
+
+        TimerIntervalAction tickAction = new TimerIntervalAction(this, (x) =>
+        {
+            gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA * (float)tick / GameplayResumeManager.k_NUMBEROFLEADINTICKS);
+            gameplayResume_tickText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA * (float)tick / GameplayResumeManager.k_NUMBEROFLEADINTICKS);
+            gameplayResume_tickText.text = tick.ToString();
+
+            tick--;
+        }, () => { }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
+
+        DSPTimerEngine.TimerInstance.AddActionToTimer(tickAction);
+    }
+
+    private void GameplayManager_OnGameplayWaitingForResume()
+    {
+        gameplayResume_UI.SetActive(true);
+        tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
+        gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA);
+        gameplayResume_tickText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA);
+        gameplayResume_tickText.text = tick.ToString();
+    }
+
+    private void GameplayManager_OnGameplayResumed()
+    {
+        TimerIntervalAction tickAction = new TimerIntervalAction(this, (x) => gameplayResume_UI.SetActive(false), () => { }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
+
+        DSPTimerEngine.TimerInstance.AddActionToTimer(tickAction);
+
     }
 
     private void GameplayManager_OnHitboxBombHit(VisualHitbox hitbox)
@@ -58,6 +105,10 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void OnDestroy()
     {
+        gameplayManager.OnGameplayWaitingForResume -= GameplayManager_OnGameplayWaitingForResume;
+        gameplayManager.OnGameplayResumeTick -= GameplayManager_OnGameplayResumeTick;
+        gameplayManager.OnGameplayResumed -= GameplayManager_OnGameplayResumed;
+
         gameplayManager.OnGameplayStarted -= GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded -= GameplayManager_OnGameplayEnded;
         gameplayManager.OnHitboxMatchedHit -= GameplayManager_OnHitboxHit;

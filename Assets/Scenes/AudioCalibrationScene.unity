@@ -2125,6 +2125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   musicAudioSource: {fileID: 1111648106}
+  resumeTickClip: {fileID: 0}
   matchHitsound_AClip: {fileID: 8300000, guid: e24c9953ea1f6784e9f4fe5f15709791, type: 3}
   matchHitsound_BClip: {fileID: 8300000, guid: f3b25a52e3beffe4398565682feab76c, type: 3}
   mismatchHitsoundClip: {fileID: 8300000, guid: 68e87a7a68b107942b3411b551a97291, type: 3}

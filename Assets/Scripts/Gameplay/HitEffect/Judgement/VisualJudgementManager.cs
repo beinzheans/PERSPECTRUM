@@ -24,7 +24,7 @@ public class VisualJudgementManager : GameplayObjectPoolManager<VisualJudgementO
 
     private void AddReturnPoolTimer(VisualJudgementObject visualJudgementObject)
     {
-        TimerIntervalAction timerAction = new TimerIntervalAction(this, (x) => UnrenderObject_ReturnToPool(visualJudgementObject), () => { }, k_JUDGEMENTALIVETIME, -1d);
+        TimerIntervalAction timerAction = new TimerIntervalAction(this, (x) => UnrenderObject_ReturnToPool(visualJudgementObject), () => { }, k_JUDGEMENTALIVETIME, 0d, 1);
         DSPTimerEngine.TimerInstance.AddActionToTimer(timerAction);
     }
     private void GameplayManager_OnHitboxBombHit(VisualHitbox obj)

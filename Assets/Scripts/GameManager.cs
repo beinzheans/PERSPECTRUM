@@ -185,7 +185,7 @@ public class GameManager : MonoBehaviour
         string defaultKeybindJson = InputActions.SaveBindingOverridesAsJson();
 
         DefaultGlobalSettings = new GlobalSettings(0d, 1f, false, 0.25f, 0.5f, defaultKeybindJson,
-                                                  new GameSettings(3d, 1d),
+                                                  new GameSettings(3d, 1.5d),
                                                   new EditorSettings(1d, 1d),
                                                   new GraphicSettings(new Vector2Int(Display.main.systemWidth, Display.main.systemHeight), true, AntiAliasingMSAA.Off, 1f, true, 0),
                                                   new GameEvents(false, false));

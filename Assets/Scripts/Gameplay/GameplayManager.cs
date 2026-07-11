@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
+using System.Transactions;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 public class GameplayManager : MonoBehaviour
@@ -16,6 +17,10 @@ public class GameplayManager : MonoBehaviour
     public event Action OnGameplayStarted;
     public event Action OnGameplayEnded;
     public event Action OnGameplayRestarted;
+    public event Action OnGameplayWaitingForResume;
+    public event Action OnGameplayResumeTick;
+    public event Action OnGameplayResumed;
+
     public event Action<GameplayStatisticRecord> OnGameplayReplayLoaded;
 
     public MouseActiveType MouseActiveType { get; private set; }
@@ -159,7 +164,6 @@ public class GameplayManager : MonoBehaviour
 
         GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
-
         GeneratePlayAreaMesh();
     }
 
@@ -373,6 +377,7 @@ public class GameplayManager : MonoBehaviour
 
     private void InvokeGameplayStartedEvent()
     {
+        CurrentActiveGameplayMarker = null;
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Linear;
         RenderSettings.fogStartDistance = k_HITPLANEDEPTH;
@@ -598,6 +603,24 @@ public class GameplayManager : MonoBehaviour
         CurrentPlayAreaDisplacement = displacement;
         CurrentPlayAreaRotation = rotation;
     }
+
+    public void InvokeGameplayResumeTimerStarted()
+    {
+        stopwatchAction.PauseTimer();
+        OnGameplayWaitingForResume?.Invoke();
+    }
+
+    public void InvokeGameplayResumeTimerEnded()
+    {
+        stopwatchAction.UnpauseTimer(GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
+        OnGameplayResumed?.Invoke();
+    }
+
+    public void InvokeGameplayResumeTick()
+    {
+        OnGameplayResumeTick?.Invoke();
+    }
+
 }
 
 public class GameplayChart

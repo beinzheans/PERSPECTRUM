@@ -19,11 +19,32 @@ public class GameplayMetronomeManager : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
 
+        gameplayManager.OnGameplayWaitingForResume += GameplayManager_OnGameplayWaitingForResume;
+        gameplayManager.OnGameplayResumed += GameplayManager_OnGameplayResumed;
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
+    }
 
+    private void GameplayManager_OnGameplayResumed()
+    {
+        if (metronomeTimer == null)
+        {
+            return;
+        }
+
+        metronomeTimer.UnpauseTimer(GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
+    }
+
+    private void GameplayManager_OnGameplayWaitingForResume()
+    {
+        if (metronomeTimer == null)
+        {
+            return;
+        }
+
+        metronomeTimer.PauseTimer();
     }
 
     private void GameplayManager_OnGameplayEnded()
@@ -33,11 +54,12 @@ public class GameplayMetronomeManager : MonoBehaviour
 
     private void GameplayManager_OnGameplayRestarted()
     {
+        currentMarkerInGameplay = null;
         gameplayManager.IsMetronomeDisabled = false;
         previousSearchIndex = 0;
     }
 
-    private bool FindInitialMarker()
+    private bool TryAssignInitialMarker()
     {
         if (gameplayManager.CurrentGameplayChart == null)
         {
@@ -65,14 +87,15 @@ public class GameplayMetronomeManager : MonoBehaviour
 
     private void GameplayManager_OnGameplayStarted()
     {
-        if (!FindInitialMarker())
+        if (!TryAssignInitialMarker())
         {
             gameplayManager.IsMetronomeDisabled = true;
             Debug.LogWarning($"No initial marker found! Metronome will not be enabled.");
             return;
         }
 
-        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 60d / initialMarker.BPM);
+        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 60d / initialMarker.BPM, 0);
+
         DSPTimerEngine.TimerInstance.AddActionToTimer(metronomeTimer);
     }
 
@@ -135,6 +158,6 @@ public class GameplayMetronomeManager : MonoBehaviour
         gameplayManager.IsMetronomeDisabled = false;
         double intervalTime = 60d / currentBPM;
 
-        metronomeTimer.EditIntervalTime(intervalTime, true);
+        metronomeTimer.EditIntervalTime(intervalTime, false);
     }
 }

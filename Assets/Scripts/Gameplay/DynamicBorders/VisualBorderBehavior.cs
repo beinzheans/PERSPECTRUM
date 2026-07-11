@@ -8,6 +8,8 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
 
     private static readonly int SHADER_HITBOXID = Shader.PropertyToID("_HitboxType_Float");
     private static readonly int SHADER_NORMALIZEDPROGRESSID = Shader.PropertyToID("_NormalizedProgress");
+
+    
     protected override void OnAwake()
     {
         meshFilter = GetComponent<MeshFilter>();
@@ -54,8 +56,6 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
 
     protected override void OnUpdateEvent()
     {
-        transform.localScale = GameplayManager.GameplayInstance.CurrentPlayAreaBorderScale;
-        transform.SetPositionAndRotation(GameplayManager.GameplayInstance.CurrentPlayAreaDisplacement + new Vector3(0f, 0f, transform.position.z), GameplayManager.GameplayInstance.CurrentPlayAreaRotation);
         propertyBlock.SetFloat(SHADER_NORMALIZEDPROGRESSID, GetNormalizedProgressFloat());
         meshRenderer.SetPropertyBlock(propertyBlock);
     }
@@ -69,6 +69,17 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
     protected override void OnDestroy()
     {
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
+    }
+
+    private void Update()
+    {
+        if (!AssociatedGameplayObject.AssociatedHitbox.IsRendered)
+        {
+            return;
+        }
+
+        transform.localScale = GameplayManager.GameplayInstance.CurrentPlayAreaBorderScale;
+        transform.SetPositionAndRotation(GameplayManager.GameplayInstance.CurrentPlayAreaDisplacement + new Vector3(0f, 0f, transform.position.z), GameplayManager.GameplayInstance.CurrentPlayAreaRotation);
     }
 
 }

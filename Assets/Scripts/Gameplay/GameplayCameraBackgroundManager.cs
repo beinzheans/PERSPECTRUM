@@ -26,6 +26,11 @@ public class GameplayCameraBackgroundManager : MonoBehaviour
     private const int k_CAMERABACKGROUNDPULSEBEAT = 4;
     private void GameplayManager_OnGameplayMetronomeFired(double obj)
     {
+        if (gameplayManager.CurrentActiveGameplayMarker == null)
+        {
+            return;
+        }
+
         if (metronomeLoopIndex == 0)
         {
             gameplayManager.GameplayCamera.backgroundColor = pulseColor;

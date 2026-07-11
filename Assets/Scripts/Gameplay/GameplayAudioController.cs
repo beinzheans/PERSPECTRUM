@@ -1,10 +1,12 @@
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 
 public class GameplayAudioController : MonoBehaviour
 {
     [SerializeField] private AudioSource musicAudioSource;
 
+    [SerializeField] private AudioClip resumeTickClip;
     [SerializeField] private AudioClip matchHitsound_AClip;
     [SerializeField] private AudioClip matchHitsound_BClip;
     [SerializeField] private AudioClip mismatchHitsoundClip;
@@ -17,13 +19,40 @@ public class GameplayAudioController : MonoBehaviour
 
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
         gameplayManager.OnGameplayChartLoaded += GameplayManager_OnGameplayAudioLoaded;
-
+        gameplayManager.OnGameplayWaitingForResume += GameplayManager_OnGameplayWaitingForResume;
+        gameplayManager.OnGameplayResumeTick += GameplayManager_OnGameplayResumeTick;
+        gameplayManager.OnGameplayResumed += GameplayManager_OnGameplayResumed;
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnHitboxMatchedHit += GameplayManager_OnHitboxMatchedHit;
         gameplayManager.OnHitboxMismatchedHit += GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
         gameplayManager.OnHitboxBecomeActive += GameplayManager_OnHitboxBecomeActive;
     }
+
+    private int tick = 0;
+    private void GameplayManager_OnGameplayResumeTick()
+    {
+        if (tick >= GameplayResumeManager.k_NUMBEROFLEADINTICKS)
+        {
+            return;
+        }
+
+        AudioEngine.AudioInstance.PlayAudioClip(resumeTickClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1f, 0f);
+        tick++;
+    }
+
+    private void GameplayManager_OnGameplayResumed()
+    {
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, GameManager.GameInstance.GlobalSettings.SongVolume, gameplayManager.CurrentGameplayTime, 1f, 0f);
+    }
+
+    private void GameplayManager_OnGameplayWaitingForResume()
+    {
+        musicAudioSource.Stop();
+        tick = 0;
+    }
+
+
 
     private void GameplayManager_OnHitboxBecomeActive(VisualHitbox obj)
     {
@@ -65,6 +94,9 @@ public class GameplayAudioController : MonoBehaviour
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
 
         gameplayManager.OnGameplayChartLoaded -= GameplayManager_OnGameplayAudioLoaded;
+        gameplayManager.OnGameplayWaitingForResume -= GameplayManager_OnGameplayWaitingForResume;
+        gameplayManager.OnGameplayResumed -= GameplayManager_OnGameplayResumed;
+
         gameplayManager.OnGameplayStarted -= GameplayManager_OnGameplayStarted;
         gameplayManager.OnHitboxMatchedHit -= GameplayManager_OnHitboxMatchedHit;
         gameplayManager.OnHitboxMismatchedHit -= GameplayManager_OnHitboxMismatchedHit;
