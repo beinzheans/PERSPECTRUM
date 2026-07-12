@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using SFB;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -358,7 +359,7 @@ public class EditorManager : MonoBehaviour
 
         if (math.abs(GameManager.GameInstance.GlobalSettings.AudioOffsetMs) >= GameManager.k_HIGHLATENCYTHRESHOLDMS)
         {
-            ConfirmAction confirmAction = new ConfirmAction(() => { }, () => SceneLoader.LoadSceneAtIndex(SceneLoader.k_TITLESCREENINDEX, () => { }), "It is not recommend to chart with a high audio latency.\n" +
+            ConfirmAction confirmAction = new ConfirmAction(() => { }, () => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask), "It is not recommend to chart with a high audio latency.\n" +
                                                                                                                                                       "Do you still want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(confirmAction);
         }
@@ -722,7 +723,7 @@ public class EditorManager : MonoBehaviour
                 InvokeOnEditorMetadataLoaded(metadata);
             }
 
-            (bool audioResult, AudioClip clip, byte[] bytes) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes);
+            (bool audioResult, AudioClip clip, byte[] bytes) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes).ConfigureAwait(false);
 
             if (!audioResult)
             {

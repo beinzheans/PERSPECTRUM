@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -188,7 +189,7 @@ public class GameplayUIBehavior : MonoBehaviour
     }
     public void UI_OnReturnButton()
     {
-        SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { });
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => Task.CompletedTask);
     }
 
     public void UI_OnRetryButton()

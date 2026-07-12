@@ -1,4 +1,4 @@
-using System.IO;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -14,17 +14,17 @@ public class TitleUIBehavior : MonoBehaviour
     {
         if (!GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial)
         {
-            ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { }), () => { }, "It is recommended to play the tutorial first.\n" +
+            ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => Task.CompletedTask), () => { }, "It is recommended to play the tutorial first.\n" +
                                                                                                                                                                 "Do you still want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(loadConfirmAction);
             return;
         }
         else
         {
-            SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { });
+            SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => Task.CompletedTask);
         }
     }
-    
+
     public void UI_OnTutorialButtonPressed()
     {
         GameManager.GameInstance.RequestPlayChartEvent(GameManager.GameInstance.k_TUTORIALFILEPATHSTRING);
@@ -34,21 +34,21 @@ public class TitleUIBehavior : MonoBehaviour
     {
         if (!GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial)
         {
-            ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_CALIBRATIONINDEX, () => { }), () => { }, "It is recommended to play the tutorial first, the offset screen contains gameplay elements.\n" +
+            ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CALIBRATIONINDEX, () => Task.CompletedTask), () => { }, "It is recommended to play the tutorial first, the offset screen contains gameplay elements.\n" +
                                                                                                                                                           "Do you want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(loadConfirmAction);
             return;
         }
         else
         {
-            SceneLoader.LoadSceneAtIndex(SceneLoader.k_CALIBRATIONINDEX, () => { });
+            SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CALIBRATIONINDEX, () => Task.CompletedTask);
         }
 
     }
 
     public void UI_OnEditorButtonPressed()
     {
-        SceneLoader.LoadSceneAtIndex(SceneLoader.k_EDITORINDEX, () => { });
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_EDITORINDEX, () => Task.CompletedTask);
     }
 
     public void UI_OnQuitButtonPressed()

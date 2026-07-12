@@ -3,9 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.Contracts;
 using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using UnityEngine;
@@ -303,19 +301,19 @@ public class GameManager : MonoBehaviour
         {
             if (path != k_TUTORIALFILEPATHSTRING)
             {
-                ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path)), () => { }, "It is recommended to play the tutorial chart first.\n" +
+                ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path)), () => { }, "It is recommended to play the tutorial chart first.\n" +
                                                                                                                                                                                                                          "Do you still want to continue?");
                 InvokeConfirmActionNeeded(loadConfirmAction);
                 return;
             }
         }
 
-        SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path));
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path));
     }
 
     public void RequestReplayChartEvent(string path, GameplayStatisticRecord gameplayRecord)
     {
-        SceneLoader.LoadSceneAtIndex(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord));
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord));
     }
     public void InvokeGamePauseMenuEnable()
     {
@@ -488,7 +486,7 @@ public class GraphicSettings
     /// <summary>
     /// Set to non-positive for no limit (unless if VSync is on), positive ints for FPS limit (overrides VSync).
     /// </summary>
-    
+
     [DefaultValue(0)]
     public int FrameRateLimit { get; private set; }
 

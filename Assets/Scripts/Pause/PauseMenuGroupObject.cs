@@ -160,7 +160,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
                     break;
                 }
             }
-            
+
             groupDropdown.onValueChanged.AddListener(x => groupDropdownAction?.Invoke(x));
 
         }

@@ -3,6 +3,7 @@ using SFB;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -96,7 +97,7 @@ public class ChartChooseManager : MonoBehaviour
 
     public void UI_ReturnMainMenuButton()
     {
-        SceneLoader.LoadSceneAtIndex(SceneLoader.k_TITLESCREENINDEX, () => { });
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
     }
 
     public void DeleteChartWithPath(string path)

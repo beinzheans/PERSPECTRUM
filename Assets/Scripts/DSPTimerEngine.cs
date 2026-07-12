@@ -172,7 +172,7 @@ public abstract class TimerAction
         StartTime = ExecuteTime;
     }
 
-    
+
 
     /// <summary>
     /// Updates the currect action if the caller is not null
@@ -211,7 +211,7 @@ public abstract class TimerAction
     {
         OnUnregisterEvent?.Invoke();
     }
-    
+
     /// <summary>
     /// Pauses the timer, preventing the timer from updating. <br></br>
     /// Use this when you want a specific timer to be inactive when <see cref="DSPTimerEngine"/> is not paused.

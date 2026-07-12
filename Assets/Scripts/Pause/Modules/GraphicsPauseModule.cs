@@ -29,10 +29,11 @@ public class GraphicsPauseModule : BasePauseModule
     {
         allPossibleResolutions = GetAllScreenResolutions();
 
-        pauseMenuGroups[k_RESOLUTIONINDEX].SetGroupAction_Dropdown(GetStringRepresentationOfScreenResolution(allPossibleResolutions), 
-            x => {
+        pauseMenuGroups[k_RESOLUTIONINDEX].SetGroupAction_Dropdown(GetStringRepresentationOfScreenResolution(allPossibleResolutions),
+            x =>
+            {
                 GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.CurrentResolution, allPossibleResolutions[x]);
-                }, 
+            },
             GetStringRepresentationOfCurrentScreenResolution());
 
         pauseMenuGroups[k_FULLSCREENINDEX].SetGroupAction_Toggle(x =>

@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using SFB;
+using System.Threading.Tasks;
 using UnityEngine;
 public class EditorChartTool : EditorUIBehavior
 {
@@ -51,7 +52,7 @@ public class EditorChartTool : EditorUIBehavior
                 GameManager.GameInstance.InvokeConfirmActionNeeded(loadAction);
                 break;
             case ChartOptions.EXITEDITOR:
-                ConfirmAction exitAction = new(() => SceneLoader.LoadSceneAtIndex(SceneLoader.k_TITLESCREENINDEX, () => { }), () => { }, "Are you sure you want to exit?\n" +
+                ConfirmAction exitAction = new(() => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask), () => { }, "Are you sure you want to exit?\n" +
                                                                                                                                                "All unsaved progress will be lost.");
                 GameManager.GameInstance.InvokeConfirmActionNeeded(exitAction);
                 break;

@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AudioCalibrationScene.unity
     guid: df817596440fbdf42976964d5e7b37dd
+  - enabled: 1
+    path: Assets/Scenes/LoadingScreen.unity
+    guid: ac4c71397ac28f94a81e7476f471f96a
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 76527d23ccecb7047a4f6abd56270fb3, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

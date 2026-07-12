@@ -9,7 +9,7 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
     private static readonly int SHADER_HITBOXID = Shader.PropertyToID("_HitboxType_Float");
     private static readonly int SHADER_NORMALIZEDPROGRESSID = Shader.PropertyToID("_NormalizedProgress");
 
-    
+
     protected override void OnAwake()
     {
         meshFilter = GetComponent<MeshFilter>();

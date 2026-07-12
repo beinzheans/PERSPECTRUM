@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,7 +44,7 @@ public class GamePauseManager : MonoBehaviour
         returnMainMenuConfirmAction = new(() =>
         {
             gameManager.InputActions.Gameplay.EscapeMenuInput.performed += EscapeMenuInput_performed;
-            SceneLoader.LoadSceneAtIndex(SceneLoader.k_TITLESCREENINDEX, () => { });
+            SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
             isInPauseMenu = false;
             RemovePauseMenu();
         }, () =>

@@ -1,4 +1,3 @@
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class GameplayPauseModule : BasePauseModule
@@ -50,7 +49,7 @@ public class GameplayPauseModule : BasePauseModule
         pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupAction_Button(() =>
         {
             pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText("Press any key...");
-            RebindHelper.StartRebindAction(GameManager.GameInstance.InputActions.Gameplay.SwitchAInput, 
+            RebindHelper.StartRebindAction(GameManager.GameInstance.InputActions.Gameplay.SwitchAInput,
                 () => pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchAInput.GetBindingDisplayString()}"));
         });
 

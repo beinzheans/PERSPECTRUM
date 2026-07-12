@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
-using System.Transactions;
+using System.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 public class GameplayManager : MonoBehaviour
@@ -155,7 +155,7 @@ public class GameplayManager : MonoBehaviour
     private void Start()
     {
         CreateGameplayReferencePoints();
-        
+
         CurrentActiveGameplayMarker = null;
 
         gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
@@ -404,7 +404,7 @@ public class GameplayManager : MonoBehaviour
     /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
     /// </summary>
     /// <param name="path"></param>
-    public void RequestGameplayStartedEvent(string path)
+    public async Task RequestGameplayStartedEvent(string path)
     {
         CurrentPath = path;
         GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] bytes);
@@ -431,7 +431,6 @@ public class GameplayManager : MonoBehaviour
         {
             Debug.LogWarning($"Game is outdated, can not load the chart!");
             GameManager.GameInstance.InvokeInformationDisplayNeeded("Your game is outdated and can not play the chart!", 5d);
-            return;
         }
         else if (compareResult == -1)
         {
@@ -439,24 +438,24 @@ public class GameplayManager : MonoBehaviour
             {
                 Debug.LogWarning($"Loaded chart can not be automatically resolved!");
 
-                ConfirmAction confirmAction = new ConfirmAction(() => StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes),
-                                                                () => SceneLoader.LoadSceneAtIndex(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => { }),
+                ConfirmAction confirmAction = new ConfirmAction(async () => await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes),
+                                                                () => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => Task.CompletedTask),
                                                                 "The game attempted to resolve version mismatch but failed. Do you still want to try to play this chart?");
 
                 GameManager.GameInstance.InvokeConfirmActionNeeded(confirmAction);
-                return;
             }
 
             Debug.Log($"Loaded chart version conflict is automatically resolved");
 
-            StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes);
+            await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes);
             return;
         }
 
-        StartGameplayFromJsonString(chartJson, metadataJson, bytes);
+        await StartGameplayFromJsonString(chartJson, metadataJson, bytes);
+        return;
     }
 
-    private async void StartGameplayFromJsonString(string chartJson, string metadataJson, byte[] audioBytes)
+    private async Task StartGameplayFromJsonString(string chartJson, string metadataJson, byte[] audioBytes)
     {
         (bool convertResult, EditorChart editorChart, AudioClip clip) = await GamePersistenceManager.ConvertFilesToEditorChart(chartJson, audioBytes);
 
@@ -478,11 +477,11 @@ public class GameplayManager : MonoBehaviour
     /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
     /// </summary>
     /// <param name="path"></param>
-    public void InvokeGameplayReplayStartedEvent(string path, GameplayStatisticRecord record)
+    public async Task InvokeGameplayReplayStartedEvent(string path, GameplayStatisticRecord record)
     {
         IsInReplayMode = true;
         CurrentGameplayRecord = record;
-        RequestGameplayStartedEvent(path);
+        await RequestGameplayStartedEvent(path);
     }
 
     public void InvokeGameplayObjectRendered(GameplayObject obj)
