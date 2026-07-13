@@ -51,6 +51,7 @@ public class EditorMusicManager : MonoBehaviour
             musicAudioSource.clip = null;
             return;
         }
+
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded audio clip");
         musicAudioSource.clip = obj;
     }

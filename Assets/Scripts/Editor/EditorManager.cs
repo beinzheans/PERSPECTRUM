@@ -727,18 +727,18 @@ public class EditorManager : MonoBehaviour
 
             if (!audioResult)
             {
-                GameManager.GameInstance.InvokeInformationDisplayNeeded("Failed audio load");
                 return;
             }
 
+            await Awaitable.MainThreadAsync();
+
+            // return to main thread in order to invoke this action.
             InvokeAudioClipLoadedEvent(clip, bytes);
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded audio", 1d);
         }
         catch (Exception e)
         {
             Debug.LogWarning($"Failed to parse file! Exception: \n" +
                              $"{e}");
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid file");
             return;
         }
     }
