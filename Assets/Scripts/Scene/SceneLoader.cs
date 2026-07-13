@@ -85,14 +85,15 @@ public class SceneLoader : MonoBehaviour
             yield return null;
         }
 
-        // here we have completely loaded the next scene
-        // ready to unload the loading scene.
-
-        yield return UnloadIntermediateLoadingSceneAsync();
-
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneName));
         yield return new WaitForSceneCallbackComplete(callback?.Invoke());
 
-        // completely loaded 
+        // here we have completely loaded the next scene
+        // ready to unload the loading scene.
+        yield return UnloadIntermediateLoadingSceneAsync();
+
+
+        // we are done with loading logic
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(transitionToNewSceneTimer);
         transitionToNewSceneTimer = new TimerStopwatchAction(this, x => OnTransitionToNextScene?.Invoke(x), () => GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Enable(), 0d, k_LOADINGMINTRANSITIONTIME, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(transitionToNewSceneTimer);

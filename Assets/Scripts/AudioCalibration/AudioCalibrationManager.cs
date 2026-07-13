@@ -35,8 +35,6 @@ public class AudioCalibrationManager : MonoBehaviour
         offsetSlider.onValueChanged.AddListener((x) => { GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.AudioOffsetMs, (double)(1000f * x)); UpdateOffsetText(); });
         ShowPopupDialogBeforeStartingGameplay(chartFilePath);
         UpdateOffsetText();
-
-        GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasAdjustedOffset, true);
     }
 
     private void ShowPopupDialogBeforeStartingGameplay(string filePath)
@@ -48,7 +46,9 @@ public class AudioCalibrationManager : MonoBehaviour
             TimerIntervalAction dialog_one = new TimerIntervalAction(this, x => GameManager.GameInstance.InvokeInformationDisplayNeeded("Adjust your offset so that the note borders touch the outermost yellow border on the beat.", 5d), () => { }, 0d, 0d);
             TimerIntervalAction dialog_two = new TimerIntervalAction(this, x => GameManager.GameInstance.InvokeInformationDisplayNeeded("Use the slider below to adjust your offset. For a specific value, type it in the Settings menu.", 5d), () => { }, 6d, 0d);
             TimerIntervalAction dialog_three = new TimerIntervalAction(this, x => GameManager.GameInstance.InvokeInformationDisplayNeeded("Leave this screen using the Settings menu by pressing ESC.", 5d), () => { }, 12d, 0d);
-            TimerIntervalAction startAction = new TimerIntervalAction(this, x => gameplayManager.RequestGameplayStartedEvent(filePath), () => { }, 18d, 0d);
+            TimerIntervalAction startAction = new TimerIntervalAction(this, x => gameplayManager.RequestGameplayStartedEvent(filePath), 
+                () => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasAdjustedOffset, true),
+                18d, 0d);
 
             DSPTimerEngine.TimerInstance.AddActionToTimer(dialog_one);
             DSPTimerEngine.TimerInstance.AddActionToTimer(dialog_two);

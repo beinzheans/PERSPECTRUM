@@ -15,15 +15,9 @@ public class GameplayStatisticRecorder : MonoBehaviour
     public const double k_MOUSERECORDINTERVAL = 1d / 100d;
     private double lastSampleBufferTime = 0d;
 
-    TimerIntervalAction captureTimer;
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
-
-        if (gameplayManager.IsInReplayMode)
-        {
-            return;
-        }
 
         gameplayManager.OnHitboxBombHit += GameplayManager_OnHitboxBombHit;
         gameplayManager.OnHitboxMatchedHit += GameplayManager_OnHitboxMatchedHit;
@@ -36,26 +30,51 @@ public class GameplayStatisticRecorder : MonoBehaviour
 
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
     {
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
+
         replayJudgementBuffer.Add(new ReplayJudgementInfo(gameplayManager.CurrentGameplayTime, obj, JudgementType.MISS));
     }
 
     private void GameplayManager_OnHitboxMismatchedHit(VisualHitbox obj)
     {
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
+
         replayJudgementBuffer.Add(new ReplayJudgementInfo(gameplayManager.CurrentGameplayTime, obj, JudgementType.MISMATCH));
     }
 
     private void GameplayManager_OnHitboxMatchedHit(VisualHitbox obj)
     {
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
+
         replayJudgementBuffer.Add(new ReplayJudgementInfo(gameplayManager.CurrentGameplayTime, obj, JudgementType.MATCH));
     }
 
     private void GameplayManager_OnHitboxBombHit(VisualHitbox obj)
     {
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
+
         replayJudgementBuffer.Add(new ReplayJudgementInfo(gameplayManager.CurrentGameplayTime, obj, JudgementType.MISS));
     }
 
     private void GameplayManager_OnGameplayTimeUpdated(double time)
     {
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
+
         while (time - lastSampleBufferTime > k_MOUSERECORDINTERVAL || MathHelper.IsTwoDoublesEqualWithEpsilion(time - lastSampleBufferTime, k_MOUSERECORDINTERVAL))
         {
             double currentSampleTime = lastSampleBufferTime + k_MOUSERECORDINTERVAL;
@@ -76,7 +95,11 @@ public class GameplayStatisticRecorder : MonoBehaviour
 
     private void GameplayManager_OnGameplayEnded()
     {
-        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(captureTimer);
+        if (gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
+
         if (gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount < gameplayManager.MaxHitboxCount) // did not finish this play, don't save replay
         {
             return;

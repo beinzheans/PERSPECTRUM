@@ -17,12 +17,6 @@ public class GameplayReplayManager : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
 
-        if (!gameplayManager.IsInReplayMode)
-        {
-            return;
-
-        }
-
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
         gameplayManager.OnGameplayReplayLoaded += GameplayManager_OnGameplayReplayLoaded;
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
@@ -30,6 +24,11 @@ public class GameplayReplayManager : MonoBehaviour
 
     private void GameplayManager_OnGameplayTimeUpdated(double obj)
     {
+        if (!gameplayManager.IsInReplayMode)
+        {
+            return;
+        }
+
         SetGameplayBufferAtTime(obj);
     }
 

@@ -131,7 +131,7 @@ public class GameplayManager : MonoBehaviour
     public double CurrentScore { get; private set; } = 0d;
 
     public bool IsInReplayMode { get; private set; } = false;
-    public GameplayStatisticRecord? CurrentGameplayRecord { get; private set; }
+    public GameplayStatisticRecord CurrentGameplayRecord { get; private set; }
 
     public bool IsMetronomeDisabled;
     public double EndTime { get; private set; }
@@ -325,14 +325,14 @@ public class GameplayManager : MonoBehaviour
 
         if (IsInReplayMode)
         {
-            if (!((GameplayStatisticRecord)CurrentGameplayRecord).BaseChartMetadata.Equals(CurrentMetadata.BaseMetadata))
+            if (!CurrentGameplayRecord.BaseChartMetadata.Equals(CurrentMetadata.BaseMetadata))
             {
                 Debug.LogWarning($"The replay metadata does not match the loaded chart metadata.\n" +
                                  $"The replay will play, but the visuals may have discrepancy.");
                 GameManager.GameInstance.InvokeInformationDisplayNeeded("Metadata conflict, visuals will be wrong.", 1d);
             }
 
-            OnGameplayReplayLoaded?.Invoke((GameplayStatisticRecord)CurrentGameplayRecord);
+            OnGameplayReplayLoaded?.Invoke(CurrentGameplayRecord);
         }
 
         CurrentAccuracy = 1d;
@@ -481,6 +481,7 @@ public class GameplayManager : MonoBehaviour
     {
         IsInReplayMode = true;
         CurrentGameplayRecord = record;
+
         await RequestGameplayStartedEvent(path);
     }
 
