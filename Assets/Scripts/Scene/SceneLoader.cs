@@ -30,6 +30,9 @@ public class SceneLoader : MonoBehaviour
 
     TimerStopwatchAction transitionToBlackTimer;
     TimerStopwatchAction transitionToNewSceneTimer;
+
+    private string sceneToLoad;
+
     private void Awake()
     {
         if (SceneLoaderInstance == null)
@@ -49,7 +52,15 @@ public class SceneLoader : MonoBehaviour
     /// <param name="callback"></param>
     public void LoadSceneByName(string sceneName, Func<Task> callback)
     {
-        GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Disable(); // disallow pausing if loading next scene
+        if (!string.IsNullOrWhiteSpace(sceneToLoad))
+        {
+            Debug.LogWarning($"Already trying to load {sceneToLoad}! Ignoring request to load {sceneName}.");
+            return;
+        }
+
+        GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Disable(); // disallow pausing if loading next scene. sometimes this still makes the pause menu mess up the laoding though..
+
+        sceneToLoad = sceneName;
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(transitionToBlackTimer);
         transitionToBlackTimer = new TimerStopwatchAction(this, x => OnTransitionToBlack?.Invoke(x), () => StartCoroutine(LoadSceneAtIndexAsync(sceneName, callback)), 0d, k_LOADINGMINTRANSITIONTIME, false); // transition to black before doing anything
         DSPTimerEngine.TimerInstance.AddActionToTimer(transitionToBlackTimer);
@@ -94,6 +105,9 @@ public class SceneLoader : MonoBehaviour
 
 
         // we are done with loading logic
+
+        sceneToLoad = ""; // reset scene to load
+
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(transitionToNewSceneTimer);
         transitionToNewSceneTimer = new TimerStopwatchAction(this, x => OnTransitionToNextScene?.Invoke(x), () => GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Enable(), 0d, k_LOADINGMINTRANSITIONTIME, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(transitionToNewSceneTimer);

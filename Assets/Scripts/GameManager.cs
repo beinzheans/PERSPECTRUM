@@ -98,10 +98,10 @@ public class GameManager : MonoBehaviour
         {
             GameInstance = this;
             DontDestroyOnLoad(gameObject);
-        }
 
-        InputActions = new();
-        InputActions.Enable();
+            InputActions = new();
+            InputActions.Enable();
+        }
     }
 
     /// <summary>
