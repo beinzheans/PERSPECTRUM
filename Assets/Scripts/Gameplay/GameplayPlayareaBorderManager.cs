@@ -37,7 +37,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
 
         playareaBorderMeshFilter_Back.sharedMesh = playareaBorderMeshFilter_earlyHitPlane.sharedMesh = playareaBorderMeshFilter_Front.sharedMesh = gameplayManager.PlayAreaBorderMesh;
-
+        
         gameplayManager.AssignGameplayBorderScale(Vector3.one);
         gameplayManager.AssignGameplayDisplacementRotation(Vector3.zero, Quaternion.identity);
 

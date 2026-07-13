@@ -389,15 +389,8 @@ public class GameplayManager : MonoBehaviour
 
     private void GetAccuracy()
     {
-        int totalHits = MatchHitCount + MismatchHitCount - BombHitCount;
-        if (totalHits + MissCount == 0)
-        {
-            CurrentAccuracy = 1d;
-        }
-        else
-        {
-            CurrentAccuracy = (double)(totalHits) / (totalHits + MissCount);
-        }
+        int totalHits = MatchHitCount + MismatchHitCount;
+        CurrentAccuracy = totalHits + MissCount == 0 ? 1d : (double)totalHits / (totalHits + MissCount);
     }
 
     /// <summary>

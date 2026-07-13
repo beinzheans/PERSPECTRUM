@@ -15,11 +15,15 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private TMP_Text gameplay_songCredit;
     [SerializeField] private TMP_Text gameplay_matchCount;
     [SerializeField] private TMP_Text gameplay_mismatchCount;
-    [SerializeField] private TMP_Text gameplay_bombCount;
     [SerializeField] private TMP_Text gameplay_missCount;
     [SerializeField] private TMP_Text gameplay_accuracyPercent;
     [SerializeField] private TMP_Text gameplay_score;
     [SerializeField] private TMP_Text gameplay_chartDifficulty;
+    [SerializeField] private Slider gameplay_accuracySlider;
+
+    [SerializeField] private TMP_Text gameplay_progress;
+    [SerializeField] private Slider gameplay_progressSlider;
+
 
     [Header("Gameplay Resume UI")]
     [SerializeField] private GameObject gameplayResume_UI;
@@ -95,13 +99,18 @@ public class GameplayUIBehavior : MonoBehaviour
 
     }
 
+    private void UpdateGameplayStatistics()
+    {
+        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
+        gameplay_accuracySlider.value = (float)gameplayManager.CurrentAccuracy;
+        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
+        gameplay_progress.text = $"{gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount} | {gameplayManager.MaxHitboxCount}";
+        gameplay_progressSlider.value= (float)(gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount) / gameplayManager.MaxHitboxCount;
+    }
     private void GameplayManager_OnHitboxBombHit(VisualHitbox hitbox)
     {
         comboText.text = "0";
-        gameplay_bombCount.text = gameplayManager.BombHitCount.ToString();
-        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
-        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
-
+        gameplay_missCount.text = $"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}";
     }
 
     private void OnDestroy()
@@ -122,9 +131,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.text = gameplayManager.CurrentCombo.ToString();
         gameplay_mismatchCount.text = gameplayManager.MismatchHitCount.ToString();
-        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
-        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
-
+        UpdateGameplayStatistics();
     }
 
     private void GameplayManager_OnGameplayEnded()
@@ -144,17 +151,15 @@ public class GameplayUIBehavior : MonoBehaviour
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
     {
         comboText.text = "0";
-        gameplay_missCount.text = gameplayManager.MissCount.ToString();
-        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
-        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
+        gameplay_missCount.text = $"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}";
+        UpdateGameplayStatistics();
     }
 
     private void GameplayManager_OnHitboxHit(VisualHitbox obj)
     {
         comboText.text = gameplayManager.CurrentCombo.ToString();
         gameplay_matchCount.text = gameplayManager.MatchHitCount.ToString();
-        gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
-        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
+        UpdateGameplayStatistics();
     }
 
 
@@ -166,10 +171,13 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplay_chartDifficulty.text = $"Difficulty {gameplayManager.CurrentMetadata.BaseMetadata.ChartDifficulty}";
         gameplay_matchCount.text = "0";
         gameplay_mismatchCount.text = "0";
-        gameplay_bombCount.text = "0";
-        gameplay_missCount.text = "0";
-        gameplay_accuracyPercent.text = "100%";
+        gameplay_missCount.text = "0 | 0";
+        gameplay_accuracyPercent.text = "100.00%";
         gameplay_score.text = "0";
+
+        gameplay_progress.text = $"0 | {gameplayManager.MaxHitboxCount}";
+        gameplay_progressSlider.value = 0f;
+        gameplay_accuracySlider.value = 1f;
     }
 
     private void SetupEndscreenUI()
