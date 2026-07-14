@@ -85,8 +85,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     // we bounce the border when we hit, shrink the border when miss, ignore if hit bomb
     // pulseInterval will be used for the bounce timer so it is dynamic to BPM too
 
-    private readonly Vector3 k_BOUNCEMAXSIZE = new Vector3(1.020f, 1.020f, 1f);
-    private readonly Vector3 k_SHRINKMINSIZE = new Vector3(0.980f, 0.980f, 1f);
+    private readonly Vector3 k_BOUNCEMAXSIZE = new Vector3(1.025f, 1.025f, 1f);
+    private readonly Vector3 k_SHRINKMINSIZE = new Vector3(0.975f, 0.975f, 1f);
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
     {
         ShrinkBorders();

@@ -10,14 +10,14 @@ public class GameplayUIBehavior : MonoBehaviour
 
     [Header("Gameplay UI")]
     [SerializeField] private GameObject gameplayUI;
-    [SerializeField] private TMP_Text comboText;
+    [SerializeField] private UIElasticText comboText;
     [SerializeField] private TMP_Text gameplay_chartCredit;
     [SerializeField] private TMP_Text gameplay_songCredit;
-    [SerializeField] private TMP_Text gameplay_matchCount;
-    [SerializeField] private TMP_Text gameplay_mismatchCount;
-    [SerializeField] private TMP_Text gameplay_missCount;
+    [SerializeField] private UIElasticText gameplay_matchCount;
+    [SerializeField] private UIElasticText gameplay_mismatchCount;
+    [SerializeField] private UIElasticText gameplay_missCount;
     [SerializeField] private TMP_Text gameplay_accuracyPercent;
-    [SerializeField] private TMP_Text gameplay_score;
+    [SerializeField] private UIElasticText gameplay_score;
     [SerializeField] private TMP_Text gameplay_chartDifficulty;
     [SerializeField] private Slider gameplay_accuracySlider;
 
@@ -28,7 +28,7 @@ public class GameplayUIBehavior : MonoBehaviour
     [Header("Gameplay Resume UI")]
     [SerializeField] private GameObject gameplayResume_UI;
     [SerializeField] private Image gameplayResume_background;
-    [SerializeField] private TMP_Text gameplayResume_tickText;
+    [SerializeField] private UIElasticText gameplayResume_tickText;
 
     [Header("Endscreen UI")]
     [SerializeField] private GameObject endscreenUI;
@@ -73,8 +73,8 @@ public class GameplayUIBehavior : MonoBehaviour
         TimerIntervalAction tickAction = new TimerIntervalAction(this, (x) =>
         {
             gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA * (float)tick / GameplayResumeManager.k_NUMBEROFLEADINTICKS);
-            gameplayResume_tickText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA * (float)tick / GameplayResumeManager.k_NUMBEROFLEADINTICKS);
-            gameplayResume_tickText.text = tick.ToString();
+            gameplayResume_tickText.UIText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA * (float)tick / GameplayResumeManager.k_NUMBEROFLEADINTICKS);
+            gameplayResume_tickText.SetText(tick.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
 
             tick--;
         }, () => { }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
@@ -87,8 +87,8 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplayResume_UI.SetActive(true);
         tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
         gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA);
-        gameplayResume_tickText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA);
-        gameplayResume_tickText.text = tick.ToString();
+        gameplayResume_tickText.UIText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA);
+        gameplayResume_tickText.SetText(tick.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
     }
 
     private void GameplayManager_OnGameplayResumed()
@@ -99,18 +99,21 @@ public class GameplayUIBehavior : MonoBehaviour
 
     }
 
+    private readonly Vector2 k_DEFAULTGAMEPLAYBOUNCESIZE = new Vector2(0.9f, 1.2f);
+    private readonly Vector2 k_MISSGAMEPLAYBOUNCESIZE = new Vector2(1.2f, 0.9f);
+    private readonly double k_DEFAULTGAMEPLAYBOUNCETIME = 0.05d;
     private void UpdateGameplayStatistics()
     {
         gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
         gameplay_accuracySlider.value = (float)gameplayManager.CurrentAccuracy;
-        gameplay_score.text = ((int)math.round(gameplayManager.CurrentScore)).ToString();
+        gameplay_score.SetText(((int)math.round(gameplayManager.CurrentScore)).ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_progress.text = $"{gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount} | {gameplayManager.MaxHitboxCount}";
         gameplay_progressSlider.value= (float)(gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount) / gameplayManager.MaxHitboxCount;
     }
     private void GameplayManager_OnHitboxBombHit(VisualHitbox hitbox)
     {
-        comboText.text = "0";
-        gameplay_missCount.text = $"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}";
+        comboText.SetText("0", k_MISSGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_missCount.SetText($"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}", k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
     }
 
     private void OnDestroy()
@@ -129,8 +132,8 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void GameplayManager_OnHitboxMismatchedHit(VisualHitbox obj)
     {
-        comboText.text = gameplayManager.CurrentCombo.ToString();
-        gameplay_mismatchCount.text = gameplayManager.MismatchHitCount.ToString();
+        comboText.SetText(gameplayManager.CurrentCombo.ToString(), new Vector2(0.95f, 1.1f), k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_mismatchCount.SetText(gameplayManager.MismatchHitCount.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
@@ -150,30 +153,30 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
     {
-        comboText.text = "0";
-        gameplay_missCount.text = $"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}";
+        comboText.SetText("0", k_MISSGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_missCount.SetText($"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}", k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
     private void GameplayManager_OnHitboxHit(VisualHitbox obj)
     {
-        comboText.text = gameplayManager.CurrentCombo.ToString();
-        gameplay_matchCount.text = gameplayManager.MatchHitCount.ToString();
+        comboText.SetText(gameplayManager.CurrentCombo.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_matchCount.SetText(gameplayManager.MatchHitCount.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
 
     private void SetupGameplayUI()
     {
-        comboText.text = "0";
+        comboText.SetTextWithoutElastic("0");
         gameplay_chartCredit.text = gameplayManager.CurrentMetadata.BaseMetadata.ChartName;
         gameplay_songCredit.text = $"{gameplayManager.CurrentMetadata.BaseMetadata.SongArtist} - {gameplayManager.CurrentMetadata.BaseMetadata.SongName}";
         gameplay_chartDifficulty.text = $"Difficulty {gameplayManager.CurrentMetadata.BaseMetadata.ChartDifficulty}";
-        gameplay_matchCount.text = "0";
-        gameplay_mismatchCount.text = "0";
-        gameplay_missCount.text = "0 | 0";
+        gameplay_matchCount.SetTextWithoutElastic("0");
+        gameplay_mismatchCount.SetTextWithoutElastic("0");
+        gameplay_missCount.SetTextWithoutElastic("0 | 0");
         gameplay_accuracyPercent.text = "100.00%";
-        gameplay_score.text = "0";
+        gameplay_score.SetTextWithoutElastic("0");
 
         gameplay_progress.text = $"0 | {gameplayManager.MaxHitboxCount}";
         gameplay_progressSlider.value = 0f;

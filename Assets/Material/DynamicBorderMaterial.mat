@@ -139,14 +139,14 @@ Material:
     - _ZWrite: 0
     - _ZWriteControl: 0
     m_Colors:
-    - _AColor: {r: 0.9528302, g: 0, b: 0, a: 0.039215688}
-    - _BColor: {r: 0.01298303, g: 0.6514058, b: 0.8148468, a: 0.039215688}
+    - _AColor: {r: 1.9056604, g: 0, b: 0, a: 0.039215688}
+    - _BColor: {r: 0.02596606, g: 1.3028116, b: 1.6296936, a: 0.039215688}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _BombColor: {r: 1, g: 1, b: 1, a: 0.039215688}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FlashColor: {r: 12.37615, g: 12.37615, b: 12.37615, a: 1}
-    - _InitialColor: {r: 0.0627451, g: 0.0627451, b: 0.0627451, a: 0.003921569}
+    - _InitialColor: {r: 0.1254902, g: 0.1254902, b: 0.1254902, a: 0.003921569}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _StartColor: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []

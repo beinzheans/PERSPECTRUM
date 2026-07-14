@@ -230,6 +230,7 @@ GameObject:
   - component: {fileID: 74929331}
   - component: {fileID: 74929333}
   - component: {fileID: 74929332}
+  - component: {fileID: 74929334}
   m_Layer: 5
   m_Name: JudgementText_Match
   m_TagString: Untagged
@@ -355,6 +356,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 74929330}
   m_CullTransparentMesh: 1
+--- !u!114 &74929334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74929330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daa318ba9ff81dd4baf7f12c2090393a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &111738820
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,6 +767,7 @@ GameObject:
   - component: {fileID: 149013985}
   - component: {fileID: 149013987}
   - component: {fileID: 149013986}
+  - component: {fileID: 149013988}
   m_Layer: 5
   m_Name: JudgementText_Miss
   m_TagString: Untagged
@@ -879,6 +893,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 149013984}
   m_CullTransparentMesh: 1
+--- !u!114 &149013988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 149013984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daa318ba9ff81dd4baf7f12c2090393a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &251093018
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,6 +2375,7 @@ GameObject:
   - component: {fileID: 494260735}
   - component: {fileID: 494260737}
   - component: {fileID: 494260736}
+  - component: {fileID: 494260738}
   m_Layer: 5
   m_Name: ResumeTickText
   m_TagString: Untagged
@@ -2476,6 +2503,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 494260734}
   m_CullTransparentMesh: 1
+--- !u!114 &494260738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 494260734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daa318ba9ff81dd4baf7f12c2090393a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &508671595
 GameObject:
   m_ObjectHideFlags: 0
@@ -3678,6 +3717,7 @@ GameObject:
   - component: {fileID: 923345960}
   - component: {fileID: 923345962}
   - component: {fileID: 923345961}
+  - component: {fileID: 923345963}
   m_Layer: 5
   m_Name: ScoreText
   m_TagString: Untagged
@@ -3803,6 +3843,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 923345959}
   m_CullTransparentMesh: 1
+--- !u!114 &923345963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 923345959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daa318ba9ff81dd4baf7f12c2090393a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &969935158
 GameObject:
   m_ObjectHideFlags: 0
@@ -9585,21 +9637,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameplayUI: {fileID: 1802188687}
-  comboText: {fileID: 1330388965}
+  comboText: {fileID: 1330388967}
   gameplay_chartCredit: {fileID: 1528550525}
   gameplay_songCredit: {fileID: 1397952212}
-  gameplay_matchCount: {fileID: 74929332}
-  gameplay_mismatchCount: {fileID: 1400453131}
-  gameplay_missCount: {fileID: 149013986}
+  gameplay_matchCount: {fileID: 74929334}
+  gameplay_mismatchCount: {fileID: 1400453133}
+  gameplay_missCount: {fileID: 149013988}
   gameplay_accuracyPercent: {fileID: 361671019}
-  gameplay_score: {fileID: 923345961}
+  gameplay_score: {fileID: 923345963}
   gameplay_chartDifficulty: {fileID: 1424454348}
   gameplay_accuracySlider: {fileID: 1014772530}
   gameplay_progress: {fileID: 698185168}
   gameplay_progressSlider: {fileID: 745544989}
   gameplayResume_UI: {fileID: 1640495199}
   gameplayResume_background: {fileID: 1485785227}
-  gameplayResume_tickText: {fileID: 494260736}
+  gameplayResume_tickText: {fileID: 494260738}
   endscreenUI: {fileID: 1796543024}
   chartName: {fileID: 146685142}
   scoreText: {fileID: 998510907}
@@ -10371,6 +10423,7 @@ GameObject:
   - component: {fileID: 1330388964}
   - component: {fileID: 1330388966}
   - component: {fileID: 1330388965}
+  - component: {fileID: 1330388967}
   m_Layer: 5
   m_Name: ComboText
   m_TagString: Untagged
@@ -10498,6 +10551,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1330388963}
   m_CullTransparentMesh: 1
+--- !u!114 &1330388967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330388963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daa318ba9ff81dd4baf7f12c2090393a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1337567572
 GameObject:
   m_ObjectHideFlags: 0
@@ -10684,6 +10749,7 @@ GameObject:
   - component: {fileID: 1400453130}
   - component: {fileID: 1400453132}
   - component: {fileID: 1400453131}
+  - component: {fileID: 1400453133}
   m_Layer: 5
   m_Name: JudgementText_Mismatch
   m_TagString: Untagged
@@ -10811,6 +10877,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1400453129}
   m_CullTransparentMesh: 1
+--- !u!114 &1400453133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1400453129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daa318ba9ff81dd4baf7f12c2090393a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1424454346
 GameObject:
   m_ObjectHideFlags: 0
