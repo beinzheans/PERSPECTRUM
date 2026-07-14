@@ -24,6 +24,9 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private TMP_Text gameplay_progress;
     [SerializeField] private Slider gameplay_progressSlider;
 
+    [SerializeField] private UIElastic gameplay_matchIcon;
+    [SerializeField] private UIElastic gameplay_mismatchIcon;
+    [SerializeField] private UIElastic gameplay_missIcon;
 
     [Header("Gameplay Resume UI")]
     [SerializeField] private GameObject gameplayResume_UI;
@@ -102,6 +105,7 @@ public class GameplayUIBehavior : MonoBehaviour
     private readonly Vector2 k_DEFAULTGAMEPLAYBOUNCESIZE = new Vector2(0.9f, 1.2f);
     private readonly Vector2 k_MISSGAMEPLAYBOUNCESIZE = new Vector2(1.2f, 0.9f);
     private readonly double k_DEFAULTGAMEPLAYBOUNCETIME = 0.05d;
+    private readonly double k_DEFAULTGAMEPLAYICONBOUNCETIME = 0.1d;
     private void UpdateGameplayStatistics()
     {
         gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
@@ -114,6 +118,8 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText("0", k_MISSGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_missCount.SetText($"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}", k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_missIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
+        UpdateGameplayStatistics();
     }
 
     private void OnDestroy()
@@ -134,6 +140,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText(gameplayManager.CurrentCombo.ToString(), new Vector2(0.95f, 1.1f), k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_mismatchCount.SetText(gameplayManager.MismatchHitCount.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_mismatchIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
@@ -155,6 +162,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText("0", k_MISSGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_missCount.SetText($"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}", k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_missIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
@@ -162,6 +170,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText(gameplayManager.CurrentCombo.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_matchCount.SetText(gameplayManager.MatchHitCount.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+        gameplay_matchIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
         UpdateGameplayStatistics();
     }
 

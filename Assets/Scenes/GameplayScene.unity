@@ -3238,8 +3238,9 @@ GameObject:
   - component: {fileID: 743915299}
   - component: {fileID: 743915301}
   - component: {fileID: 743915300}
+  - component: {fileID: 743915302}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Image_Match
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3299,6 +3300,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 743915298}
   m_CullTransparentMesh: 1
+--- !u!114 &743915302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 743915298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 460011ddec0735b439b54fdfc8296b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &745544987
 GameObject:
   m_ObjectHideFlags: 0
@@ -9649,6 +9662,9 @@ MonoBehaviour:
   gameplay_accuracySlider: {fileID: 1014772530}
   gameplay_progress: {fileID: 698185168}
   gameplay_progressSlider: {fileID: 745544989}
+  gameplay_matchIcon: {fileID: 743915302}
+  gameplay_mismatchIcon: {fileID: 1429289287}
+  gameplay_missIcon: {fileID: 1752677216}
   gameplayResume_UI: {fileID: 1640495199}
   gameplayResume_background: {fileID: 1485785227}
   gameplayResume_tickText: {fileID: 494260738}
@@ -11113,8 +11129,9 @@ GameObject:
   - component: {fileID: 1429289284}
   - component: {fileID: 1429289286}
   - component: {fileID: 1429289285}
+  - component: {fileID: 1429289287}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Image_Match
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11174,6 +11191,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1429289283}
   m_CullTransparentMesh: 1
+--- !u!114 &1429289287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429289283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 460011ddec0735b439b54fdfc8296b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1457523506
 GameObject:
   m_ObjectHideFlags: 0
@@ -12054,8 +12083,9 @@ GameObject:
   - component: {fileID: 1752677213}
   - component: {fileID: 1752677215}
   - component: {fileID: 1752677214}
+  - component: {fileID: 1752677216}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Image_Match
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12115,6 +12145,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1752677212}
   m_CullTransparentMesh: 1
+--- !u!114 &1752677216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752677212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 460011ddec0735b439b54fdfc8296b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1762048721
 GameObject:
   m_ObjectHideFlags: 0
