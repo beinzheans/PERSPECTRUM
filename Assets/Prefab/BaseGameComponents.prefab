@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5066035480902132430}
   - component: {fileID: 7051695949114240045}
+  - component: {fileID: 7708226422820092908}
   - component: {fileID: 5676538933511860025}
   - component: {fileID: 4393783226180199288}
   - component: {fileID: 1198547001550760125}
@@ -131,6 +132,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   popupCanvas: {fileID: 7560833971648385375}
   pauseCanvas: {fileID: 5944438422091964820}
+--- !u!114 &7708226422820092908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87529997441713300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f4545be8ec06aa448421ee75fe40669, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clickUISound: {fileID: 8300000, guid: 2aba877716575a1489f0696caee7d968, type: 3}
 --- !u!114 &5676538933511860025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -604,9 +618,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1069,9 +1083,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2321,9 +2335,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2850,7 +2864,10 @@ MonoBehaviour:
   - groupLabel: Song Volume
     groupType: 2
     groupDescription: 
-  - groupLabel: Hitsound Volme
+  - groupLabel: Hitsound Volume
+    groupType: 2
+    groupDescription: 
+  - groupLabel: UI Volume
     groupType: 2
     groupDescription: 
   moduleName: Global
@@ -3202,9 +3219,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

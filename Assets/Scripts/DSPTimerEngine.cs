@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -117,21 +118,48 @@ public class DSPTimerEngine : MonoBehaviour
     /// <summary>
     /// Pauses all DSP timers globally.
     /// </summary>
+
+    private HashSet<TimerAction> alreadyPausedTimers = new();
     public void PauseDSPTimer()
     {
-        AudioListener.pause = true;
+        alreadyPausedTimers = new();
+
+        for (int i = 0; i < registeredAudioActions.Count; i++)
+        {
+            TimerAction timerAction = registeredAudioActions[i];
+            if (timerAction.IsTimerPaused)
+            {
+                alreadyPausedTimers.Add(timerAction);
+                continue;
+            }
+
+            timerAction.PauseTimer();
+        }
     }
 
+    /// <summary>
+    /// Resumes all DSP timers globally, except for those that were already paused before <see cref="PauseDSPTimer"/> is called.
+    /// </summary>
     public void ResumeDSPTimer()
     {
-        AudioListener.pause = false;
+        for (int i = 0; i < registeredAudioActions.Count; i++)
+        {
+            TimerAction timerAction = registeredAudioActions[i];
+
+            if (alreadyPausedTimers.Contains(timerAction))
+            {
+                continue;
+            }
+
+            timerAction.UnpauseTimer(0d);
+        }
     }
 }
 
 /// <summary>
 /// A class to represent an action to be performed by <see cref="DSPTimerEngine"/>
 /// </summary>
-public abstract class TimerAction
+public abstract class TimerAction : IEquatable<TimerAction>
 {
     /// <summary>
     /// The Unity object that created this timer
@@ -159,7 +187,7 @@ public abstract class TimerAction
     /// </summary>
     public double ElapsedTime { get; protected set; }
 
-    protected bool timerPauseState;
+    public bool IsTimerPaused { get; protected set; }
 
     public TimerAction(UnityEngine.Object timerCaller, Action<double> actionToExecute, Action onUnregisterEvent, double startOffsetTime)
     {
@@ -187,7 +215,7 @@ public abstract class TimerAction
             return;
         }
 
-        if (timerPauseState)
+        if (IsTimerPaused)
         {
             return;
         }
@@ -218,13 +246,13 @@ public abstract class TimerAction
     /// </summary>
     public void PauseTimer()
     {
-        if (timerPauseState)
+        if (IsTimerPaused)
         {
             return;
         }
 
         OnTimerPausedEvent();
-        timerPauseState = true;
+        IsTimerPaused = true;
     }
 
     /// <summary>
@@ -232,13 +260,13 @@ public abstract class TimerAction
     /// </summary>
     public void UnpauseTimer(double offset)
     {
-        if (!timerPauseState)
+        if (!IsTimerPaused)
         {
             return;
         }
 
         OnTimerUnpausedEvent(offset);
-        timerPauseState = false;
+        IsTimerPaused = false;
     }
 
     /// <summary>
@@ -250,12 +278,31 @@ public abstract class TimerAction
     /// Custom implementations of events when the timer is unpaused.
     /// </summary>
     protected abstract void OnTimerUnpausedEvent(double offset);
+
+    public override bool Equals(object obj)
+    {
+        return Equals(obj as TimerAction);
+    }
+
+    public bool Equals(TimerAction other)
+    {
+        return other is not null &&
+               EqualityComparer<UnityEngine.Object>.Default.Equals(TimerCaller, other.TimerCaller) &&
+               EqualityComparer<Action<double>>.Default.Equals(ActionToExecute, other.ActionToExecute) &&
+               EqualityComparer<Action>.Default.Equals(OnUnregisterEvent, other.OnUnregisterEvent) &&
+               startOffsetTime == other.startOffsetTime;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(TimerCaller, ActionToExecute, OnUnregisterEvent, startOffsetTime);
+    }
 }
 
 /// <summary>
 /// A class to represent an action to be performed by <see cref="DSPTimerEngine"/> on a regular interval
 /// </summary>
-public class TimerIntervalAction : TimerAction
+public class TimerIntervalAction : TimerAction, IEquatable<TimerIntervalAction>
 {
     /// <summary>
     /// How long before each action should be repeated
@@ -347,12 +394,30 @@ public class TimerIntervalAction : TimerAction
         ExecuteTime = AudioSettings.dspTime + offset + pauseTimeProgress;
     }
 
+    public override bool Equals(object obj)
+    {
+        return Equals(obj as TimerIntervalAction);
+    }
+
+    public bool Equals(TimerIntervalAction other)
+    {
+        return other is not null &&
+               base.Equals(other) &&
+               repeatIntervalTime == other.repeatIntervalTime &&
+               numberOfExecutions == other.numberOfExecutions &&
+               useElapsedTimeForAction == other.useElapsedTimeForAction;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(base.GetHashCode(), repeatIntervalTime, numberOfExecutions, useElapsedTimeForAction);
+    }
 }
 
 /// <summary>
 /// A class to represent an action to be performed by <see cref="DSPTimerEngine"/> that involves incremental time.
 /// </summary>
-public class TimerStopwatchAction : TimerAction
+public class TimerStopwatchAction : TimerAction, IEquatable<TimerStopwatchAction>
 {
     /// <summary>
     /// Whether or not the timer returns delta time instead of total elapsed time
@@ -410,4 +475,21 @@ public class TimerStopwatchAction : TimerAction
         previousDSPTime = AudioSettings.dspTime + offset;
     }
 
+    public override bool Equals(object obj)
+    {
+        return Equals(obj as TimerStopwatchAction);
+    }
+
+    public bool Equals(TimerStopwatchAction other)
+    {
+        return other is not null &&
+               base.Equals(other) &&
+               MeasureDeltaTime == other.MeasureDeltaTime &&
+               maxTimeElapsed == other.maxTimeElapsed;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(base.GetHashCode(), MeasureDeltaTime, maxTimeElapsed);
+    }
 }

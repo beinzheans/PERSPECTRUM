@@ -8,7 +8,7 @@ public class GlobalPauseModule : BasePauseModule
     private const int k_SHOWFPSGROUPINDEX = 3;
     private const int k_SONGVOLUMEGROUPINDEX = 4;
     private const int k_HITSOUNDVOLUMEGROUPINDEX = 5;
-
+    private const int k_UIVOLUMEGROUPINDEX = 6;
     protected override void OnModuleAwake()
     {
         return;
@@ -49,5 +49,10 @@ public class GlobalPauseModule : BasePauseModule
         {
             GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.HitsoundVolume, x);
         }, GameManager.GameInstance.GlobalSettings.HitsoundVolume);
+
+        pauseMenuGroups[k_UIVOLUMEGROUPINDEX].SetGroupAction_Slider(x =>
+        {
+            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UIVolume, x);
+        }, GameManager.GameInstance.GlobalSettings.UIVolume);
     }
 }

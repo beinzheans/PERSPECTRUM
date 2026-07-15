@@ -14,9 +14,21 @@ public class EditorMusicManager : MonoBehaviour
         editorManager = EditorManager.EditorInstance;
 
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        GameManager.GameInstance.OnPauseMenuEnable += GameInstance_OnPauseMenuEnable;
+        GameManager.GameInstance.OnPauseMenuDisable += GameInstance_OnPauseMenuDisable;
         editorManager.OnMusicAudioClipLoaded += EditorManager_OnMusicAudioClipLoaded;
         editorManager.OnPlaybackStart += EditorManager_OnPlaybackStart;
         editorManager.OnPlaybackStopped += EditorManager_OnPlaybackStopped;
+    }
+
+    private void GameInstance_OnPauseMenuDisable()
+    {
+        musicAudioSource.UnPause();
+    }
+
+    private void GameInstance_OnPauseMenuEnable()
+    {
+        musicAudioSource.Pause();
     }
 
     private void GameInstance_OnGameSettingsChanged()
@@ -27,6 +39,12 @@ public class EditorMusicManager : MonoBehaviour
     private void OnDestroy()
     {
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
+        GameManager.GameInstance.OnPauseMenuEnable -= GameInstance_OnPauseMenuEnable;
+        GameManager.GameInstance.OnPauseMenuDisable -= GameInstance_OnPauseMenuDisable;
+        editorManager.OnMusicAudioClipLoaded -= EditorManager_OnMusicAudioClipLoaded;
+        editorManager.OnPlaybackStart -= EditorManager_OnPlaybackStart;
+        editorManager.OnPlaybackStopped -= EditorManager_OnPlaybackStopped;
+
     }
     private void EditorManager_OnPlaybackStopped()
     {

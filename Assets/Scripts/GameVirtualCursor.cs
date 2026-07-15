@@ -1,6 +1,10 @@
+using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.UI;
 
 /// <summary>
 /// A class to create a virtual cursor based on the hardware mouse.
@@ -24,6 +28,9 @@ public class GameVirtualCursor : MonoBehaviour
 
     public Vector2 VirtualMousePosition { get; private set; }
     public bool MouseVisibleState { get; private set; }
+
+    public event Action OnVirtualCursorClickedUIElement;
+    
     private void Awake()
     {
         if (GameVirtualCursorInstance == null)
@@ -50,6 +57,8 @@ public class GameVirtualCursor : MonoBehaviour
         InputSystem.RemoveDevice(VirtualMouse);
         InputSystem.RemoveDeviceUsage(VirtualMouse, k_VIRTUALMOUSE_TAG);
     }
+    private bool wasLeftButtonClicked = false; // we do this because of some bs not exposing an event for left button
+
     private void Start()
     {
         hardwareMouse = Mouse.current; // cache hardware mouse, since virtual mouse & hardware mouse may conflict
@@ -66,6 +75,7 @@ public class GameVirtualCursor : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
+
 
         ShowVirtualMouse();
     }
@@ -116,6 +126,13 @@ public class GameVirtualCursor : MonoBehaviour
         mouseState.WithButton(MouseButton.Back, backMouseButton);
 
         InputSystem.QueueStateEvent(VirtualMouse, mouseState);
+
+        if (leftMouseButton && !wasLeftButtonClicked)
+        {
+            StartCoroutine(GetEventSystemLastRaycastEvent());
+        }
+
+        wasLeftButtonClicked = leftMouseButton;
     }
 
     private void UpdateVirtualCursorPosition()
@@ -125,6 +142,32 @@ public class GameVirtualCursor : MonoBehaviour
         mouseCursorRectTransform.anchoredPosition = Vector2.zero;
     }
 
+    private IEnumerator GetEventSystemLastRaycastEvent()
+    {
+        // because the input system will actually process the state event in the next Update(), we need to wait until then to correctly get the last raycast result.
+
+        yield return null;
+        yield return new WaitForEndOfFrame();
+
+        if (EventSystem.current == null)
+        {
+            yield break;
+        }
+
+        if (EventSystem.current.currentInputModule is not InputSystemUIInputModule uiInputModule)
+        {
+            yield break;
+        }
+
+        RaycastResult result = uiInputModule.GetLastRaycastResult(VirtualMouse.deviceId);
+
+        if (!result.isValid)
+        {
+            yield break;
+        }
+
+        OnVirtualCursorClickedUIElement?.Invoke();
+    }
     public void HideVirtualMouse()
     {
         if (mouseCursorRectTransform == null)

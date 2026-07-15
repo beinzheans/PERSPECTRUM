@@ -17,6 +17,7 @@ public class GameplayAudioController : MonoBehaviour
         gameplayManager = GameplayManager.GameplayInstance;
 
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        GameManager.GameInstance.OnPauseMenuEnable += GameInstance_OnPauseMenuEnable;
         gameplayManager.OnGameplayChartLoaded += GameplayManager_OnGameplayAudioLoaded;
         gameplayManager.OnGameplayWaitingForResume += GameplayManager_OnGameplayWaitingForResume;
         gameplayManager.OnGameplayResumeTick += GameplayManager_OnGameplayResumeTick;
@@ -28,6 +29,11 @@ public class GameplayAudioController : MonoBehaviour
         gameplayManager.OnHitboxBecomeActive += GameplayManager_OnHitboxBecomeActive;
     }
 
+    private void GameInstance_OnPauseMenuEnable()
+    {
+        musicAudioSource.Stop();
+    }
+
     private int tick = 0;
     private void GameplayManager_OnGameplayResumeTick()
     {
@@ -36,7 +42,7 @@ public class GameplayAudioController : MonoBehaviour
             return;
         }
 
-        AudioEngine.AudioInstance.PlayAudioClip(resumeTickClip, 0d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1f, 0f);
+        AudioEngine.AudioInstance.PlayAudioClip(resumeTickClip, 0d, GameManager.GameInstance.GlobalSettings.UIVolume, 1f, 0f);
         tick++;
     }
 
@@ -47,7 +53,6 @@ public class GameplayAudioController : MonoBehaviour
 
     private void GameplayManager_OnGameplayWaitingForResume()
     {
-        musicAudioSource.Stop();
         tick = 0;
     }
 
@@ -91,7 +96,7 @@ public class GameplayAudioController : MonoBehaviour
     private void OnDestroy()
     {
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
-
+        GameManager.GameInstance.OnPauseMenuEnable -= GameInstance_OnPauseMenuEnable;
         gameplayManager.OnGameplayChartLoaded -= GameplayManager_OnGameplayAudioLoaded;
         gameplayManager.OnGameplayWaitingForResume -= GameplayManager_OnGameplayWaitingForResume;
         gameplayManager.OnGameplayResumed -= GameplayManager_OnGameplayResumed;
