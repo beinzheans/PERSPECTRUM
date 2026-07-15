@@ -4,6 +4,7 @@ using UnityEngine;
 public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHitbox>
 {
     private MeshRenderer meshRenderer;
+    [SerializeField] private MeshRenderer bombCrossMeshRenderer;
 
     private static readonly int SHADER_HITBOXID = Shader.PropertyToID("_HitboxType_Float");
     private static readonly int SHADER_NORMALIZEDPROGRESSID = Shader.PropertyToID("_NormalizedProgress");
@@ -25,9 +26,12 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
         else if (AssociatedGameplayObject.HitboxType == HitboxType.B) hitboxIDFloat = 1f;
         else hitboxIDFloat = 2f;
 
+        bombCrossMeshRenderer.gameObject.SetActive(AssociatedGameplayObject.HitboxType == HitboxType.BOMB);
+
         propertyBlock.SetFloat(SHADER_HITBOXID, hitboxIDFloat);
         propertyBlock.SetFloat(SHADER_NORMALIZEDPROGRESSID, GetNormalizedProgressFloat());
         meshRenderer.SetPropertyBlock(propertyBlock);
+        bombCrossMeshRenderer.SetPropertyBlock(propertyBlock);
     }
 
     private void SetPosition()
@@ -61,6 +65,10 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
         propertyBlock.SetFloat(SHADER_NORMALIZEDPROGRESSID, GetNormalizedProgressFloat());
 
         meshRenderer.SetPropertyBlock(propertyBlock);
+        if (AssociatedGameplayObject.HitboxType == HitboxType.BOMB)
+        {
+            bombCrossMeshRenderer.SetPropertyBlock(propertyBlock);
+        }
     }
 
     private float GetNormalizedProgressFloat()
