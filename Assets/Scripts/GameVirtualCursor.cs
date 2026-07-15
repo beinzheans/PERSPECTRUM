@@ -30,7 +30,7 @@ public class GameVirtualCursor : MonoBehaviour
     public bool MouseVisibleState { get; private set; }
 
     public event Action OnVirtualCursorClickedUIElement;
-    
+
     private void Awake()
     {
         if (GameVirtualCursorInstance == null)

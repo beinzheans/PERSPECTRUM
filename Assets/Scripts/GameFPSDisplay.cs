@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 /// <summary>
 /// A class to handle the FPS display. <br></br>

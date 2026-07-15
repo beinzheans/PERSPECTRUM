@@ -89,7 +89,7 @@ public class SceneLoader : MonoBehaviour
         }
 
         loadOperation.allowSceneActivation = true;
-        OnNextSceneStartActivate?.Invoke(); 
+        OnNextSceneStartActivate?.Invoke();
 
         while (!loadOperation.isDone)
         {

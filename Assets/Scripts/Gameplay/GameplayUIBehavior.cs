@@ -114,7 +114,7 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplay_accuracySlider.value = (float)gameplayManager.CurrentAccuracy;
         gameplay_score.SetText(((int)math.round(gameplayManager.CurrentScore)).ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_progress.text = $"{gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount} | {gameplayManager.MaxHitboxCount}";
-        gameplay_progressSlider.value= (float)(gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount) / gameplayManager.MaxHitboxCount;
+        gameplay_progressSlider.value = (float)(gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount) / gameplayManager.MaxHitboxCount;
     }
     private void GameplayManager_OnHitboxBombHit(VisualHitbox hitbox)
     {
