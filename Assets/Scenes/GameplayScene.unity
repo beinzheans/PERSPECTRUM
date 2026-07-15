@@ -176,7 +176,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 4
   m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -456,6 +456,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 116885568}
+  - component: {fileID: 116885569}
   m_Layer: 5
   m_Name: Gameplay_RunningStatisticsUI_Judgement
   m_TagString: Untagged
@@ -484,6 +485,18 @@ RectTransform:
   m_AnchoredPosition: {x: -768, y: 0}
   m_SizeDelta: {x: 384, y: -432}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &116885569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 116885567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 601bddf0e19288640ad1e7e106bf818f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &146685140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1864,6 +1877,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 395773449}
+  - component: {fileID: 395773450}
   m_Layer: 5
   m_Name: Gameplay_RunningStatisticsUI_Performance
   m_TagString: Untagged
@@ -1892,6 +1906,18 @@ RectTransform:
   m_AnchoredPosition: {x: 768, y: 0}
   m_SizeDelta: {x: 384, y: -432}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &395773450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395773448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 601bddf0e19288640ad1e7e106bf818f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -2647,7 +2673,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 4
   m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -3084,7 +3110,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 4
   m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -3755,7 +3781,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 152.5626, y: 72.9967}
+  m_SizeDelta: {x: 100, y: 72.9967}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &923345961
 MonoBehaviour:
@@ -3804,13 +3830,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -9649,7 +9675,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4e2960002b0ecb4ca1b0c6f8f7b88c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameplayUI: {fileID: 1802188687}
+  gameplayUI: {fileID: 1802188688}
   comboText: {fileID: 1330388967}
   gameplay_chartCredit: {fileID: 1528550525}
   gameplay_songCredit: {fileID: 1397952212}
@@ -9665,6 +9691,10 @@ MonoBehaviour:
   gameplay_matchIcon: {fileID: 743915302}
   gameplay_mismatchIcon: {fileID: 1429289287}
   gameplay_missIcon: {fileID: 1752677216}
+  dynamicUIElements:
+  - {fileID: 1330388968}
+  - {fileID: 116885569}
+  - {fileID: 395773450}
   gameplayResume_UI: {fileID: 1640495199}
   gameplayResume_background: {fileID: 1485785227}
   gameplayResume_tickText: {fileID: 494260738}
@@ -10440,6 +10470,7 @@ GameObject:
   - component: {fileID: 1330388966}
   - component: {fileID: 1330388965}
   - component: {fileID: 1330388967}
+  - component: {fileID: 1330388968}
   m_Layer: 5
   m_Name: ComboText
   m_TagString: Untagged
@@ -10577,6 +10608,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: daa318ba9ff81dd4baf7f12c2090393a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1330388968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330388963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 601bddf0e19288640ad1e7e106bf818f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1337567572
@@ -12001,8 +12044,8 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_Spacing: 25
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0

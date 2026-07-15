@@ -9,8 +9,9 @@ public class GameplayUIBehavior : MonoBehaviour
     private GameplayManager gameplayManager;
 
     [Header("Gameplay UI")]
-    [SerializeField] private GameObject gameplayUI;
+    [SerializeField] private RectTransform gameplayUI;
     [SerializeField] private UIElasticText comboText;
+
     [SerializeField] private TMP_Text gameplay_chartCredit;
     [SerializeField] private TMP_Text gameplay_songCredit;
     [SerializeField] private UIElasticText gameplay_matchCount;
@@ -28,6 +29,7 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private UIElastic gameplay_mismatchIcon;
     [SerializeField] private UIElastic gameplay_missIcon;
 
+    [SerializeField] private UIDynamic[] dynamicUIElements = new UIDynamic[0];
     [Header("Gameplay Resume UI")]
     [SerializeField] private GameObject gameplayResume_UI;
     [SerializeField] private Image gameplayResume_background;
@@ -146,14 +148,14 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void GameplayManager_OnGameplayEnded()
     {
-        gameplayUI.SetActive(false);
+        gameplayUI.gameObject.SetActive(false);
         endscreenUI.SetActive(true);
         SetupEndscreenUI();
     }
 
     private void GameplayManager_OnGameplayStarted()
     {
-        gameplayUI.SetActive(true);
+        gameplayUI.gameObject.SetActive(true);
         endscreenUI.SetActive(false);
         SetupGameplayUI();
     }
@@ -215,5 +217,16 @@ public class GameplayUIBehavior : MonoBehaviour
     public void UI_OnRetryButton()
     {
         gameplayManager.InvokeGameplayRestartEvent();
+    }
+
+    private const float k_UIDISPLACEMENTSCALER = 0.5f;
+    private void Update()
+    {
+        Vector2 UIDisplacement = k_UIDISPLACEMENTSCALER * gameplayManager.CurrentPlayAreaDisplacement / gameplayManager.WorldToScreenSizeRatioOfPreview;
+
+        for (int i = 0; i < dynamicUIElements.Length; i++)
+        {
+            dynamicUIElements[i].Displace(UIDisplacement);
+        }
     }
 }
