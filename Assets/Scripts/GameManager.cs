@@ -227,7 +227,7 @@ public class GameManager : MonoBehaviour
     {
         int width = GlobalSettings.GraphicSettings.CurrentResolution.x;
         int height = GlobalSettings.GraphicSettings.CurrentResolution.y;
-        FullScreenMode fullScreenMode = GlobalSettings.GraphicSettings.IsUseFullScreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed;
+        FullScreenMode fullScreenMode = GlobalSettings.GraphicSettings.IsUseFullScreen ? FullScreenMode.ExclusiveFullScreen : FullScreenMode.Windowed;
         if (GlobalSettings.GraphicSettings.FrameRateLimit > 0)
         {
             QualitySettings.vSyncCount = 0;
