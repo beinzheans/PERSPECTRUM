@@ -95,7 +95,7 @@ public class EditorManager : MonoBehaviour
 
     private byte[] currentEditorAudioClipByteArray = new byte[0];
 
-    public event Func<EditorChartMetadata> OnRequestChartMetadata;
+    public event Func<BaseChartMetadata> OnRequestBaseChartMetadata;
     public event Action<EditorChartMetadata> OnChartMetadataLoaded;
 
     [SerializeField] private RawImage gridCursorVisualizationImage;
@@ -613,7 +613,7 @@ public class EditorManager : MonoBehaviour
         }
 
         string chartJson = "";
-        EditorChartMetadata metadata = OnRequestChartMetadata?.Invoke();
+        BaseChartMetadata baseMetadata = (BaseChartMetadata)(OnRequestBaseChartMetadata?.Invoke());
 
         try
         {
@@ -626,6 +626,7 @@ public class EditorManager : MonoBehaviour
         }
 
         string metadataJson = "";
+        EditorChartMetadata metadata = CreateChartMetadataFromBaseMetadata(baseMetadata);
 
         try
         {
@@ -639,6 +640,42 @@ public class EditorManager : MonoBehaviour
 
         GamePersistenceManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray);
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
+    }
+
+    private EditorChartMetadata CreateChartMetadataFromBaseMetadata(in BaseChartMetadata baseMetadata)
+    {
+        double previewStartTime = GetSongPreviewStartTime();
+
+        return new EditorChartMetadata(baseMetadata, previewStartTime);
+    }
+
+    /// <summary>
+    /// Gets the song's preview start time. <br></br>
+    /// If multiple markers are marked as the start time, we choose the earliest one. If none are marked, we default to 0d as the start time.
+    /// </summary>
+    /// <returns></returns>
+    private double GetSongPreviewStartTime()
+    {
+        double minStartTime = double.MaxValue;
+        bool hasAssigned = false;
+
+        for (int i = 0; i < CurrentEditorChart.TimelineMarkers.Count; i++)
+        {
+            TimelineMarker marker = CurrentEditorChart.TimelineMarkers[i];
+
+            if (!marker.IsPreviewStartMarker)
+            {
+                continue;
+            }
+
+            if (marker.RenderTime < minStartTime)
+            {
+                hasAssigned = true;
+                minStartTime = marker.RenderTime;
+            }
+        }
+
+        return hasAssigned ? 0d : minStartTime;
     }
 
     public void LoadEditorChart()
@@ -814,9 +851,12 @@ public class EditorChartMetadata : IEquatable<EditorChartMetadata>
     [JsonProperty(GameManager.k_METADATABASEDATAKEY)]
     public BaseChartMetadata BaseMetadata { get; private set; }
 
-    public EditorChartMetadata(BaseChartMetadata baseChartMetadata)
+    [DefaultValue(0d)]
+    public double PreviewStartTime { get; private set; }
+    public EditorChartMetadata(BaseChartMetadata baseChartMetadata, double previewStartTime)
     {
         BaseMetadata = baseChartMetadata;
+        PreviewStartTime = previewStartTime;
     }
 
     public override bool Equals(object obj)

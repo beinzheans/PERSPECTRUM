@@ -374,20 +374,22 @@ public class TimelineMarker : EditorDynamicObject, IConvertable<GameplayMarker>
     }
 
     [JsonConstructor]
-    public TimelineMarker(double markerTime, string markerLabel, double BPM, string displayMessage, double displayTime) : base(markerTime)
+    public TimelineMarker(double markerTime, string markerLabel, double BPM, string displayMessage, double displayTime, bool isPreviewStartMarker) : base(markerTime)
     {
         MarkerLabel = markerLabel;
         this.BPM = BPM;
         DisplayMessage = displayMessage;
         DisplayTime = displayTime;
+        IsPreviewStartMarker = isPreviewStartMarker;
     }
 
-    public void AssignMarkerValues(string label, double BPM, string displayMessage, double displayTime)
+    public void AssignMarkerValues(string label, double BPM, string displayMessage, double displayTime, bool isPreviewStartMarker)
     {
         MarkerLabel = label;
         this.BPM = BPM;
         DisplayMessage = displayMessage;
         DisplayTime = displayTime;
+        IsPreviewStartMarker = isPreviewStartMarker;
     }
 
     public bool Convert(out GameplayMarker converted)
@@ -400,6 +402,8 @@ public class TimelineMarker : EditorDynamicObject, IConvertable<GameplayMarker>
     public double BPM { get; private set; }
     public string DisplayMessage { get; private set; }
     public double DisplayTime { get; private set; }
+
+    public bool IsPreviewStartMarker { get; private set; }
 }
 
 /// <summary>

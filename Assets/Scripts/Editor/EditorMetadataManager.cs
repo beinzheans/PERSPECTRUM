@@ -12,7 +12,7 @@ public class EditorMetadataManager : MonoBehaviour
 
     private void Start()
     {
-        EditorManager.EditorInstance.OnRequestChartMetadata += EditorInstance_OnRequestChartMetadata;
+        EditorManager.EditorInstance.OnRequestBaseChartMetadata += EditorInstance_OnRequestChartMetadata;
         EditorManager.EditorInstance.OnChartMetadataLoaded += EditorInstance_OnChartMetadataLoaded;
     }
 
@@ -40,7 +40,7 @@ public class EditorMetadataManager : MonoBehaviour
         songArtist.text = obj.BaseMetadata.SongArtist;
     }
 
-    private EditorChartMetadata EditorInstance_OnRequestChartMetadata()
+    private BaseChartMetadata EditorInstance_OnRequestChartMetadata()
     {
         string c_name = string.IsNullOrWhiteSpace(chartName.text) ? k_NOCHARTNAMESTRING : chartName.text;
         string c_mapper = string.IsNullOrWhiteSpace(chartMapper.text) ? k_NOCHARTMAPPERSTRING : chartMapper.text;
@@ -60,6 +60,6 @@ public class EditorMetadataManager : MonoBehaviour
             baseChartMetadata = new BaseChartMetadata(c_name, c_mapper, s_name, s_artist, c_difficulty, GameManager.GameInstance.CurrentVersion, GUID);
         }
 
-        return new EditorChartMetadata(baseChartMetadata);
+        return baseChartMetadata;
     }
 }
