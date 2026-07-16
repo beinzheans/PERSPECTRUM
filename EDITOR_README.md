@@ -304,7 +304,11 @@ Sets the message of the marker that will be displayed initially when the marker 
 
 Sets the time duration that the message will be displayed for. The information panel will not be displayed if the message time is not set.
 
-#### 5. Delete Current Mrk.
+#### 5. Set Preview Mrk.
+
+Sets this marker as the song preview starting time when choosing charts. If multiple markers are set as the preview marker, the earliest marker is regarded as the preview marker. If no preview marker is set, the preview start time will default to the beginning (ie. time = 0)
+
+#### 6. Delete Current Mrk.
 
 Deletes the current active marker that is displayed on the [Timeline Panel](#timeline-panel).
 
