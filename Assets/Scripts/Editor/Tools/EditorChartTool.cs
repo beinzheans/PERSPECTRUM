@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using SFB;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 public class EditorChartTool : EditorUIBehavior
@@ -28,7 +29,9 @@ public class EditorChartTool : EditorUIBehavior
                     return;
                 }
 
-                (bool success, AudioClip clip, byte[] bytes) = await AudioEngine.AudioInstance.GetAudioClipFromLocalFile(paths[0]);
+                byte[] bytes = File.ReadAllBytes(paths[0]);
+                (bool success, AudioClip clip) = await GamePersistenceManager.GetAudioClipFromByteArray(bytes, false);
+
 
                 if (!success)
                 {

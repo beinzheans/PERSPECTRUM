@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using SFB;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
@@ -723,7 +724,7 @@ public class EditorManager : MonoBehaviour
                 InvokeOnEditorMetadataLoaded(metadata);
             }
 
-            (bool audioResult, AudioClip clip, byte[] bytes) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes).ConfigureAwait(false);
+            (bool audioResult, AudioClip clip) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes, false);
 
             if (!audioResult)
             {
@@ -733,7 +734,7 @@ public class EditorManager : MonoBehaviour
             await Awaitable.MainThreadAsync();
 
             // return to main thread in order to invoke this action.
-            InvokeAudioClipLoadedEvent(clip, bytes);
+            InvokeAudioClipLoadedEvent(clip, audioBytes);
         }
         catch (Exception e)
         {

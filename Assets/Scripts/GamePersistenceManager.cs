@@ -67,7 +67,7 @@ public static class GamePersistenceManager
 
     /// <summary>
     /// Converts a chart file to JSON and audio byte array information if possible. <br></br>
-    /// Returns false and empty chart information if no JSON nor audio byte array is valid.
+    /// Returns empty chart information if no JSON nor audio byte array is valid.
     /// </summary>
     /// <param name="fullFilePath"></param>
     /// <param name="chartJson"></param>
@@ -139,32 +139,39 @@ public static class GamePersistenceManager
 
     }
 
-    private const string k_TEMPORARYFILENAME = "temporary_cache.mp3";
+    private const string k_TEMPORARYCACHE_AUDIOFILENAME = "temporary_cache.mp3";
     /// <summary>
     /// Gets an audio clip from the bytes by using temporary file cache.
     /// </summary>
     /// <param name="audioByte"></param>
     /// <returns></returns>
-    public static async Task<(bool, AudioClip, byte[])> GetAudioClipFromByteArray(byte[] audioByte)
+    public static async Task<(bool, AudioClip)> GetAudioClipFromByteArray(byte[] audioByte, bool isStreamingAudio)
     {
         if (audioByte == null || audioByte.Length <= 0)
         {
-            return (false, null, new byte[0]);
+            return (false, null);
         }
 
-        string tempFilePath = Path.Combine(Application.temporaryCachePath, k_TEMPORARYFILENAME);
+        string tempFilePath = Path.Combine(Application.temporaryCachePath, k_TEMPORARYCACHE_AUDIOFILENAME);
 
         try
         {
             File.WriteAllBytes(tempFilePath, audioByte);
-            return await AudioEngine.AudioInstance.GetAudioClipFromLocalFile(tempFilePath);
+            if (isStreamingAudio)
+            {
+                return await AudioEngine.AudioInstance.GetAudioClipFromLocalFileStreaming(tempFilePath);
+            }
+            else
+            {
+                return await AudioEngine.AudioInstance.GetAudioClipFromLocalFile(tempFilePath);
+            }
         }
         catch (Exception e)
         {
             Debug.LogWarning($"Failed to create temporary cache file. Exception:\n" +
                              $"{e}");
 
-            return (false, null, new byte[0]);
+            return (false, null);
         }
         finally
         {
@@ -181,7 +188,7 @@ public static class GamePersistenceManager
         {
             EditorChart editorChart = JsonConvert.DeserializeObject<EditorChart>(chartJson, GameManager.GameInstance.JsonSerializerSettings);
 
-            (bool clipResult, AudioClip clip, byte[] _) = await GetAudioClipFromByteArray(audioBytes);
+            (bool clipResult, AudioClip clip) = await GetAudioClipFromByteArray(audioBytes, false);
 
             if (!clipResult)
             {

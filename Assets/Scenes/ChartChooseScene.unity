@@ -2256,6 +2256,7 @@ GameObject:
   - component: {fileID: 1069841124}
   - component: {fileID: 1069841123}
   - component: {fileID: 1069841125}
+  - component: {fileID: 1069841126}
   m_Layer: 0
   m_Name: ChartChooseManager
   m_TagString: Untagged
@@ -2310,6 +2311,19 @@ MonoBehaviour:
   behaviorParentRectTransform: {fileID: 1676601377}
   behaviorPrefab: {fileID: 1041493655820195356, guid: ed5bbeaf24b1c03419c9e8c15a6f20f1, type: 3}
   playHistoryLabelText: {fileID: 1466717092}
+--- !u!114 &1069841126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1069841122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73b7b100918cf8a4984b29e0c00e2450, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  music_AudioSource: {fileID: 1111648106}
 --- !u!1 &1111648105
 GameObject:
   m_ObjectHideFlags: 0

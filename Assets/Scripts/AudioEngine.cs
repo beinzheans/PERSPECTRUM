@@ -96,12 +96,38 @@ public class AudioEngine : MonoBehaviour
         source.PlayScheduled(AudioSettings.dspTime + playOffsetTime);
     }
 
+    private TimerStopwatchAction fadeInStopwatch;
+    public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime)
+    {
+        fadeInTime = math.max(0.01d, fadeInTime);
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeInStopwatch);
+        fadeInStopwatch = new TimerStopwatchAction(this, x =>
+        {
+            source.volume = math.lerp(0f, maxVolume, (float)(x / fadeInTime));
+        }, () => { }, 0d, fadeInTime, false);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInStopwatch);
+    }
+
+    private TimerStopwatchAction fadeOutStopwatch;
+
+    public void FadeOutAudioSource(AudioSource source, double fadeOutTime)
+    {
+        fadeOutTime = math.max(0.01d, fadeOutTime);
+        float startingVolume = source.volume;
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
+        fadeOutStopwatch = new TimerStopwatchAction(this, x =>
+        {
+            source.volume = math.lerp(startingVolume, 0f, (float)(x / fadeOutTime));
+        }, () => { }, 0d, fadeOutTime, false);
+    }
+
     public void EditAudioSource(AudioSource source, float volume)
     {
         source.volume = volume;
     }
 
-    public async Task<(bool result, AudioClip clip, byte[] bytes)> GetAudioClipFromLocalFile(string fullFilePath)
+    
+    public async Task<(bool result, AudioClip clip)> GetAudioClipFromLocalFile(string fullFilePath)
     {
         Uri request = new Uri("file://" + fullFilePath);
 
@@ -117,12 +143,42 @@ public class AudioEngine : MonoBehaviour
         if (webRequest.result != UnityWebRequest.Result.Success)
         {
             Debug.LogWarning($"Failed to load audio clip from local file");
-            return (false, null, new byte[0]);
+            webRequest.Dispose();
+            return (false, null);
         }
 
-        byte[] data = webRequest.downloadHandler.data;
         AudioClip loadedClip = DownloadHandlerAudioClip.GetContent(webRequest);
 
-        return (true, loadedClip, data);
+        webRequest.Dispose();
+        return (true, loadedClip);
+    }
+
+    public async Task<(bool result, AudioClip clip)> GetAudioClipFromLocalFileStreaming(string fullFilePath)
+    {
+        Uri request = new Uri("file://" + fullFilePath);
+
+        UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(request, AudioType.MPEG);
+        DownloadHandlerAudioClip downloadHandler = webRequest.downloadHandler as DownloadHandlerAudioClip;
+        downloadHandler.streamAudio = true;
+
+        UnityWebRequestAsyncOperation asyncOperation = webRequest.SendWebRequest();
+
+        while (!asyncOperation.isDone)
+        {
+            await Task.Yield();
+        }
+
+        if (webRequest.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogWarning($"Failed to stream audio clip from local file");
+            webRequest.Dispose();
+            return (false, null);
+        }
+
+        AudioClip loadedClip = DownloadHandlerAudioClip.GetContent(webRequest);
+        webRequest.Dispose();
+        return (true, loadedClip);
+
+
     }
 }
