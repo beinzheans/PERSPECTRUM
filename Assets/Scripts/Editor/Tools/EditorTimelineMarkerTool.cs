@@ -9,8 +9,8 @@ public class EditorTimelineMarkerTool : EditorToolManager
     private const int k_MARKERBPMINDEX = 1;
     private const int k_MARKERMESSAGEINDEX = 2;
     private const int k_MARKERDISPLAYMESSAGETIMEINDEX = 3;
-    private const int k_DELETECURRENTMARKERINDEX = 4;
-    private const int k_ISPREVIEWMARKERINDEX = 5;
+    private const int k_ISPREVIEWMARKERINDEX = 4;
+    private const int k_DELETECURRENTMARKERINDEX = 5;
 
     protected override void Start()
     {

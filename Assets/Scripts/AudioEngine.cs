@@ -97,28 +97,30 @@ public class AudioEngine : MonoBehaviour
     }
 
     private TimerStopwatchAction fadeInStopwatch;
-    public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime)
+    public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime, Action callback)
     {
         fadeInTime = math.max(0.01d, fadeInTime);
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeInStopwatch);
-        fadeInStopwatch = new TimerStopwatchAction(this, x =>
+        fadeInStopwatch = new TimerStopwatchAction(source, x =>
         {
             source.volume = math.lerp(0f, maxVolume, (float)(x / fadeInTime));
-        }, () => { }, 0d, fadeInTime, false);
+        }, () => callback?.Invoke(), 0d, fadeInTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInStopwatch);
     }
 
     private TimerStopwatchAction fadeOutStopwatch;
 
-    public void FadeOutAudioSource(AudioSource source, double fadeOutTime)
+    public void FadeOutAudioSource(AudioSource source, double fadeOutTime, Action callback)
     {
         fadeOutTime = math.max(0.01d, fadeOutTime);
         float startingVolume = source.volume;
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
-        fadeOutStopwatch = new TimerStopwatchAction(this, x =>
+        fadeOutStopwatch = new TimerStopwatchAction(source, x =>
         {
             source.volume = math.lerp(startingVolume, 0f, (float)(x / fadeOutTime));
-        }, () => { }, 0d, fadeOutTime, false);
+        }, () => callback?.Invoke(), 0d, fadeOutTime, false);
+
+        DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutStopwatch);
     }
 
     public void EditAudioSource(AudioSource source, float volume)

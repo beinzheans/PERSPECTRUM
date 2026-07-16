@@ -82,6 +82,7 @@ public class GameManager : MonoBehaviour
     public const string k_CHARTGUIDKEY = "GUID";
     public const string k_CHARTDIFFICULTYKEY = "ChartDifficulty";
 
+    public const string k_CHARTSTARTPREVIEWTIMEKEY = "PreviewStartTime";
     private UniversalRenderPipelineAsset URP_asset;
     public List<Vector2Int> AllPossibleResolutions { get; private set; }
 

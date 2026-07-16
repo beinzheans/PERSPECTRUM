@@ -57,6 +57,12 @@ public class DSPTimerEngine : MonoBehaviour
         while (audioActionsToRegister.Count > 0)
         {
             TimerAction register = audioActionsToRegister.Dequeue();
+            if (register.TimerCaller == null)
+            {
+                Debug.Log($"Ignored timer registeration due to null caller");
+                return;
+            }
+
             registeredAudioActions.Add(register);
         }
 
@@ -92,6 +98,7 @@ public class DSPTimerEngine : MonoBehaviour
         {
             return;
         }
+
 
         audioActionsToRegister.Enqueue(action);
     }
@@ -163,7 +170,7 @@ public abstract class TimerAction : IEquatable<TimerAction>
     /// <summary>
     /// The Unity object that created this timer
     /// </summary>
-    protected UnityEngine.Object TimerCaller;
+    public UnityEngine.Object TimerCaller { get; protected set; }
     protected Action<double> ActionToExecute;
     protected Action OnUnregisterEvent;
     /// <summary>

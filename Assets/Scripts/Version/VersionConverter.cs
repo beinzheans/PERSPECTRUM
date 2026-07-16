@@ -87,3 +87,18 @@ public class VersionConverter_1_0_1_to_1_1_0 : VersionConverter
         return true;
     }
 }
+
+public class VersionConverter_1_1_0_to_1_2_0 : VersionConverter
+{
+    public override string InVersion => "1.1.0";
+
+    public override string OutVersion => "1.2.0";
+
+    protected override bool OnConvertChartEvent(ref JObject chartJObject, ref JObject metadataJObject)
+    {
+        JProperty JProperty = new JProperty(GameManager.k_CHARTSTARTPREVIEWTIMEKEY, 0d);
+        metadataJObject.Add(JProperty);
+
+        return true;
+    }
+}

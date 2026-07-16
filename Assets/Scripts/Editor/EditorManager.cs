@@ -675,7 +675,7 @@ public class EditorManager : MonoBehaviour
             }
         }
 
-        return hasAssigned ? 0d : minStartTime;
+        return !hasAssigned ? 0d : minStartTime;
     }
 
     public void LoadEditorChart()
@@ -852,6 +852,7 @@ public class EditorChartMetadata : IEquatable<EditorChartMetadata>
     public BaseChartMetadata BaseMetadata { get; private set; }
 
     [DefaultValue(0d)]
+    [JsonProperty(GameManager.k_CHARTSTARTPREVIEWTIMEKEY)]
     public double PreviewStartTime { get; private set; }
     public EditorChartMetadata(BaseChartMetadata baseChartMetadata, double previewStartTime)
     {

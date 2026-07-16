@@ -14204,9 +14204,10 @@ MonoBehaviour:
   - Set Marker BPM
   - Set Message
   - Set Message Time
+  - Set Preview Mrk.
   - Delete Current Mrk.
   isAlwaysActiveTool: 010101010000000000
-  isToolToggle: 000000000000000000
+  isToolToggle: 000000000100000000
 --- !u!114 &1527063494
 MonoBehaviour:
   m_ObjectHideFlags: 0
