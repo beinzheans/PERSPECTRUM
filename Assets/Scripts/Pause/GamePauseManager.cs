@@ -120,6 +120,7 @@ public class GamePauseManager : MonoBehaviour
         gameManager.PauseCanvas.gameObject.SetActive(true);
 
         AddListeners();
+        OnPauseModuleButtonClicked(0); // force it back to first module
         gameManager.InvokeGamePauseMenuEnable();
         GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
     }

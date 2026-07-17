@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
 
 /// <summary>
 /// A class to create a virtual cursor based on the hardware mouse.
@@ -12,9 +13,10 @@ using UnityEngine.InputSystem.UI;
 public class GameVirtualCursor : MonoBehaviour
 {
     public static GameVirtualCursor GameVirtualCursorInstance;
-    [SerializeField] private RectTransform mouseCursorRectTransform;
-    [SerializeField] private Canvas mouseCanvas;
+    [SerializeField] private UIElasticColor mouseCursorElasticUI;
+    [SerializeField] private Color mouseCursorPulseColor;
 
+    [SerializeField] private Canvas mouseCanvas;
     private RectTransform mouseCanvasRectTransform;
 
     public const string k_VIRTUALMOUSEKEY = "VirtualMouse";
@@ -29,8 +31,10 @@ public class GameVirtualCursor : MonoBehaviour
     public Vector2 VirtualMousePosition { get; private set; }
     public bool MouseVisibleState { get; private set; }
 
-    public event Action OnVirtualCursorClickedUIElement;
+    public event Action<GameObject> OnVirtualCursorClickedUIElement;
 
+    private readonly Vector2 k_VIRTUALCURSORCLICKEDELASTICSIZE = new Vector2(0.75f, 1.25f);
+    private const double k_VIRTUALCURSORELASTICTIME = 0.25d;
     private void Awake()
     {
         if (GameVirtualCursorInstance == null)
@@ -67,10 +71,10 @@ public class GameVirtualCursor : MonoBehaviour
 
         InputSystem.AddDeviceUsage(VirtualMouse, k_VIRTUALMOUSE_TAG);
 
-        mouseCursorRectTransform.anchorMin = mouseCursorRectTransform.anchorMax = Vector2.zero; // set to bottom-left anchor, so (0, 0) is the bottom-left corner
+        mouseCursorElasticUI.RectTransform.anchorMin = mouseCursorElasticUI.RectTransform.anchorMax = Vector2.zero; // set to bottom-left anchor, so (0, 0) is the bottom-left corner
         mouseCanvasRectTransform = mouseCanvas.GetComponent<RectTransform>();
         Vector2 centre = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(0.5f, 0.5f), mouseCanvasRectTransform);
-        mouseCursorRectTransform.anchoredPosition = centre;
+        mouseCursorElasticUI.RectTransform.anchoredPosition = centre;
         VirtualMousePosition = centre;
 
         Cursor.lockState = CursorLockMode.Confined;
@@ -85,7 +89,7 @@ public class GameVirtualCursor : MonoBehaviour
         UpdateVirtualMouse();
     }
 
-    private const float k_DEFAULTMOUSESENSITIVITY = 1f; // testing value
+    private const float k_DEFAULTMOUSESENSITIVITY = 1f;
     private void UpdateVirtualMouse()
     {
         Vector2 delta = hardwareMouse.delta.ReadValue();
@@ -138,8 +142,8 @@ public class GameVirtualCursor : MonoBehaviour
     private void UpdateVirtualCursorPosition()
     {
         MathHelper.GetNormalizedPointInsideReferenceUI(VirtualMousePosition, mouseCanvasRectTransform, out Vector2 normalizedPoint);
-        mouseCursorRectTransform.anchorMax = mouseCursorRectTransform.anchorMin = normalizedPoint;
-        mouseCursorRectTransform.anchoredPosition = Vector2.zero;
+        mouseCursorElasticUI.RectTransform.anchorMax = mouseCursorElasticUI.RectTransform.anchorMin = normalizedPoint;
+        mouseCursorElasticUI.RectTransform.anchoredPosition = Vector2.zero;
     }
 
     private IEnumerator GetEventSystemLastRaycastEvent()
@@ -166,27 +170,40 @@ public class GameVirtualCursor : MonoBehaviour
             yield break;
         }
 
-        OnVirtualCursorClickedUIElement?.Invoke();
+        if (!result.gameObject.TryGetComponent<Selectable>(out Selectable selectable))
+        {
+            yield break;
+        }
+
+        if (!selectable.IsInteractable())
+        {
+            yield break;
+        }
+
+        mouseCursorElasticUI.PulseElasticSize(k_VIRTUALCURSORCLICKEDELASTICSIZE, k_VIRTUALCURSORELASTICTIME);
+        mouseCursorElasticUI.PulseGraphicColor(mouseCursorPulseColor, k_VIRTUALCURSORELASTICTIME);
+        OnVirtualCursorClickedUIElement?.Invoke(result.gameObject);
     }
+
     public void HideVirtualMouse()
     {
-        if (mouseCursorRectTransform == null)
+        if (mouseCursorElasticUI == null)
         {
             return;
         }
 
-        mouseCursorRectTransform.gameObject.SetActive(false);
+        mouseCursorElasticUI.gameObject.SetActive(false);
         MouseVisibleState = false;
     }
 
     public void ShowVirtualMouse()
     {
-        if (mouseCursorRectTransform == null)
+        if (mouseCursorElasticUI == null)
         {
             return;
         }
 
-        mouseCursorRectTransform.gameObject.SetActive(true);
+        mouseCursorElasticUI.gameObject.SetActive(true);
         MouseVisibleState = true;
     }
 }

@@ -13,7 +13,13 @@ public class ChartChooseAudioManager : MonoBehaviour
         chartChooseManager.OnChartButtonClicked += ChartChooseManager_OnChartButtonClicked;
         GameManager.GameInstance.OnPauseMenuEnable += GameInstance_OnPauseMenuEnable;
         GameManager.GameInstance.OnPauseMenuDisable += GameInstance_OnPauseMenuDisable;
+        GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
         chartChooseManager.OnChartDeleted += ChartChooseManager_OnChartDeleted;
+    }
+
+    private void GameInstance_OnGameSettingsChanged()
+    {
+        music_AudioSource.volume = GameManager.GameInstance.GlobalSettings.SongVolume;
     }
 
     private void GameInstance_OnPauseMenuDisable()
@@ -37,6 +43,7 @@ public class ChartChooseAudioManager : MonoBehaviour
         chartChooseManager.OnChartButtonClicked -= ChartChooseManager_OnChartButtonClicked;
         GameManager.GameInstance.OnPauseMenuEnable -= GameInstance_OnPauseMenuEnable;
         GameManager.GameInstance.OnPauseMenuDisable -= GameInstance_OnPauseMenuDisable;
+        GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
         chartChooseManager.OnChartDeleted -= ChartChooseManager_OnChartDeleted;
     }
 

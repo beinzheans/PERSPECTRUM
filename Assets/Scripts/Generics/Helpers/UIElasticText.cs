@@ -17,7 +17,7 @@ public class UIElasticText : UIElastic
 
     public void SetText(string text, Vector2 elasticSize, double elasticTime)
     {
-        base.SetElasticTimer(elasticSize, elasticTime);
+        base.PulseElasticSize(elasticSize, elasticTime);
         UIText.SetText(text);
     }
 

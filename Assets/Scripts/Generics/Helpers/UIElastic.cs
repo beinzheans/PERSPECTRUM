@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// A class to handle the elasticity of UI elements. That is, to allow UI elements to bounce or shrink.
@@ -9,17 +10,38 @@ public class UIElastic : MonoBehaviour
 {
     public RectTransform RectTransform { get; private set; }
     protected TimerStopwatchAction elasticStopwatch;
-
     protected virtual void Awake()
     {
         RectTransform = GetComponent<RectTransform>();
     }
 
-    public virtual void SetElasticTimer(Vector2 elasticSize, double elasticTime)
+    protected virtual void Start()
+    {
+        GameVirtualCursor.GameVirtualCursorInstance.OnVirtualCursorClickedUIElement += GameVirtualCursorInstance_OnVirtualCursorClickedUIElement;
+    }
+
+    protected virtual void OnDestroy()
+    {
+        GameVirtualCursor.GameVirtualCursorInstance.OnVirtualCursorClickedUIElement -= GameVirtualCursorInstance_OnVirtualCursorClickedUIElement;
+    }
+
+    protected readonly Vector2 k_DEFAULTSCALEWHENCLICKED = new Vector2(0.95f, 1.05f);
+    protected const double k_DEFAULTSCALETIMERWHENCLICKED = 0.1d;
+    private void GameVirtualCursorInstance_OnVirtualCursorClickedUIElement(GameObject gameObject)
+    {
+        if (gameObject != this.gameObject)
+        {
+            return;
+        }
+
+        PulseElasticSize(k_DEFAULTSCALEWHENCLICKED, k_DEFAULTSCALETIMERWHENCLICKED);
+    }
+
+    public virtual void PulseElasticSize(Vector2 elasticScale, double elasticTime)
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(elasticStopwatch);
         double internal_elasticTime = math.max(0.001d, elasticTime);
-        elasticStopwatch = new TimerStopwatchAction(this, x => AnimateElasticSize(x, elasticSize, internal_elasticTime), () => { }, 0d, internal_elasticTime, false);
+        elasticStopwatch = new TimerStopwatchAction(this, x => AnimateElasticSize(x, elasticScale, internal_elasticTime), () => { }, 0d, internal_elasticTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(elasticStopwatch);
     }
 

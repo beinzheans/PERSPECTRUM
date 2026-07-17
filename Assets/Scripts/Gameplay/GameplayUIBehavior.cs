@@ -120,7 +120,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText("0", k_MISSGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_missCount.SetText($"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}", k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
-        gameplay_missIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
+        gameplay_missIcon.PulseElasticSize(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
@@ -142,7 +142,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText(gameplayManager.CurrentCombo.ToString(), new Vector2(0.95f, 1.1f), k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_mismatchCount.SetText(gameplayManager.MismatchHitCount.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
-        gameplay_mismatchIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
+        gameplay_mismatchIcon.PulseElasticSize(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
@@ -164,7 +164,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText("0", k_MISSGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_missCount.SetText($"{gameplayManager.MissCount} | {gameplayManager.BombHitCount}", k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
-        gameplay_missIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
+        gameplay_missIcon.PulseElasticSize(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
         UpdateGameplayStatistics();
     }
 
@@ -172,7 +172,7 @@ public class GameplayUIBehavior : MonoBehaviour
     {
         comboText.SetText(gameplayManager.CurrentCombo.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_matchCount.SetText(gameplayManager.MatchHitCount.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
-        gameplay_matchIcon.SetElasticTimer(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
+        gameplay_matchIcon.PulseElasticSize(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYICONBOUNCETIME);
         UpdateGameplayStatistics();
     }
 

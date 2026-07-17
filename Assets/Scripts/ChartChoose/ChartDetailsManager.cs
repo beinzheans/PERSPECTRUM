@@ -7,10 +7,10 @@ public class ChartDetailsManager : MonoBehaviour
     [SerializeField] private GameObject selectedUI;
     [SerializeField] private GameObject noneSelectedUI;
 
-    [SerializeField] private TMP_Text chartTitleText;
-    [SerializeField] private TMP_Text chartMapperText;
-    [SerializeField] private TMP_Text chartDifficultyText;
-    [SerializeField] private TMP_Text songCreditText;
+    [SerializeField] private UIElasticText chartTitleText;
+    [SerializeField] private UIElasticText chartMapperText;
+    [SerializeField] private UIElasticText chartDifficultyText;
+    [SerializeField] private UIElasticText songCreditText;
     [SerializeField] private Button PlayChartButton;
     [SerializeField] private Button DeleteChartButton;
 
@@ -20,15 +20,19 @@ public class ChartDetailsManager : MonoBehaviour
         ChartChooseManager.ChartChooseInstance.OnChartButtonClicked += ChartChooseInstance_OnChartButtonClicked;
     }
 
+    private readonly Vector2 k_DETAILSCALE = new Vector2(0.9f, 1.1f);
+    private const double k_DETAILSCALETIME = 0.1d;
     private void ChartChooseInstance_OnChartButtonClicked(ChartButtonBehavior obj)
     {
         PlayChartButton.onClick.RemoveAllListeners();
         DeleteChartButton.onClick.RemoveAllListeners();
 
-        chartTitleText.text = obj.BaseChartMetadata.ChartName;
-        chartMapperText.text = $"Charted by {obj.BaseChartMetadata.ChartMapper}";
-        songCreditText.text = $"{obj.BaseChartMetadata.SongName} by {obj.BaseChartMetadata.SongArtist}";
-        chartDifficultyText.text = $"Difficulty {obj.BaseChartMetadata.ChartDifficulty}";
+        ShowSelectedUI();
+
+        chartTitleText.SetText(obj.BaseChartMetadata.ChartName, k_DETAILSCALE, k_DETAILSCALETIME);
+        chartMapperText.SetText($"Charted by {obj.BaseChartMetadata.ChartMapper}", k_DETAILSCALE, k_DETAILSCALETIME);
+        songCreditText.SetText($"{obj.BaseChartMetadata.SongName} by {obj.BaseChartMetadata.SongArtist}", k_DETAILSCALE, k_DETAILSCALETIME);
+        chartDifficultyText.SetText($"Difficulty {obj.BaseChartMetadata.ChartDifficulty}", k_DETAILSCALE, k_DETAILSCALETIME);
         PlayChartButton.onClick.AddListener(() => GameManager.GameInstance.RequestPlayChartEvent(obj.AssociatedFullFilePath));
         DeleteChartButton.onClick.AddListener(() =>
         {
@@ -36,7 +40,6 @@ public class ChartDetailsManager : MonoBehaviour
             HideSelectedUI();
         });
 
-        ShowSelectedUI();
     }
 
     private void OnDestroy()

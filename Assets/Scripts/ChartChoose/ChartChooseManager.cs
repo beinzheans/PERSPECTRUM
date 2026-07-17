@@ -130,6 +130,11 @@ public class ChartChooseManager : MonoBehaviour
 
     public void InvokeOnChartButtonClickedEvent(ChartButtonBehavior chartButton)
     {
+        if (CurrentSelectedChartButton == chartButton)
+        {
+            return;
+        }
+
         CurrentSelectedChartButton = chartButton;
         OnChartButtonClicked?.Invoke(CurrentSelectedChartButton);
     }
