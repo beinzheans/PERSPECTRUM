@@ -43,7 +43,7 @@ public class GameplayResumeManager : MonoBehaviour
 
         tickInterval = (gameplayManager.CurrentActiveGameplayMarker == null || MathHelper.IsTwoDoublesEqualWithEpsilion(gameplayManager.CurrentActiveGameplayMarker.BPM, 0d)) ? k_DEFAULTTICKINTERVAL : 60d / gameplayManager.CurrentActiveGameplayMarker.BPM;
         resumeTimer.EditIntervalTime(tickInterval, true);
-        DSPTimerEngine.TimerInstance.AddActionToTimer(resumeTimer);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(resumeTimer, false);
 
         gameplayManager.InvokeGameplayResumeTimerStarted();
     }

@@ -1,4 +1,5 @@
 using System;
+using System.Net.NetworkInformation;
 using UnityEngine;
 
 /// <summary>
@@ -102,33 +103,39 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         BounceBorders();
     }
 
-    // optimizations for this is to somehow stop the previous timers from executing? But this should be negligible anyway
+    TimerStopwatchAction bounceTimer;
     private void BounceBorders()
     {
-        Action<double> bounceAction = (x) =>
-        {
-            Vector3 scale = Vector3.Lerp(k_BOUNCEMAXSIZE, Vector3.one, (float)(x / pulseInterval));
-            gameplayManager.AssignGameplayBorderScale(scale);
-            playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_earlyHitPlane.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
-        };
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(bounceTimer);
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(shrinkTimer);
 
-
-        TimerStopwatchAction bounceTimer = new TimerStopwatchAction(this, bounceAction, () => { }, 0d, pulseInterval, false);
-        DSPTimerEngine.TimerInstance.AddActionToTimer(bounceTimer);
+        bounceTimer = new TimerStopwatchAction(this, BounceAction, null, 0d, pulseInterval, false);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(bounceTimer, true);
     }
+
+    private void BounceAction(double time)
+    {
+        Vector3 scale = Vector3.Lerp(k_BOUNCEMAXSIZE, Vector3.one, (float)(time / pulseInterval));
+        gameplayManager.AssignGameplayBorderScale(scale);
+        playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_earlyHitPlane.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
+    }
+
+    TimerStopwatchAction shrinkTimer;
 
     private void ShrinkBorders()
     {
-        Action<double> shrinkAction = (x) =>
-        {
-            Vector3 scale = Vector3.Lerp(k_SHRINKMINSIZE, Vector3.one, (float)(x / pulseInterval));
-            gameplayManager.AssignGameplayBorderScale(scale);
-            playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_earlyHitPlane.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
-        };
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(shrinkTimer);
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(bounceTimer);
 
+        shrinkTimer = new TimerStopwatchAction(this, ShrinkAction, null, 0d, pulseInterval, false);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(shrinkTimer, true);
+    }
 
-        TimerStopwatchAction shrinkTimer = new TimerStopwatchAction(this, shrinkAction, () => { }, 0d, pulseInterval, false);
-        DSPTimerEngine.TimerInstance.AddActionToTimer(shrinkTimer);
+    private void ShrinkAction(double time)
+    {
+        Vector3 scale = Vector3.Lerp(k_SHRINKMINSIZE, Vector3.one, (float)(time / pulseInterval));
+        gameplayManager.AssignGameplayBorderScale(scale);
+        playareaBorderMeshFilter_Front.transform.localScale = playareaBorderMeshFilter_earlyHitPlane.transform.localScale = playareaBorderMeshFilter_Back.transform.localScale = scale;
     }
 
     private void GameplayManager_OnGameplayTimeUpdated(double time)

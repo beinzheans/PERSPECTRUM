@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 /// <summary>
@@ -84,10 +85,11 @@ public class DSPTimerEngine : MonoBehaviour
     }
 
     /// <summary>
-    /// Adds a new non-null <see cref="TimerAction"/> to the timer engine to execute. <br></br>
-    /// Note that creating a new instance of a <see cref="TimerAction"/> is considered a different timer.
+    /// Adds a new non-null <see cref="TimerAction"/> to the timer engine to execute. Note removal of <see cref="TimerAction"/> is done first before adding.<br></br>
+    /// Note that creating a new instance of a <see cref="TimerAction"/> is considered a different timer in memory. <br></br>
+    /// However, our <see cref="TimerAction"/> uses value equality. You can choose to completely override the existing timer with the <paramref name="overrideExisting"/>.
     /// </summary>
-    public void AddActionToTimer(TimerAction action)
+    public void AddActionToTimer(TimerAction action, bool overrideExisting = true)
     {
         if (action == null)
         {
@@ -96,15 +98,29 @@ public class DSPTimerEngine : MonoBehaviour
 
         if (registeredAudioActions.Contains(action))
         {
+            if (audioActionsToRemove.Contains(action))
+            {
+                audioActionsToRegister.Enqueue(action);
+                return;
+            }
+
+            if (overrideExisting)
+            {
+                audioActionsToRegister.Enqueue(action);
+                return;
+            }
+
+            Debug.Log($"Already found TimerAction called by {action.TimerCaller} (hashcode: {action.GetHashCode()}) that will not be removed. Failed to add");
             return;
         }
 
-
         audioActionsToRegister.Enqueue(action);
+
     }
 
     /// <summary>
-    /// Removes a non-null <see cref="TimerAction"/> from the timer engine if it is registered.
+    /// Removes a non-null <see cref="TimerAction"/> from the timer engine if it is registered. <br></br>
+    /// Note removal of <see cref="TimerAction"/> is done first before adding.
     /// </summary>
     public void RemoveActionFromTimer(TimerAction action)
     {
@@ -294,14 +310,14 @@ public abstract class TimerAction : IEquatable<TimerAction>
     {
         return other is not null &&
                EqualityComparer<UnityEngine.Object>.Default.Equals(TimerCaller, other.TimerCaller) &&
-               EqualityComparer<Action<double>>.Default.Equals(ActionToExecute, other.ActionToExecute) &&
-               EqualityComparer<Action>.Default.Equals(OnUnregisterEvent, other.OnUnregisterEvent) &&
+               EqualityComparer<MethodInfo>.Default.Equals(ActionToExecute?.Method, other.ActionToExecute?.Method) &&
+               EqualityComparer<MethodInfo>.Default.Equals(OnUnregisterEvent?.Method, other.OnUnregisterEvent?.Method) &&
                startOffsetTime == other.startOffsetTime;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(TimerCaller, ActionToExecute, OnUnregisterEvent, startOffsetTime);
+        return HashCode.Combine(TimerCaller, ActionToExecute?.Method, OnUnregisterEvent?.Method, startOffsetTime);
     }
 }
 
