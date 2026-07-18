@@ -34,8 +34,9 @@ public class GameplayResumeManager : MonoBehaviour
 
     private void GameInstance_OnPauseMenuDisable()
     {
-        if (gameplayManager.IsInReplayMode) // no need to timer if in replay mode
+        if (gameplayManager.IsInReplayMode) // no need to timer if in replay mode, just directly invoke resumed
         {
+            gameplayManager.InvokeGameplayResumeTimerEnded();
             return;
         }
 
