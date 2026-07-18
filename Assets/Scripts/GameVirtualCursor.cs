@@ -35,6 +35,8 @@ public class GameVirtualCursor : MonoBehaviour
 
     private readonly Vector2 k_VIRTUALCURSORCLICKEDELASTICSIZE = new Vector2(0.75f, 1.25f);
     private const double k_VIRTUALCURSORELASTICTIME = 0.25d;
+
+    public Vector2 MouseDisplacement { get; private set; }
     private void Awake()
     {
         if (GameVirtualCursorInstance == null)
@@ -96,9 +98,9 @@ public class GameVirtualCursor : MonoBehaviour
 
         float sensitivity = GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor * k_DEFAULTMOUSESENSITIVITY; // even though the execution order is earlier, everything is already instantiatied in GameManager.
 
-        Vector2 mouseDisplacement = delta * sensitivity;
+        MouseDisplacement = delta * sensitivity;
 
-        VirtualMousePosition += mouseDisplacement;
+        VirtualMousePosition += MouseDisplacement;
 
         VirtualMousePosition = MathHelper.ClampVectorByComponent(VirtualMousePosition, 0f, Screen.width, 0f, Screen.height);
 

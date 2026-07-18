@@ -1,6 +1,5 @@
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// A class to handle the elasticity of UI elements. That is, to allow UI elements to bounce or shrink.

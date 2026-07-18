@@ -74,7 +74,7 @@ public static class MathHelper
 
     private static Vector3[] worldCornerBuffer = new Vector3[4];
     /// <summary>
-    /// Get the screen point (pixel position) given a normalized point w.r.t toPoint a reference rect. Assumes normalized point uses (0, 0) for bottom-left corner.
+    /// Get the screen point (pixel position) given a normalized point w.r.t a reference rect. Assumes normalized point uses (0, 0) for bottom-left corner.
     /// </summary>
     /// <param name="normalizedPoint"></param>
     /// <param name="referenceRect"></param>
@@ -95,8 +95,8 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Get the fromPoint toPoint vector in raw pixel coordinates, given normalized fromPoint toPoint points w.r.t toPoint a reference rect. <br></br>
-    /// This is necessary because the fromPoint toPoint vector calculated fromPoint normalized vector is NOT the same as the raw pixel fromPoint toPoint vector.
+    /// Get the fromto vector in raw pixel coordinates, given normalized fromPoint toPoint points w.r.t toPoint a reference rect. <br></br>
+    /// This is necessary because the fromto vector calculated fromPoint normalized vector is NOT the same as the raw pixel fromto vector.
     /// </summary>
     /// <param name="from"></param>
     /// <param name="to"></param>
@@ -491,7 +491,7 @@ public static class MathHelper
 
     /// <summary>
     /// Applies conversion operation on every element on the original array and returns the converted types as a list. <br></br>
-    /// Modifies an pre-existing list toPoint prevent garbage generation within this method
+    /// Modifies an pre-existing list to prevent garbage generation within this method
     /// </summary>
     /// <typeparam name="T1"></typeparam>
     /// <typeparam name="T2"></typeparam>
@@ -513,7 +513,7 @@ public static class MathHelper
     }
     /// <summary>
     /// Applies conversion operation on every element on the original array and returns the converted types as an array. <br></br>
-    /// Modifies an pre-existing array toPoint prevent garbage generation within this method
+    /// Modifies an pre-existing array to prevent garbage generation within this method
     /// </summary>
     /// <typeparam name="T1"></typeparam>
     /// <typeparam name="T2"></typeparam>
@@ -739,12 +739,24 @@ public static class MathHelper
     /// <returns></returns>
     public static float GetAudioPanningFromPosition(Vector2 normalizedPosition)
     {
-        float x = normalizedPosition.x;
+        return EvaluateSigmoidFunction(normalizedPosition.x, -k_AUDIOPANNINGMAX, k_AUDIOPANNINGMAX, 10f, 0.5f);
+    }
 
-        float num = k_AUDIOPANNINGMAX * 2f;
-        float denom = 1f + math.exp(-10f * (x - 0.5f));
+    /// <summary>
+    /// Evaluates a sigmoid function f: [-inf, inf] -> (<paramref name="min"/>, <paramref name="max"/>). <br></br>
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <param name="k">The steepness coefficient. This also defines the direction of the function.</param>
+    /// <param name="x0">The exact input such that the function returns the mid-point of <paramref name="min"/> and <paramref name="max"/>.</param>
+    /// <returns></returns>
+    public static float EvaluateSigmoidFunction(float x, float min, float max, float k, float x0)
+    {
+        float num = max - min;
+        float denom = 1f + math.exp(-k * (x - x0));
 
-        return num / denom - k_AUDIOPANNINGMAX;
+        return num / denom + min;
     }
 
     public static Vector2 GetMirroredPosition(in Vector2 pos, MoveSelectedMode mode)
@@ -771,4 +783,5 @@ public static class MathHelper
             return new Vector2(-GameManager.aspectRatioReciprocalFloat * pos.y + 25f / 32f, GameManager.aspectRatioFloat * pos.x - 7f / 18f);
         }
     }
+
 }

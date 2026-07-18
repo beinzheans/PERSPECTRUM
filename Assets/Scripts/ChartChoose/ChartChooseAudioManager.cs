@@ -77,8 +77,9 @@ public class ChartChooseAudioManager : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
         playAction = new TimerIntervalAction(this, x =>
         {
-            AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME, 
-                () => {
+            AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME,
+                () =>
+                {
                     music_AudioSource.Stop();
 
                     music_AudioSource.clip = null;
