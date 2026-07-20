@@ -17,7 +17,7 @@ public class AudioEngine : MonoBehaviour
     [SerializeField] private AudioSource audioSourcePrefab;
 
     private AudioSource[] audioSourcePool;
-    private int poolIndex = 0;
+    private int poolInde = 0;
 
     private void Awake()
     {
@@ -53,13 +53,13 @@ public class AudioEngine : MonoBehaviour
             return;
         }
 
-        poolIndex = (poolIndex + 1) % k_MAXIMUMNUMBEROFSOURCES; // cycle through the pool index
-        AudioSource source = audioSourcePool[poolIndex];
+        poolInde = (poolInde + 1) % k_MAXIMUMNUMBEROFSOURCES; // cycle through the pool index
+        AudioSource source = audioSourcePool[poolInde];
         source.pitch = (float)playbackSpeed;
         source.clip = clip;
         source.volume = volume;
         source.panStereo = panning;
-        audioSourcePool[poolIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
+        audioSourcePool[poolInde].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
     }
 
     /// <summary>
