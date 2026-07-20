@@ -8,21 +8,18 @@ using UnityEngine.Networking;
 /// Note the automatically generated audio sources used by <see cref="PlayAudioClip(UnityEngine.AudioClip, double, float)"/> will be 2D sources. <br></br>
 /// To play 3D audio or audio that is independent, use <see cref="PlayAudioSource(UnityEngine.AudioSource, double, float)"/> that specifies a custom audio source.
 /// </summary>
-public class AudioEngine : MonoBehaviour
-{
+public class AudioEngine : MonoBehaviour{
     public static AudioEngine AudioInstance;
 
-    [SerializeField] private int k_MAXIMUMNUMBEROFSOURCES = 99;
+    [SerializeField] private int MAXSOURCES = 99;
 
     [SerializeField] private AudioSource audioSourcePrefab;
 
     private AudioSource[] audioSourcePool;
-    private int poolInde = 0;
+    private int pooIndex = 0;
 
-    private void Awake()
-    {
-        if (AudioInstance == null)
-        {
+    private void Awake(){
+        if (AudioInstance == null){
             AudioInstance = this;
             InstantiateAudioPool();
             return;
@@ -31,10 +28,9 @@ public class AudioEngine : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void InstantiateAudioPool()
-    {
-        audioSourcePool = new AudioSource[k_MAXIMUMNUMBEROFSOURCES];
-        for (int i = 0; i < k_MAXIMUMNUMBEROFSOURCES; i++)
+    private void InstantiateAudioPool(){
+        audioSourcePool = new AudioSource[MAXSOURCES];
+        for (int i = 0; i < MAXSOURCES; i++)
         {
             audioSourcePool[i] = Instantiate(audioSourcePrefab, transform, false);
         }
@@ -46,20 +42,18 @@ public class AudioEngine : MonoBehaviour
     /// </summary>
     /// <param name="clip"></param>
     /// <param name="playOffsetTime"></param>
-    public void PlayAudioClip(AudioClip clip, double playOffsetTime, float volume, double playbackSpeed, float panning)
-    {
-        if (playOffsetTime < 0d)
-        {
+    public void PlayAudioClip(AudioClip clip, double playOffsetTime, float volume, double playbackSpeed, float panning){
+        if (playOffsetTime < 0d){
             return;
         }
 
-        poolInde = (poolInde + 1) % k_MAXIMUMNUMBEROFSOURCES; // cycle through the pool index
-        AudioSource source = audioSourcePool[poolInde];
+        pooIndex = (pooIndex + 1) % MAXSOURCES; // cycle through the pool index
+        AudioSource source = audioSourcePool[pooIndex];
         source.pitch = (float)playbackSpeed;
         source.clip = clip;
         source.volume = volume;
         source.panStereo = panning;
-        audioSourcePool[poolInde].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
+        audioSourcePool[pooIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
     }
 
     /// <summary>
@@ -69,22 +63,18 @@ public class AudioEngine : MonoBehaviour
     /// <param name="source"></param>
     /// <param name="playOffsetTime"></param>
     /// <param name="playStartTime">The time at which the audio source starts playing.</param>
-    public void PlayAudioSource(AudioSource source, double playOffsetTime, float volume, double playStartTime, double playbackSpeed, float panning)
-    {
-        if (playOffsetTime < 0d)
-        {
+    public void PlayAudioSource(AudioSource source, double playOffsetTime, float volume, double playStartTime, double playbackSpeed, float panning){
+        if (playOffsetTime < 0d){
             return;
         }
 
-        if (source.clip == null)
-        {
+        if (source.clip == null){
             return;
         }
 
         int seekSamples = (int)math.round(playStartTime * source.clip.frequency);
 
-        if (seekSamples > source.clip.samples) // invalid seek time, don't play anything
-        {
+        if (seekSamples > source.clip.samples){ // invalid seek time, don't play anything
             GameManager.GameInstance.InvokeInformationDisplayNeeded("Preview Longer than Audio");
             return;
         }
@@ -97,8 +87,7 @@ public class AudioEngine : MonoBehaviour
     }
 
     private TimerStopwatchAction fadeInStopwatch;
-    public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime, Action callback)
-    {
+    public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime, Action callback){
         fadeInTime = math.max(0.01d, fadeInTime);
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeInStopwatch);
         fadeInStopwatch = new TimerStopwatchAction(source, x =>
@@ -110,8 +99,7 @@ public class AudioEngine : MonoBehaviour
 
     private TimerStopwatchAction fadeOutStopwatch;
 
-    public void FadeOutAudioSource(AudioSource source, double fadeOutTime, Action callback)
-    {
+    public void FadeOutAudioSource(AudioSource source, double fadeOutTime, Action callback){
         fadeOutTime = math.max(0.01d, fadeOutTime);
         float startingVolume = source.volume;
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
@@ -123,27 +111,23 @@ public class AudioEngine : MonoBehaviour
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutStopwatch);
     }
 
-    public void EditAudioSource(AudioSource source, float volume)
-    {
+    public void EditAudioSource(AudioSource source, float volume){
         source.volume = volume;
     }
 
 
-    public async Task<(bool result, AudioClip clip)> GetAudioClipFromLocalFile(string fullFilePath)
-    {
+    public async Task<(bool result, AudioClip clip)> GetAudioClipFromLocalFile(string fullFilePath){
         Uri request = new Uri("file://" + fullFilePath);
 
         UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(request, AudioType.MPEG);
 
         UnityWebRequestAsyncOperation asyncOperation = webRequest.SendWebRequest();
 
-        while (!asyncOperation.isDone)
-        {
+        while (!asyncOperation.isDone){
             await Task.Yield();
         }
 
-        if (webRequest.result != UnityWebRequest.Result.Success)
-        {
+        if (webRequest.result != UnityWebRequest.Result.Success){
             Debug.LogWarning($"Failed to load audio clip from local file");
             webRequest.Dispose();
             return (false, null);
@@ -155,8 +139,7 @@ public class AudioEngine : MonoBehaviour
         return (true, loadedClip);
     }
 
-    public async Task<(bool result, AudioClip clip)> GetAudioClipFromLocalFileStreaming(string fullFilePath)
-    {
+    public async Task<(bool result, AudioClip clip)> GetAudioClipFromLocalFileStreaming(string fullFilePath){
         Uri request = new Uri("file://" + fullFilePath);
 
         UnityWebRequest webRequest = UnityWebRequestMultimedia.GetAudioClip(request, AudioType.MPEG);
@@ -165,13 +148,11 @@ public class AudioEngine : MonoBehaviour
 
         UnityWebRequestAsyncOperation asyncOperation = webRequest.SendWebRequest();
 
-        while (!asyncOperation.isDone)
-        {
+        while (!asyncOperation.isDone){
             await Task.Yield();
         }
 
-        if (webRequest.result != UnityWebRequest.Result.Success)
-        {
+        if (webRequest.result != UnityWebRequest.Result.Success){
             Debug.LogWarning($"Failed to stream audio clip from local file");
             webRequest.Dispose();
             return (false, null);
