@@ -68,8 +68,10 @@ public class GameplayUICursor : MonoBehaviour
         cursorRawImage.gameObject.SetActive(true);
     }
 
+    private Vector2 previousGameplayMousePosition = Vector2.zero;
+
     private const float k_MOUSEROTATIONDEADZONEMAGNTIUDE = 5f;
-    private const float k_MAXXSCALESIZE = 5f;
+    private const float k_MAXXSCALESIZE = 3f;
     private const float k_MAXSPEEDMAGNTIUDE = 25f;
 
     private const float k_DEADZONENORMALSCALESPEED = 10f;
@@ -82,7 +84,9 @@ public class GameplayUICursor : MonoBehaviour
         cursorTrailParticleSystemRectTransform.anchorMin = cursorTrailParticleSystemRectTransform.anchorMax = gameplayManager.GameplayMousePosition;
         cursorTrailParticleSystemRectTransform.anchoredPosition = Vector2.zero;
 
-        Vector2 mousePixelDisplacement = GameVirtualCursor.GameVirtualCursorInstance.MouseDisplacement;
+        Vector2 mousePixelDisplacement = MathHelper.GetPixelFromToVectorFromNormalizedPoints(gameplayManager.GameplayMousePosition, previousGameplayMousePosition, gameplayManager.GameplayRectTransform);
+
+        previousGameplayMousePosition = gameplayManager.GameplayMousePosition;
 
         if (mousePixelDisplacement.sqrMagnitude < (k_MOUSEROTATIONDEADZONEMAGNTIUDE * k_MOUSEROTATIONDEADZONEMAGNTIUDE))
         {
