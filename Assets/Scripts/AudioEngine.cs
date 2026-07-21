@@ -11,12 +11,12 @@ using UnityEngine.Networking;
 public class AudioEngine : MonoBehaviour{
     public static AudioEngine AudioInstance;
 
-    [SerializeField] private int MAXSOURCES = 99;
+    [SerializeField] private int MAXNUMBEROFSOURCES = 99;
 
     [SerializeField] private AudioSource audioSourcePrefab;
 
     private AudioSource[] audioSourcePool;
-    private int pooIndex = 0;
+    private int poolIndex = 0;
 
     private void Awake(){
         if (AudioInstance == null){
@@ -29,8 +29,8 @@ public class AudioEngine : MonoBehaviour{
     }
 
     private void InstantiateAudioPool(){
-        audioSourcePool = new AudioSource[MAXSOURCES];
-        for (int i = 0; i < MAXSOURCES; i++)
+        audioSourcePool = new AudioSource[MAXNUMBEROFSOURCES];
+        for (int i = 0; i < MAXNUMBEROFSOURCES; i++)
         {
             audioSourcePool[i] = Instantiate(audioSourcePrefab, transform, false);
         }
@@ -47,13 +47,13 @@ public class AudioEngine : MonoBehaviour{
             return;
         }
 
-        pooIndex = (pooIndex + 1) % MAXSOURCES; // cycle through the pool index
-        AudioSource source = audioSourcePool[pooIndex];
+        poolIndex = (poolIndex + 1) % MAXNUMBEROFSOURCES; // cycle through the pool index
+        AudioSource source = audioSourcePool[poolIndex];
         source.pitch = (float)playbackSpeed;
         source.clip = clip;
         source.volume = volume;
         source.panStereo = panning;
-        audioSourcePool[pooIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
+        audioSourcePool[poolIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
     }
 
     /// <summary>
