@@ -30,6 +30,10 @@ public class GameManager : MonoBehaviour
     public const string k_METADATAFILENAME = "metadata.json";
     public const string k_CHARTFILENAME = "chart.json";
     public const string k_AUDIOFILENAME = "audio.mp3"; // let's just assume mp3 for now... IDC
+    /// <summary>
+    /// This file name does not supply the extension. This is because we allow .jpg or .png and will need to be created when the chart file is created.
+    /// </summary>
+    public const string k_BACKGROUNDIMAGEFILENAME = "background";
     public const string k_FILEEXTENSION = "psr";
     public const string k_PLAYERSETTINGSFILENAME = "settings.json";
     public const string k_TUTORIALCHARTNAME = "tutorial";

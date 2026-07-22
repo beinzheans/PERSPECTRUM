@@ -404,7 +404,7 @@ public static class MathHelper
         return true;
     }
 
-    public static GameplayChart ConvertEditorChartToGameplayChart(EditorChart editorChart, AudioClip clip)
+    public static GameplayChart ConvertEditorChartToGameplayChart(EditorChart editorChart, AudioClip clip, Texture2D backgroundTexture)
     {
         Comparison<GameplayObject> comparsion = (x, y) =>
         {
@@ -436,7 +436,7 @@ public static class MathHelper
 
         IEnumerable<GameplayObject> combinedObjects = allObjects.Concat(hitboxes).Concat(lines).Concat(markers);
 
-        return new GameplayChart(combinedObjects.OrderBy(x => x.RenderTime).ToArray(), clip);
+        return new GameplayChart(combinedObjects.OrderBy(x => x.RenderTime).ToArray(), clip, backgroundTexture);
     }
 
     /// <summary>

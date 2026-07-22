@@ -21,12 +21,13 @@ public static class GamePersistenceManager
     /// <param name="fullFilePath"></param>
     /// <param name="chartJson"></param>
     /// <param name="audioByte"></param>
-    public static void SaveAsChartFile(string fullFilePath, string chartJson, string metadataJson, byte[] audioByte)
+    public static void SaveAsChartFile(string fullFilePath, string chartJson, string metadataJson, byte[] audioByte, byte[] imageByte)
     {
         MemoryStream memoryStream = new MemoryStream();
 
         ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create);
 
+        // below is horrible code. Could probably optimize / refactor this better
         ZipArchiveEntry chartJsonEntry = archive.CreateEntry(GameManager.k_CHARTFILENAME);
 
         StreamWriter jsonWriter = new StreamWriter(chartJsonEntry.Open());
@@ -44,6 +45,19 @@ public static class GamePersistenceManager
         Stream audioWriter = audioEntry.Open();
         audioWriter.Write(audioByte);
         audioWriter.Close();
+
+        bool isValidImage = IsByteArrayValidImageFile(imageByte, out string extension);
+
+        if (isValidImage)
+        {
+            string imageFilePath = $"{GameManager.k_BACKGROUNDIMAGEFILENAME}.{extension}";
+
+            ZipArchiveEntry imageEntry = archive.CreateEntry(imageFilePath);
+
+            Stream imageWriter = imageEntry.Open();
+            imageWriter.Write(imageByte);
+            imageWriter.Close();
+        }
 
         archive.Dispose();
 
@@ -73,7 +87,7 @@ public static class GamePersistenceManager
     /// <param name="chartJson"></param>
     /// <param name="audioByte"></param>
     /// <returns></returns>
-    public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte)
+    public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte, out byte[] imageByte)
     {
         bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
 
@@ -82,12 +96,15 @@ public static class GamePersistenceManager
             chartJson = "";
             metadataJson = "";
             audioByte = new byte[0];
+            imageByte = new byte[0];
             return;
         }
 
         MemoryStream stream = new MemoryStream(archiveBytes);
         ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
+        // below is actually very shit code. OH well.
+        // I guess I can fix it in the future since reading bytes from an archive file is the same. But let's do that later when I actually get the shit working
         ZipArchiveEntry jsonEntry = archive.GetEntry(GameManager.k_CHARTFILENAME);
 
         if (jsonEntry == null)
@@ -132,6 +149,25 @@ public static class GamePersistenceManager
 
             memoryStream.Close();
             audioReader.Close();
+        }
+
+        // we only match the name, since it can be .png or .jpg
+        ZipArchiveEntry imageEntry = archive.Entries.FirstOrDefault(x => string.Equals(Path.GetFileNameWithoutExtension(x.Name), GameManager.k_BACKGROUNDIMAGEFILENAME));
+
+        if (imageEntry == null)
+        {
+            imageByte = new byte[0];
+        }
+        else
+        {
+            Stream imageReader = imageEntry.Open();
+            MemoryStream memoryStream = new MemoryStream();
+
+            imageReader.CopyTo(memoryStream);
+            imageByte = memoryStream.ToArray();
+
+            memoryStream.Close();
+            imageReader.Close();
         }
 
         archive.Dispose();
@@ -453,5 +489,67 @@ public static class GamePersistenceManager
             return -1;
         }
         else return 0;
+    }
+
+    /// <summary>
+    /// Attempts to get a <see cref="Texture2D"/> from a byte array. <br></br>
+    /// Returns false if converting the file fails.
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="texture"></param>
+    /// <returns></returns>
+    public static bool GetTexture2DFromBytes(byte[] bytes, out Texture2D texture)
+    {
+        if (!IsByteArrayValidImageFile(bytes, out _))
+        {
+            texture = null;
+            return false;
+        }
+
+        try
+        {
+            texture = new Texture2D(2, 2);
+
+            texture.LoadImage(bytes, false);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Failed to convert bytes to Texture2D. Exception:\n" +
+                             $"{e.Message}");
+            texture = null;
+            return false;
+
+        }
+    }
+    /// <summary>
+    /// Checks if a provided byte array is a valid image file (.jpg or .png) and returns the extension. <br></br>
+    /// Returns false if the byte array is not .jpg nor .png.
+    /// </summary>
+    /// <param name="bytes"></param>
+    /// <param name="extension"></param>
+    /// <returns></returns>
+    public static bool IsByteArrayValidImageFile(byte[] bytes, out string extension)
+    {
+        if (bytes == null || bytes.Length < 4)
+        {
+            extension = "";
+            return false;
+        }
+
+        if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
+        {
+            extension = "jpg";
+            return true;
+        }
+
+        if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+        {
+            extension = "png";
+            return true;
+        }
+
+        extension = "";
+        return false;
     }
 }

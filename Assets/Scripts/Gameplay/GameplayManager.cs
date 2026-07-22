@@ -13,7 +13,7 @@ public class GameplayManager : MonoBehaviour
     public Camera GameplayCamera { get => gameplayCamera; }
     public static GameplayManager GameplayInstance;
 
-    public event Action<AudioClip, EditorChartMetadata> OnGameplayChartLoaded;
+    public event Action<AudioClip, Texture2D, EditorChartMetadata> OnGameplayChartLoaded;
     public event Action OnGameplayStarted;
     public event Action OnGameplayEnded;
     public event Action OnGameplayRestarted;
@@ -395,7 +395,7 @@ public class GameplayManager : MonoBehaviour
     public async Task RequestGameplayStartedEvent(string path)
     {
         CurrentPath = path;
-        GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] bytes);
+        GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
 
         if (string.IsNullOrWhiteSpace(chartJson) || string.IsNullOrWhiteSpace(metadataJson))
         {
@@ -426,7 +426,7 @@ public class GameplayManager : MonoBehaviour
             {
                 Debug.LogWarning($"Loaded chart can not be automatically resolved!");
 
-                ConfirmAction confirmAction = new ConfirmAction(async () => await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes),
+                ConfirmAction confirmAction = new ConfirmAction(async () => await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), audioBytes, imageBytes),
                                                                 () => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CHARTCHOOSESCREENINDEX, () => Task.CompletedTask),
                                                                 "The game attempted to resolve version mismatch but failed. Do you still want to try to play this chart?");
 
@@ -435,17 +435,19 @@ public class GameplayManager : MonoBehaviour
 
             Debug.Log($"Loaded chart version conflict is automatically resolved");
 
-            await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), bytes);
+            await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), audioBytes, imageBytes);
             return;
         }
 
-        await StartGameplayFromJsonString(chartJson, metadataJson, bytes);
+        await StartGameplayFromJsonString(chartJson, metadataJson, audioBytes, imageBytes);
         return;
     }
 
-    private async Task StartGameplayFromJsonString(string chartJson, string metadataJson, byte[] audioBytes)
+    private async Task StartGameplayFromJsonString(string chartJson, string metadataJson, byte[] audioBytes, byte[] imageBytes)
     {
         (bool convertResult, EditorChart editorChart, AudioClip clip) = await GamePersistenceManager.ConvertFilesToEditorChart(chartJson, audioBytes);
+
+        GamePersistenceManager.GetTexture2DFromBytes(imageBytes, out Texture2D texture);
 
         GamePersistenceManager.GetMetadataOfEditorChartFromJson(metadataJson, out EditorChartMetadata metadata);
         if (metadata == null)
@@ -455,9 +457,9 @@ public class GameplayManager : MonoBehaviour
         }
 
         CurrentMetadata = metadata;
-        CurrentGameplayChart = MathHelper.ConvertEditorChartToGameplayChart(editorChart, clip);
+        CurrentGameplayChart = MathHelper.ConvertEditorChartToGameplayChart(editorChart, clip, texture);
 
-        OnGameplayChartLoaded?.Invoke(clip, metadata);
+        OnGameplayChartLoaded?.Invoke(clip, texture, metadata);
         StartGameplay();
     }
 
@@ -611,14 +613,19 @@ public class GameplayManager : MonoBehaviour
 
 }
 
+/// <summary>
+/// A class to represent a chart for gameplay. This is generated based on an <see cref="EditorChart"/>.
+/// </summary>
 public class GameplayChart
 {
     public GameplayObject[] GameplayObjects { get; private set; }
     public AudioClip AudioClip { get; private set; }
-    public GameplayChart(GameplayObject[] gameplayObjects, AudioClip audioClip)
+    public Texture2D BackgroundTexture { get; private set; }
+    public GameplayChart(GameplayObject[] gameplayObjects, AudioClip audioClip, Texture2D backgroundTexture)
     {
         GameplayObjects = gameplayObjects;
         AudioClip = audioClip;
+        BackgroundTexture = backgroundTexture;
     }
 }
 

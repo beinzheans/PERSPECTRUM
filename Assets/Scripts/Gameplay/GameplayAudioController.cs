@@ -106,7 +106,7 @@ public class GameplayAudioController : MonoBehaviour
         gameplayManager.OnHitboxMismatchedHit -= GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnGameplayRestarted -= GameplayManager_OnGameplayRestarted;
     }
-    private void GameplayManager_OnGameplayAudioLoaded(AudioClip obj, EditorChartMetadata metadata)
+    private void GameplayManager_OnGameplayAudioLoaded(AudioClip obj, Texture2D texture, EditorChartMetadata metadata)
     {
         musicAudioSource.clip = obj;
     }

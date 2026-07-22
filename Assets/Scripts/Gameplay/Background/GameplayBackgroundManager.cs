@@ -11,8 +11,9 @@ public class GameplayImageBlurManager : MonoBehaviour
 {
     private static readonly int k_SHADER_BLURAMOUNT = Shader.PropertyToID("_Sigma");
 
-    [SerializeField] private Texture2D testTex;
+    private Texture2D textureCache;
     [SerializeField] private RawImage rawImage;
+    [SerializeField] private AspectRatioFitter aspectRatioFitter;
     private Material blurMaterial;
 
     [SerializeField] private Image darkPanelImage;
@@ -41,9 +42,21 @@ public class GameplayImageBlurManager : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        gameplayManager.OnGameplayChartLoaded += GameplayManager_OnGameplayChartLoaded;
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
         gameplayManager.OnGameplayMetronomeFired += GameplayManager_OnGameplayMetronomeFired;
+    }
+
+    private void GameplayManager_OnGameplayChartLoaded(AudioClip clip, Texture2D texture, EditorChartMetadata metadata)
+    {
+        if (texture == null)
+        {
+            return;
+        }
+
+        textureCache = texture;
+        aspectRatioFitter.aspectRatio = texture.width / texture.height;
     }
 
     private const int k_CAMERABACKGROUNDPULSEBEAT = 4;
@@ -87,12 +100,12 @@ public class GameplayImageBlurManager : MonoBehaviour
 
     private void GameInstance_OnGameSettingsChanged()
     {
-        UpdateBackground(testTex);
+        UpdateBackground(textureCache);
     }
 
     private void GameplayManager_OnGameplayStarted()
     {
-        UpdateBackground(testTex);
+        UpdateBackground(textureCache);
     }
 
     private void SetupFog()

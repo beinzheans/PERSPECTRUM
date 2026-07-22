@@ -10046,8 +10046,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31552e86262767841820dbc2d5b13cff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testTex: {fileID: 2800000, guid: 239e9e28dede4bc44afde006861c2a63, type: 3}
   rawImage: {fileID: 1530975513}
+  aspectRatioFitter: {fileID: 1530975514}
   darkPanelImage: {fileID: 1603871331}
   defaultBackgroundColor: {r: 0.1764706, g: 0.1764706, b: 0.1764706, a: 1}
   pulseBackgroundColor_default: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}

@@ -95,6 +95,10 @@ public class EditorManager : MonoBehaviour
 
     private byte[] currentEditorAudioClipByteArray = new byte[0];
 
+    private byte[] currentEditorBackgroundByteArray = new byte[0];
+    public event Action<Texture2D> OnBackgroundTextureLoaded;
+
+    
     public event Func<BaseChartMetadata> OnRequestBaseChartMetadata;
     public event Action<EditorChartMetadata> OnChartMetadataLoaded;
 
@@ -592,6 +596,17 @@ public class EditorManager : MonoBehaviour
         OnMusicAudioClipLoaded?.Invoke(clip);
     }
 
+    public void InvokeBackgroundTextureLoadedEvent(Texture2D texture, byte[] imageByteArray)
+    {
+        currentEditorBackgroundByteArray = imageByteArray;
+        OnBackgroundTextureLoaded?.Invoke(texture);
+    }
+
+    public void InvokeRemoveBackgroundTextureEvent()
+    {
+        currentEditorBackgroundByteArray = new byte[0];
+        OnBackgroundTextureLoaded?.Invoke(null);
+    }
     public void InvokeEditorSnapMouseToGrid(bool snapState)
     {
         IsEditorSnapMouseToGrid = snapState;
@@ -638,7 +653,7 @@ public class EditorManager : MonoBehaviour
                              $"{e}");
         }
 
-        GamePersistenceManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray);
+        GamePersistenceManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray, currentEditorBackgroundByteArray);
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
     }
 
@@ -688,7 +703,7 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        GamePersistenceManager.LoadChartFile(paths[0], out string chartJson, out string metadataJson, out byte[] audioBytes);
+        GamePersistenceManager.LoadChartFile(paths[0], out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
 
         JObject chartJObject = JObject.Parse(chartJson);
         JObject metadataJObject = JObject.Parse(metadataJson);
@@ -697,13 +712,13 @@ public class EditorManager : MonoBehaviour
 
         if (!validResult)
         {
-            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
+            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
                                                                                                                                                "Do you want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(invalidConfirmAction);
         }
         else if (compareResult == 1)
         {
-            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
+            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
                                                                                                                                                     "Do you want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(outdatedGameConfirmAction);
         }
@@ -715,7 +730,7 @@ public class EditorManager : MonoBehaviour
 
             if (!result)
             {
-                ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes), () => { }, "The selected chart has a version mismatch and the game failed to resolve it.\n" +
+                ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has a version mismatch and the game failed to resolve it.\n" +
                                                                                                                                                    "Do you want to continue?");
 
                 GameManager.GameInstance.InvokeConfirmActionNeeded(convertConfirmAction);
@@ -723,16 +738,16 @@ public class EditorManager : MonoBehaviour
             else
             {
                 Debug.Log($"Resolved version mismatch automatically");
-                ConvertToEditorChart(chartJson, metadataJson, audioBytes);
+                ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes);
             }
         }
         else
         {
-            ConvertToEditorChart(chartJson, metadataJson, audioBytes);
+            ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes);
         }
     }
 
-    private async void ConvertToEditorChart(string chartJson, string metadataJson, byte[] audioBytes)
+    private async void ConvertToEditorChart(string chartJson, string metadataJson, byte[] audioBytes, byte[] imageBytes)
     {
         try
         {
@@ -763,15 +778,20 @@ public class EditorManager : MonoBehaviour
 
             (bool audioResult, AudioClip clip) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes, false);
 
-            if (!audioResult)
+            if (audioResult)
             {
-                return;
+                await Awaitable.MainThreadAsync();
+
+                // return to main thread in order to invoke this action.
+                InvokeAudioClipLoadedEvent(clip, audioBytes);
             }
 
-            await Awaitable.MainThreadAsync();
+            bool imageResult = GamePersistenceManager.GetTexture2DFromBytes(imageBytes, out Texture2D texture);
 
-            // return to main thread in order to invoke this action.
-            InvokeAudioClipLoadedEvent(clip, audioBytes);
+            if (imageResult)
+            {
+                
+            }
         }
         catch (Exception e)
         {
