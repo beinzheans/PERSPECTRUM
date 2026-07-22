@@ -378,11 +378,6 @@ public class GameplayManager : MonoBehaviour
     private void InvokeGameplayStartedEvent()
     {
         CurrentActiveGameplayMarker = null;
-        RenderSettings.fog = true;
-        RenderSettings.fogMode = FogMode.Linear;
-        RenderSettings.fogStartDistance = k_HITPLANEDEPTH;
-        RenderSettings.fogEndDistance = GameplayFarClipPlane;
-        RenderSettings.fogColor = gameplayCamera.backgroundColor;
         Debug.Log($"Started gameplay!");
         OnGameplayStarted?.Invoke();
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
@@ -784,4 +785,54 @@ public static class MathHelper
         }
     }
 
+    /// <summary>
+    /// Generates a blurred version of a Texture2D using a convolutional box blur. <br></br>
+    /// The box blur works by finding the average color of a <paramref name="blurSize"/> x <paramref name="blurSize"/> grid of pixels.
+    /// </summary>
+    /// <param name="texture"></param>
+    /// <param name="blurSize"></param>
+    /// <param name="blurOffset"></param>
+    /// <returns></returns>
+    public static Texture2D GetBlurredTexture2D(in Texture2D texture, int blurSize)
+    {
+        Texture2D result = new Texture2D(texture.width, texture.height);
+        for (int i = 0; i < texture.width; i++)
+        {
+            for (int j = 0; j < texture.height; j++)
+            {
+                Color colorSum = new Color(0f, 0f, 0f, 0f);
+                // create our box. This is our offset from position <i, j>.
+                int sampleCount = 0;
+                for (int x = -blurSize; x <= blurSize; x++)
+                {
+                    if (i + x < 0 || i + x > texture.width)
+                    {
+                        continue;
+                    }
+
+                    int samplePixel_x = math.clamp(i + x, 0, texture.width);
+
+                    for (int y = -blurSize; y <= blurSize; y++)
+                    {
+                        if (j + y < 0 || j + y > texture.height)
+                        {
+                            continue;
+                        }
+
+                        int samplePixel_y = math.clamp(j + y, 0, texture.height);
+
+                        Color sampledColor = texture.GetPixel(samplePixel_x, samplePixel_y, 0);
+                        sampleCount++;
+                        colorSum += sampledColor;
+                    }
+                }
+
+                colorSum /= sampleCount; // no need to check for division by zero since at least one pixel must be sampled at <i, j>.
+                result.SetPixel(i, j, colorSum);
+            }
+        }
+
+        result.Apply();
+        return result;
+    }
 }

@@ -676,6 +676,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1154,6 +1155,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2160,6 +2162,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2296,6 +2299,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2432,6 +2436,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2793,7 +2798,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4053dd0f9cbc6824dbe455cc49d1526c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  k_MAXIMUMNUMBEROFSOURCES: 499
+  MAXNUMBEROFSOURCES: 99
   audioSourcePrefab: {fileID: 8999374074260792838, guid: 393e832d82953704e940587f4d2bc666, type: 3}
 --- !u!1 &5620176167719096081
 GameObject:
@@ -2955,6 +2960,15 @@ MonoBehaviour:
 
 
 '
+  - groupLabel: Use Custom Backgrounds
+    groupType: 4
+    groupDescription: Whether or not custom backgrounds are enabled.
+  - groupLabel: Background Blur
+    groupType: 34
+    groupDescription: How much the background is blurred.
+  - groupLabel: Background Darken
+    groupType: 34
+    groupDescription: How much to darken the background.
   - groupLabel: Rebind Red Key
     groupType: 48
     groupDescription: Set the current keybind to become Red (Hitbox Type A).
@@ -3316,6 +3330,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3666,6 +3681,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3877,6 +3893,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

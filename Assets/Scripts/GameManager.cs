@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviour
         string defaultKeybindJson = InputActions.SaveBindingOverridesAsJson();
 
         DefaultGlobalSettings = new GlobalSettings(0d, 1f, false, 0.25f, 0.5f, 0.5f, defaultKeybindJson, true,
-                                                  new GameSettings(3d, 1.5d),
+                                                  new GameSettings(3d, 1.5d, 0.5f, 0.5f, true),
                                                   new EditorSettings(1d, 1d),
                                                   new GraphicSettings(new Vector2Int(Display.main.systemWidth, Display.main.systemHeight), true, AntiAliasingMSAA.Off, 1f, true, 0),
                                                   new GameEvents(false, false));
@@ -449,10 +449,22 @@ public class GameSettings
 
     [DefaultValue(1d)]
     public double GameLookaheadTime { get; private set; }
-    public GameSettings(double gameScrollSpeed, double gameLookaheadTime)
+
+    [DefaultValue(0.5f)]
+    public float BackgroundBlurAmount { get; private set; }
+
+    [DefaultValue(0.5f)]
+    public float BackgroundDarkenAmount { get; private set; }
+
+    [DefaultValue(true)]
+    public bool UseCustomBackground { get; private set; }
+    public GameSettings(double gameScrollSpeed, double gameLookaheadTime, float backgroundBlurAmount, float backgroundDarkenAmount, bool useCustomBackground)
     {
         GameScrollSpeed = gameScrollSpeed;
         GameLookaheadTime = gameLookaheadTime;
+        BackgroundBlurAmount = backgroundBlurAmount;
+        BackgroundDarkenAmount = backgroundDarkenAmount;
+        UseCustomBackground = useCustomBackground;
     }
 }
 
