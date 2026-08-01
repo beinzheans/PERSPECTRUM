@@ -791,6 +791,11 @@ public class EditorManager : MonoBehaviour
                 await Awaitable.MainThreadAsync();
                 InvokeBackgroundTextureLoadedEvent(texture, imageBytes);
             }
+            else
+            {
+                await Awaitable.MainThreadAsync();
+                InvokeBackgroundTextureLoadedEvent(null, imageBytes);
+            }
         }
         catch (Exception e)
         {
