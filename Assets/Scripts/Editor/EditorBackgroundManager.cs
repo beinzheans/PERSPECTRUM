@@ -32,7 +32,10 @@ public class EditorBackgroundManager : EditorUIBehavior
                 }
 
                 EditorManager.EditorInstance.InvokeBackgroundTextureLoadedEvent(texture, imageBytes);
+                GameManager.GameInstance.InvokeInformationDisplayNeeded("");
                 break;
+            case (int)BackgroundOptions.PREVIEW_IMAGE:
+
             case (int)BackgroundOptions.REMOVE_IMAGE:
                 EditorManager.EditorInstance.InvokeRemoveBackgroundTextureEvent();
                 break;
@@ -42,6 +45,7 @@ public class EditorBackgroundManager : EditorUIBehavior
     private enum BackgroundOptions
     {
         LOAD_IMAGE = 0,
-        REMOVE_IMAGE = 1
+        PREVIEW_IMAGE = 1,
+        REMOVE_IMAGE = 2,
     }
 }
