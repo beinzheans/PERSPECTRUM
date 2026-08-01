@@ -98,7 +98,7 @@ public class EditorManager : MonoBehaviour
     private byte[] currentEditorBackgroundByteArray = new byte[0];
     public event Action<Texture2D> OnBackgroundTextureLoaded;
 
-    
+
     public event Func<BaseChartMetadata> OnRequestBaseChartMetadata;
     public event Action<EditorChartMetadata> OnChartMetadataLoaded;
 

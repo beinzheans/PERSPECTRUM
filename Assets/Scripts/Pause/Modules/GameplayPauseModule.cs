@@ -49,10 +49,10 @@ public class GameplayPauseModule : BasePauseModule
             GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime, time);
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime.ToString("F2"));
 
-        pauseMenuGroups[k_BACKGROUNDENABLEINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground, x), 
+        pauseMenuGroups[k_BACKGROUNDENABLEINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground, x),
             GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground);
 
-        pauseMenuGroups[k_BACKGROUNDBLURINDEX].SetGroupAction_Slider(x => 
+        pauseMenuGroups[k_BACKGROUNDBLURINDEX].SetGroupAction_Slider(x =>
         {
             GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount, x);
             pauseMenuGroups[k_BACKGROUNDBLURINDEX].SetGroupDisplayText(x.ToString("F2"));
