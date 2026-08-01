@@ -3,13 +3,13 @@ using Unity.Mathematics;
 public class GlobalPauseModule : BasePauseModule
 {
     private const int k_OFFSETGROUPINDEX = 0;
-    private const int k_MOUSESENSITIVITYINDEX = 1;
-    private const int k_CURSORMOVEMODEINDEX = 2;
-    private const int k_PREDICTIVEHITSOUNDGROUPINDEX = 2;
-    private const int k_SHOWFPSGROUPINDEX = 3;
-    private const int k_SONGVOLUMEGROUPINDEX = 4;
-    private const int k_HITSOUNDVOLUMEGROUPINDEX = 5;
-    private const int k_UIVOLUMEGROUPINDEX = 6;
+    private const int k_CURSORMOVEMODEINDEX = 1;
+    private const int k_MOUSESENSITIVITYINDEX = 2;
+    private const int k_PREDICTIVEHITSOUNDGROUPINDEX = 3;
+    private const int k_SHOWFPSGROUPINDEX = 4;
+    private const int k_SONGVOLUMEGROUPINDEX = 5;
+    private const int k_HITSOUNDVOLUMEGROUPINDEX = 6;
+    private const int k_UIVOLUMEGROUPINDEX = 7;
     protected override void OnModuleAwake()
     {
         return;
@@ -25,6 +25,11 @@ public class GlobalPauseModule : BasePauseModule
             }
         }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs.ToString("F2"));
 
+        pauseMenuGroups[k_CURSORMOVEMODEINDEX].SetGroupAction_Dropdown(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.CursorMovementType, (CursorMovementTypes)x),
+    GameManager.GameInstance.GlobalSettings.CursorMovementType);
+
+        pauseMenuGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
+
         pauseMenuGroups[k_MOUSESENSITIVITYINDEX].SetGroupAction_Slider(x =>
         {
             float scale = math.remap(0f, 1f, 0.1f, 3f, x);
@@ -34,10 +39,6 @@ public class GlobalPauseModule : BasePauseModule
 
         pauseMenuGroups[k_MOUSESENSITIVITYINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor.ToString("F2"));
 
-        pauseMenuGroups[k_CURSORMOVEMODEINDEX].SetGroupAction_Dropdown(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.CursorMovementType, (CursorMovementTypes)x),
-            GameManager.GameInstance.GlobalSettings.CursorMovementType);
-
-        pauseMenuGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
 
         pauseMenuGroups[k_PREDICTIVEHITSOUNDGROUPINDEX].SetGroupAction_Toggle((x) =>
         {

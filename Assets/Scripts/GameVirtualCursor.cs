@@ -79,7 +79,6 @@ public class GameVirtualCursor : MonoBehaviour
         VirtualMousePosition = centre;
 
         Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
 
 
         ShowVirtualMouse();
@@ -187,21 +186,17 @@ public class GameVirtualCursor : MonoBehaviour
 
         if (!result.isValid)
         {
-            Debug.Log($"Result is invalid!");
             yield break;
         }
 
-        Debug.Log($"Got last raycast result!", result.gameObject);
 
         if (!result.gameObject.TryGetComponent<Selectable>(out Selectable selectable))
         {
-            Debug.Log($"Result has no Selectable component!");
             yield break;
         }
 
         if (!selectable.IsInteractable())
         {
-            Debug.Log($"Selectable component is not interactable!");
             yield break;
         }
 

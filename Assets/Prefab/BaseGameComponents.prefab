@@ -2896,27 +2896,23 @@ MonoBehaviour:
 
       To calibrate,
       go to the offset calibration screen in the Main Menu.'
-  - groupLabel: Cursor Sensitivity Scale
-    groupType: 34
-    groupDescription: 'Adjusts the game cursor sensitivity by scaling. The default
-      value is 1.
-
-      To use raw mouse input (no mouse acceleration), turn it
-      off in your OS settings.
-
-'
   - groupLabel: Cursor Move Method
     groupType: 8
     groupDescription: 'Controls the method used to move the game cursor.
 
       Relative
-      moves the game cursor by the movement of your input device.
+      moves the game cursor by the raw input of your device.
 
-      Absolute
-      moves the game cursor to your touch / press, if your input device supports
-      it.
+      Absolute moves
+      the game cursor to the position of your device.'
+  - groupLabel: Cursor Sensitivity Scale
+    groupType: 34
+    groupDescription: 'Adjusts the game cursor sensitivity by scaling. This has no
+      effect when Cursor Move Method is set to Absolute.
 
-      Note that mouse sensitivity has no effect when using Absolute.'
+      Note using fullscreen
+      on a non-native resolution will require different sensitivity. To fix, use
+      Windowed mode.'
   - groupLabel: Use Prescheduled Hitsounds
     groupType: 4
     groupDescription: 'Whether or not prescheduled hitsounds are used. This will
@@ -3018,13 +3014,11 @@ MonoBehaviour:
   pauseMenuGroupInfo:
   - groupLabel: Resolution
     groupType: 8
-    groupDescription: 'Changes the resolution of the game. Choose a suitable resolution
-      in this window.
-
-      This only effects Fullscreen mode.'
+    groupDescription: Changes the resolution of the game. Note that the gameplay
+      will be locked to a 16:9 aspect ratio regardless of your resolution.
   - groupLabel: Fullscreen Mode
     groupType: 4
-    groupDescription: Whether or not the game will run in fullscreen.
+    groupDescription: 
   - groupLabel: MSAA (Anti-Aliasing) Samples
     groupType: 8
     groupDescription: How many samples MSAA will use for anti-aliasing. Use this
@@ -3032,7 +3026,7 @@ MonoBehaviour:
   - groupLabel: Render Scale
     groupType: 2
     groupDescription: How much the current resolution is scaled up for rendering.
-      Set this to a lower value for a lower render resolution.
+      Set this to a lower value for a lower render resolution for better performance.
   - groupLabel: VSync
     groupType: 4
     groupDescription: Whether or not VSync (Vertical Sync) is used. This will limit
