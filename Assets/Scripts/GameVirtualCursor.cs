@@ -26,7 +26,7 @@ public class GameVirtualCursor : MonoBehaviour
     /// </summary>
     public const string k_VIRTUALMOUSE_TAG = "VirtualMouseTag";
     public Mouse VirtualMouse { get; private set; }
-    private Mouse hardwareMouse;
+    private Pointer hardwarePointer;
 
     public Vector2 VirtualMousePosition { get; private set; }
     public bool MouseVisibleState { get; private set; }
@@ -67,12 +67,11 @@ public class GameVirtualCursor : MonoBehaviour
 
     private void Start()
     {
-        hardwareMouse = Mouse.current; // cache hardware mouse, since virtual mouse & hardware mouse may conflict
+        hardwarePointer = Pointer.current; // cache hardware pointer, since virtual mouse & hardware mouse may conflict
 
         VirtualMouse = InputSystem.AddDevice<Mouse>(k_VIRTUALMOUSEKEY);
 
         InputSystem.AddDeviceUsage(VirtualMouse, k_VIRTUALMOUSE_TAG);
-
         mouseCursorElasticUI.RectTransform.anchorMin = mouseCursorElasticUI.RectTransform.anchorMax = Vector2.zero; // set to bottom-left anchor, so (0, 0) is the bottom-left corner
         mouseCanvasRectTransform = mouseCanvas.GetComponent<RectTransform>();
         Vector2 centre = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(0.5f, 0.5f), mouseCanvasRectTransform);
@@ -80,7 +79,6 @@ public class GameVirtualCursor : MonoBehaviour
         VirtualMousePosition = centre;
 
         Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
 
 
         ShowVirtualMouse();
@@ -94,13 +92,20 @@ public class GameVirtualCursor : MonoBehaviour
     private const float k_DEFAULTMOUSESENSITIVITY = 1f;
     private void UpdateVirtualMouse()
     {
-        Vector2 delta = hardwareMouse.delta.ReadValue();
+        if (GameManager.GameInstance.GlobalSettings.CursorMovementType == CursorMovementTypes.Relative)
+        {
+            Vector2 delta = hardwarePointer.delta.ReadValue();
 
-        float sensitivity = GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor * k_DEFAULTMOUSESENSITIVITY; // even though the execution order is earlier, everything is already instantiatied in GameManager.
+            float sensitivity = GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor * k_DEFAULTMOUSESENSITIVITY; // even though the execution order is earlier, everything is already instantiatied in GameManager.
 
-        MouseDisplacement = delta * sensitivity;
+            MouseDisplacement = delta * sensitivity;
 
-        VirtualMousePosition += MouseDisplacement;
+            VirtualMousePosition += MouseDisplacement;
+        }
+        else if (GameManager.GameInstance.GlobalSettings.CursorMovementType == CursorMovementTypes.Absolute)
+        {
+            VirtualMousePosition = hardwarePointer.position.ReadValue();
+        }
 
         VirtualMousePosition = MathHelper.ClampVectorByComponent(VirtualMousePosition, 0f, Screen.width, 0f, Screen.height);
 
@@ -108,22 +113,33 @@ public class GameVirtualCursor : MonoBehaviour
         UpdateVirtualCursorPosition();
     }
 
+
     private void SetEventSystem()
     {
-        bool leftMouseButton = hardwareMouse.leftButton.isPressed;
-        bool rightMouseButton = hardwareMouse.rightButton.isPressed;
-        bool middleMouseButton = hardwareMouse.middleButton.isPressed;
-        bool forwardMouseButton = hardwareMouse.forwardButton.isPressed;
-        bool backMouseButton = hardwareMouse.backButton.isPressed;
+        bool leftMouseButton = false, rightMouseButton = false, middleMouseButton = false, forwardMouseButton = false, backMouseButton = false;
 
-        int clickCount = hardwareMouse.clickCount.ReadValue();
-        Vector2 scroll = hardwareMouse.scroll.ReadValue();
-        MouseState mouseState = new MouseState()
+        MouseState mouseState = new();
+
+        if (hardwarePointer is Mouse hardwareMouse) // we can give more information we are using the mouse
         {
-            position = VirtualMousePosition,
-            clickCount = (ushort)clickCount,
-            scroll = scroll
-        };
+            leftMouseButton = hardwareMouse.leftButton.isPressed;
+            rightMouseButton = hardwareMouse.rightButton.isPressed;
+            middleMouseButton = hardwareMouse.middleButton.isPressed;
+            forwardMouseButton = hardwareMouse.forwardButton.isPressed;
+            backMouseButton = hardwareMouse.backButton.isPressed;
+
+            int clickCount = hardwareMouse.clickCount.ReadValue();
+            Vector2 scroll = hardwareMouse.scroll.ReadValue();
+
+            mouseState.clickCount = (ushort)clickCount;
+            mouseState.scroll = scroll;
+        }
+        else
+        {
+            leftMouseButton = hardwarePointer.press.isPressed;
+        }
+
+        mouseState.position = VirtualMousePosition;
 
         mouseState.WithButton(MouseButton.Left, leftMouseButton);
         mouseState.WithButton(MouseButton.Right, rightMouseButton);
@@ -165,12 +181,14 @@ public class GameVirtualCursor : MonoBehaviour
             yield break;
         }
 
+
         RaycastResult result = uiInputModule.GetLastRaycastResult(VirtualMouse.deviceId);
 
         if (!result.isValid)
         {
             yield break;
         }
+
 
         if (!result.gameObject.TryGetComponent<Selectable>(out Selectable selectable))
         {
