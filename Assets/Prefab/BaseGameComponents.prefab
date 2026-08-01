@@ -676,6 +676,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1154,6 +1155,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2160,6 +2162,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2296,6 +2299,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2432,6 +2436,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2793,7 +2798,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4053dd0f9cbc6824dbe455cc49d1526c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  k_MAXIMUMNUMBEROFSOURCES: 499
+  MAXNUMBEROFSOURCES: 99
   audioSourcePrefab: {fileID: 8999374074260792838, guid: 393e832d82953704e940587f4d2bc666, type: 3}
 --- !u!1 &5620176167719096081
 GameObject:
@@ -2891,7 +2896,7 @@ MonoBehaviour:
 
       To calibrate,
       go to the offset calibration screen in the Main Menu.'
-  - groupLabel: Mouse Sensitivity Scale
+  - groupLabel: Cursor Sensitivity Scale
     groupType: 34
     groupDescription: 'Adjusts the game cursor sensitivity by scaling. The default
       value is 1.
@@ -2900,6 +2905,18 @@ MonoBehaviour:
       off in your OS settings.
 
 '
+  - groupLabel: Cursor Move Method
+    groupType: 8
+    groupDescription: 'Controls the method used to move the game cursor.
+
+      Relative
+      moves the game cursor by the movement of your input device.
+
+      Absolute
+      moves the game cursor to your touch / press, if your input device supports
+      it.
+
+      Note that mouse sensitivity has no effect when using Absolute.'
   - groupLabel: Use Prescheduled Hitsounds
     groupType: 4
     groupDescription: 'Whether or not prescheduled hitsounds are used. This will
@@ -3316,6 +3333,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3666,6 +3684,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3877,6 +3896,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0

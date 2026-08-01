@@ -4,6 +4,7 @@ public class GlobalPauseModule : BasePauseModule
 {
     private const int k_OFFSETGROUPINDEX = 0;
     private const int k_MOUSESENSITIVITYINDEX = 1;
+    private const int k_CURSORMOVEMODEINDEX = 2;
     private const int k_PREDICTIVEHITSOUNDGROUPINDEX = 2;
     private const int k_SHOWFPSGROUPINDEX = 3;
     private const int k_SONGVOLUMEGROUPINDEX = 4;
@@ -32,6 +33,9 @@ public class GlobalPauseModule : BasePauseModule
         }, math.remap(0.1f, 3f, 0f, 1f, GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor));
 
         pauseMenuGroups[k_MOUSESENSITIVITYINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor.ToString("F2"));
+
+        pauseMenuGroups[k_CURSORMOVEMODEINDEX].SetGroupAction_Dropdown(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.CursorMovementType, (CursorMovementTypes)x),
+            GameManager.GameInstance.GlobalSettings.CursorMovementType);
 
         pauseMenuGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
 
