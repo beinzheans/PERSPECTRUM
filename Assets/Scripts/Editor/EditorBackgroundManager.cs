@@ -1,9 +1,38 @@
 using SFB;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EditorBackgroundManager : EditorUIBehavior
 {
+    [SerializeField] private RawImage backgroundImage;
+    [SerializeField] private AspectRatioFitter backgroundAspectRatio;
+
+
+    protected override void Start()
+    {
+        base.Start();
+        EditorManager.EditorInstance.OnBackgroundTextureLoaded += EditorInstance_OnBackgroundTextureLoaded;
+    }
+
+    private void OnDestroy()
+    {
+        EditorManager.EditorInstance.OnBackgroundTextureLoaded -= EditorInstance_OnBackgroundTextureLoaded;
+    }
+
+    private void EditorInstance_OnBackgroundTextureLoaded(Texture2D obj)
+    {
+        if (obj == null)
+        {
+            backgroundImage.texture = null;
+            backgroundAspectRatio.aspectRatio = 1f;
+            return;
+        }
+
+        backgroundImage.texture = obj;
+        backgroundAspectRatio.aspectRatio = (float)obj.width / obj.height;
+    }
+
     protected override void UI_OnButtonPress(int index)
     {
         if (index < (int)BackgroundOptions.LOAD_IMAGE || index > (int)BackgroundOptions.REMOVE_IMAGE)
@@ -32,10 +61,8 @@ public class EditorBackgroundManager : EditorUIBehavior
                 }
 
                 EditorManager.EditorInstance.InvokeBackgroundTextureLoadedEvent(texture, imageBytes);
-                GameManager.GameInstance.InvokeInformationDisplayNeeded("");
+                GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded background");
                 break;
-            case (int)BackgroundOptions.PREVIEW_IMAGE:
-
             case (int)BackgroundOptions.REMOVE_IMAGE:
                 EditorManager.EditorInstance.InvokeRemoveBackgroundTextureEvent();
                 break;
@@ -45,7 +72,6 @@ public class EditorBackgroundManager : EditorUIBehavior
     private enum BackgroundOptions
     {
         LOAD_IMAGE = 0,
-        PREVIEW_IMAGE = 1,
-        REMOVE_IMAGE = 2,
+        REMOVE_IMAGE = 1,
     }
 }

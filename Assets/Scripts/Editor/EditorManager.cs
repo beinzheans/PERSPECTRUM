@@ -781,8 +781,6 @@ public class EditorManager : MonoBehaviour
             if (audioResult)
             {
                 await Awaitable.MainThreadAsync();
-
-                // return to main thread in order to invoke this action.
                 InvokeAudioClipLoadedEvent(clip, audioBytes);
             }
 
@@ -790,7 +788,8 @@ public class EditorManager : MonoBehaviour
 
             if (imageResult)
             {
-                
+                await Awaitable.MainThreadAsync();
+                InvokeBackgroundTextureLoadedEvent(texture, imageBytes);
             }
         }
         catch (Exception e)

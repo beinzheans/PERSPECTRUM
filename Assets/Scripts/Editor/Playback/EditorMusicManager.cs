@@ -70,7 +70,6 @@ public class EditorMusicManager : MonoBehaviour
             return;
         }
 
-        GameManager.GameInstance.InvokeInformationDisplayNeeded("Loaded audio clip");
         musicAudioSource.clip = obj;
     }
 }

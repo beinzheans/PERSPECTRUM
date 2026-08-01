@@ -64,7 +64,7 @@ public class GameplayImageBlurManager : MonoBehaviour
         }
 
         textureCache = texture;
-        aspectRatioFitter.aspectRatio = texture.width / texture.height;
+        aspectRatioFitter.aspectRatio = (float)texture.width / texture.height;
     }
 
     private const int k_CAMERABACKGROUNDPULSEBEAT = 4;

@@ -79,7 +79,7 @@ public class GameVirtualCursor : MonoBehaviour
         VirtualMousePosition = centre;
 
         Cursor.lockState = CursorLockMode.Confined;
-
+        Cursor.visible = false;
 
         ShowVirtualMouse();
     }
