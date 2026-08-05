@@ -86,7 +86,10 @@ public class GameVirtualCursor : MonoBehaviour
 
     private void Update()
     {
-        hardwarePointer = Pointer.current; // get the new hardware pointer, it's possible that we switch between mouse / pen / touchscreen etc ...
+        if (Pointer.current != VirtualMouse)
+        {
+            hardwarePointer = Pointer.current; // get the new hardware pointer, it's possible that we switch between mouse / pen / touchscreen etc ...
+        }
 
         UpdateVirtualMouse();
     }
