@@ -2915,6 +2915,18 @@ MonoBehaviour:
       Note using fullscreen
       on a non-native resolution will require different sensitivity. To fix, use
       Windowed mode.'
+  - groupLabel: Invert X
+    groupType: 4
+    groupDescription: 'Inverts the cursor movement on the X-axis (left and right).
+
+      This
+      has no effect if Cursor Move Method is set to Absolute.'
+  - groupLabel: Invert Y
+    groupType: 4
+    groupDescription: 'Inverts the cursor movement on the Y-axis (up and down).
+
+      This
+      has no effect if Cursor Move Method is set to Absolute.'
   - groupLabel: Use Prescheduled Hitsounds
     groupType: 4
     groupDescription: 'Whether or not prescheduled hitsounds are used. This will
