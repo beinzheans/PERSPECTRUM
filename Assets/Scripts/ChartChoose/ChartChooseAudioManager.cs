@@ -47,7 +47,7 @@ public class ChartChooseAudioManager : MonoBehaviour
         chartChooseManager.OnChartDeleted -= ChartChooseManager_OnChartDeleted;
     }
 
-    private const double k_MUSICFADETIME = 0.5d;
+    private const double k_MUSICFADETIME = 0.15d;
     private const double k_MUSICPREVIEWTIME = 15d;
 
     private TimerIntervalAction playAction;
