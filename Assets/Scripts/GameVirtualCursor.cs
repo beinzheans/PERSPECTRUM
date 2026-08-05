@@ -67,7 +67,7 @@ public class GameVirtualCursor : MonoBehaviour
 
     private void Start()
     {
-        hardwarePointer = Pointer.current; // cache hardware pointer, since virtual mouse & hardware mouse may conflict
+        hardwarePointer = Pointer.current;
 
         VirtualMouse = InputSystem.AddDevice<Mouse>(k_VIRTUALMOUSEKEY);
 
@@ -86,6 +86,8 @@ public class GameVirtualCursor : MonoBehaviour
 
     private void Update()
     {
+        hardwarePointer = Pointer.current; // get the new hardware pointer, it's possible that we switch between mouse / pen / touchscreen etc ...
+
         UpdateVirtualMouse();
     }
 
