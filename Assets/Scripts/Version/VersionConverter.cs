@@ -62,30 +62,32 @@ public abstract class VersionConverter
     protected abstract bool OnConvertChartEvent(ref JObject chartJObject, ref JObject metadataJObject);
 }
 
-// Add converters inheriting the above parent class here.
-
-public class VersionConverter_1_0_0_to_1_0_1 : VersionConverter
+/// <summary>
+/// A more specific implementation of <see cref="VersionConverter"/>. <br></br> 
+/// Declares that <see cref="VersionConverter.InVersion"/> and <see cref="VersionConverter.OutVersion"/> are completely backwards compatiable with no additional changes. <br></br>
+/// </summary>
+public abstract class ValidVersionConverter : VersionConverter
 {
-    public override string InVersion => "1.0.0";
-
-    public override string OutVersion => "1.0.1";
-
     protected override bool OnConvertChartEvent(ref JObject chartJObject, ref JObject metadataJObject)
     {
         return true;
     }
 }
 
-public class VersionConverter_1_0_1_to_1_1_0 : VersionConverter
+// Add converters inheriting the above parent(s) class here.
+
+public class VersionConverter_1_0_0_to_1_0_1 : ValidVersionConverter
+{
+    public override string InVersion => "1.0.0";
+
+    public override string OutVersion => "1.0.1";
+}
+
+public class VersionConverter_1_0_1_to_1_1_0 : ValidVersionConverter
 {
     public override string InVersion => "1.0.1";
 
     public override string OutVersion => "1.1.0";
-
-    protected override bool OnConvertChartEvent(ref JObject chartJObject, ref JObject metadataJObject)
-    {
-        return true;
-    }
 }
 
 public class VersionConverter_1_1_0_to_1_2_0 : VersionConverter
@@ -101,4 +103,10 @@ public class VersionConverter_1_1_0_to_1_2_0 : VersionConverter
 
         return true;
     }
+}
+
+public class VersionConverter_1_2_0_to_1_2_1 : ValidVersionConverter
+{
+    public override string InVersion => "1.2.0";
+    public override string OutVersion => "1.2.1";
 }
