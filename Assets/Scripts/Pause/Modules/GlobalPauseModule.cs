@@ -5,11 +5,13 @@ public class GlobalPauseModule : BasePauseModule
     private const int k_OFFSETGROUPINDEX = 0;
     private const int k_CURSORMOVEMODEINDEX = 1;
     private const int k_MOUSESENSITIVITYINDEX = 2;
-    private const int k_PREDICTIVEHITSOUNDGROUPINDEX = 3;
-    private const int k_SHOWFPSGROUPINDEX = 4;
-    private const int k_SONGVOLUMEGROUPINDEX = 5;
-    private const int k_HITSOUNDVOLUMEGROUPINDEX = 6;
-    private const int k_UIVOLUMEGROUPINDEX = 7;
+    private const int k_CURSORINVERTXINDEX = 3;
+    private const int k_CURSORINVERTYINDEX = 4;
+    private const int k_PREDICTIVEHITSOUNDGROUPINDEX = 5;
+    private const int k_SHOWFPSGROUPINDEX = 6;
+    private const int k_SONGVOLUMEGROUPINDEX = 7;
+    private const int k_HITSOUNDVOLUMEGROUPINDEX = 8;
+    private const int k_UIVOLUMEGROUPINDEX = 9;
     protected override void OnModuleAwake()
     {
         return;
@@ -26,7 +28,7 @@ public class GlobalPauseModule : BasePauseModule
         }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs.ToString("F2"));
 
         pauseMenuGroups[k_CURSORMOVEMODEINDEX].SetGroupAction_Dropdown(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.CursorMovementType, (CursorMovementTypes)x),
-    GameManager.GameInstance.GlobalSettings.CursorMovementType);
+        GameManager.GameInstance.GlobalSettings.CursorMovementType);
 
         pauseMenuGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
 
@@ -39,6 +41,9 @@ public class GlobalPauseModule : BasePauseModule
 
         pauseMenuGroups[k_MOUSESENSITIVITYINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor.ToString("F2"));
 
+        pauseMenuGroups[k_CURSORINVERTXINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.MouseInvert_XAxis, x), GameManager.GameInstance.GlobalSettings.MouseInvert_XAxis);
+
+        pauseMenuGroups[k_CURSORINVERTYINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.MouseInvert_YAxis, x), GameManager.GameInstance.GlobalSettings.MouseInvert_YAxis);
 
         pauseMenuGroups[k_PREDICTIVEHITSOUNDGROUPINDEX].SetGroupAction_Toggle((x) =>
         {

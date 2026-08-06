@@ -187,7 +187,7 @@ public class GameManager : MonoBehaviour
         CreateInputActionModifierCache();
         string defaultKeybindJson = InputActions.SaveBindingOverridesAsJson();
 
-        DefaultGlobalSettings = new GlobalSettings(0d, 1f, CursorMovementTypes.Relative, false, 0.25f, 0.5f, 0.5f, defaultKeybindJson, true,
+        DefaultGlobalSettings = new GlobalSettings(0d, CursorMovementTypes.Relative, 1f, false, false, false, 0.25f, 0.5f, 0.5f, defaultKeybindJson, true,
                                                   new GameSettings(3d, 1.5d, 0.5f, 0.85f, true),
                                                   new EditorSettings(1d, 1d),
                                                   new GraphicSettings(new Vector2Int(Display.main.systemWidth, Display.main.systemHeight), true, AntiAliasingMSAA.Off, 1f, true, 0),
@@ -369,11 +369,17 @@ public class GlobalSettings
     [DefaultValue(0f)]
     public double AudioOffsetMs { get; private set; }
 
+    [DefaultValue(CursorMovementTypes.Relative)]
+    public CursorMovementTypes CursorMovementType { get; private set; }
+
     [DefaultValue(1f)]
     public float MouseSensitivityScaleFactor { get; private set; }
 
-    [DefaultValue(CursorMovementTypes.Relative)]
-    public CursorMovementTypes CursorMovementType { get; private set; }
+    [DefaultValue(false)]
+    public bool MouseInvert_XAxis { get; private set; }
+
+    [DefaultValue(false)]
+    public bool MouseInvert_YAxis { get; private set; }
 
     [DefaultValue(false)]
     public bool UsePrescheduledHitsounds { get; private set; }
@@ -404,11 +410,13 @@ public class GlobalSettings
 
 
     // we are going to trust that the settings file has valid inputs. Lol
-    public GlobalSettings(double audioOffsetMs, float mouseSensitivityScaleFactor, CursorMovementTypes cursorMovementType, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, float UIVolume, string keybindJson, bool showFPSCounter, GameSettings gameSettings, EditorSettings editorSettings, GraphicSettings graphicSettings, GameEvents gameEvents)
+    public GlobalSettings(double audioOffsetMs, CursorMovementTypes cursorMovementType, float mouseSensitivityScaleFactor, bool mouseInvert_XAxis, bool mouseInvert_YAxis, bool usePrescheduledHitsounds, float songVolume, float hitsoundVolume, float UIVolume, string keybindJson, bool showFPSCounter, GameSettings gameSettings, EditorSettings editorSettings, GraphicSettings graphicSettings, GameEvents gameEvents)
     {
         AudioOffsetMs = audioOffsetMs;
-        MouseSensitivityScaleFactor = mouseSensitivityScaleFactor;
         CursorMovementType = cursorMovementType;
+        MouseSensitivityScaleFactor = mouseSensitivityScaleFactor;
+        MouseInvert_XAxis = mouseInvert_XAxis;
+        MouseInvert_YAxis = mouseInvert_YAxis;
         UsePrescheduledHitsounds = usePrescheduledHitsounds;
         SongVolume = songVolume;
         HitsoundVolume = hitsoundVolume;
