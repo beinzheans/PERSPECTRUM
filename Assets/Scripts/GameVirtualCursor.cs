@@ -94,6 +94,11 @@ public class GameVirtualCursor : MonoBehaviour
         UpdateVirtualMouse();
     }
 
+    private void LateUpdate()
+    {
+        UpdateVirtualCursorPosition();
+    }
+
     private const float k_DEFAULTMOUSESENSITIVITY = 1f;
     private void UpdateVirtualMouse()
     {
@@ -117,7 +122,6 @@ public class GameVirtualCursor : MonoBehaviour
         VirtualMousePosition = MathHelper.ClampVectorByComponent(VirtualMousePosition, 0f, Screen.width, 0f, Screen.height);
 
         SetEventSystem();
-        UpdateVirtualCursorPosition();
     }
 
 

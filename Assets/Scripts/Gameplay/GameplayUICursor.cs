@@ -69,13 +69,20 @@ public class GameplayUICursor : MonoBehaviour
     }
 
     private Vector2 previousGameplayMousePosition = Vector2.zero;
+    private Vector3 scaleVelocity = Vector3.zero;
+    private const float k_CURSORDEADZONERATE = 100f;
+    private const float k_MAXXSCALESIZE = 2f;
+    private const float k_MAXDISPLACEMENTMAGNTIUDE = 5000f;
 
-    private const float k_MOUSEROTATIONDEADZONEMAGNTIUDE = 5f;
-    private const float k_MAXXSCALESIZE = 3f;
-    private const float k_MAXSPEEDMAGNTIUDE = 25f;
+    private const float k_CURSORSCALETIME = 0.1f;
+    /// <summary>
+    /// How much time the cursor needs to be idle before we actually scale it down.
+    /// </summary>
+    private const double k_CURSORIDLEWAITTIME = 0.5d;
 
-    private const float k_DEADZONENORMALSCALESPEED = 10f;
-    private void Update()
+    private TimerIntervalAction cursorIdleShrinkTimer;
+    private bool cursorHasStartedShrinking = false;
+    private void LateUpdate()
     {
         RectTransform cursorRect = cursorRawImage.rectTransform;
         cursorRect.anchorMin = cursorRect.anchorMax = gameplayManager.GameplayMousePosition;
@@ -84,29 +91,44 @@ public class GameplayUICursor : MonoBehaviour
         cursorTrailParticleSystemRectTransform.anchorMin = cursorTrailParticleSystemRectTransform.anchorMax = gameplayManager.GameplayMousePosition;
         cursorTrailParticleSystemRectTransform.anchoredPosition = Vector2.zero;
 
-        Vector2 mousePixelDisplacement = MathHelper.GetPixelFromToVectorFromNormalizedPoints(gameplayManager.GameplayMousePosition, previousGameplayMousePosition, gameplayManager.GameplayRectTransform);
+        Vector2 mousePixelDisplacement = MathHelper.GetPixelFromToVectorFromNormalizedPoints(gameplayManager.GameplayMousePosition, previousGameplayMousePosition, gameplayManager.GameplayRectTransform) / Time.deltaTime;
 
         previousGameplayMousePosition = gameplayManager.GameplayMousePosition;
 
-        if (mousePixelDisplacement.sqrMagnitude < (k_MOUSEROTATIONDEADZONEMAGNTIUDE * k_MOUSEROTATIONDEADZONEMAGNTIUDE))
+        float deadzoneDisplacementThresholdSqr = k_CURSORDEADZONERATE * k_CURSORDEADZONERATE;
+        Vector3 targetScale = Vector3.one;
+
+        if (mousePixelDisplacement.sqrMagnitude >= deadzoneDisplacementThresholdSqr)
         {
-            cursorRect.localScale = Vector3.Slerp(cursorRect.localScale, Vector3.one, Time.deltaTime * k_DEADZONENORMALSCALESPEED);
-            return;
+            DSPTimerEngine.TimerInstance.RemoveActionFromTimer(cursorIdleShrinkTimer);
+            cursorHasStartedShrinking = false;
+            float zRadian = MathHelper.IsTwoFloatsEqualWithEpsilion(mousePixelDisplacement.x, 0f) ? Mathf.PI / 2 : Mathf.Atan2(mousePixelDisplacement.y, mousePixelDisplacement.x);
+
+            float zRotation = GetConvertedRotationAngleForSymmetricalUI(zRadian) * Mathf.Rad2Deg;
+
+            Quaternion rotation = Quaternion.Euler(0f, 0f, zRotation);
+            cursorRect.rotation = rotation;
+
+            float maxDisplacementThresholdSqr = k_MAXDISPLACEMENTMAGNTIUDE * k_MAXDISPLACEMENTMAGNTIUDE;
+            float normalizedX = math.remap(deadzoneDisplacementThresholdSqr, maxDisplacementThresholdSqr, 0f, 1f, mousePixelDisplacement.sqrMagnitude);
+
+            targetScale = new Vector3(MathHelper.EvaluateSigmoidFunction(normalizedX, 1f, k_MAXXSCALESIZE, 5f, 0.5f), 1f, 1f);
+        }
+        else
+        {
+            if (!cursorHasStartedShrinking)
+            {
+                cursorIdleShrinkTimer = new TimerIntervalAction(this, x => { targetScale = Vector3.one; cursorHasStartedShrinking = true; }, () => { }, k_CURSORIDLEWAITTIME, 0d);
+                DSPTimerEngine.TimerInstance.AddActionToTimer(cursorIdleShrinkTimer, false);
+            }
         }
 
-        float zRadian = MathHelper.IsTwoFloatsEqualWithEpsilion(mousePixelDisplacement.x, 0f) ? Mathf.PI / 2 : Mathf.Atan2(mousePixelDisplacement.y, mousePixelDisplacement.x);
-
-        float zRotation = GetConvertedRotationAngleForSymmetricalUI(zRadian) * Mathf.Rad2Deg;
-
-        cursorRect.rotation = Quaternion.Euler(0f, 0f, zRotation);
-
-        float normalizedX = math.remap(k_MOUSEROTATIONDEADZONEMAGNTIUDE * k_MOUSEROTATIONDEADZONEMAGNTIUDE, k_MAXSPEEDMAGNTIUDE * k_MAXSPEEDMAGNTIUDE, 0f, 1f, mousePixelDisplacement.sqrMagnitude);
-
-        cursorRect.localScale = new Vector3(MathHelper.EvaluateSigmoidFunction(normalizedX, 1f, k_MAXXSCALESIZE, 5f, 0.5f), 1f, 1f);
+        cursorRect.localScale = Vector3.SmoothDamp(cursorRect.localScale, targetScale, ref scaleVelocity, k_CURSORSCALETIME);
     }
 
     /// <summary>
-    /// Returns the corrected rotation angle (in radians) for symmertical UI elements given a <paramref name="angle"/> in [-pi, pi] range.
+    /// Returns the corrected rotation angle (in radians) for symmetrical UI elements given a <paramref name="angle"/> in [-pi, pi] range. <br></br>
+    /// That is, f: [-pi, pi] -> [-pi/2, pi/2].
     /// </summary>
     /// <param name="angle"></param>
     /// <returns></returns>

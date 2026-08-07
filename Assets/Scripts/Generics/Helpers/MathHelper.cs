@@ -95,7 +95,7 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Get the fromto vector in raw pixel coordinates, given normalized fromPoint toPoint points w.r.t toPoint a reference rect. <br></br>
+    /// Get the fromto vector in raw pixel coordinates, given normalized from and to points w.r.t. a reference rect. <br></br>
     /// This is necessary because the fromto vector calculated fromPoint normalized vector is NOT the same as the raw pixel fromto vector.
     /// </summary>
     /// <param name="from"></param>
@@ -184,7 +184,7 @@ public static class MathHelper
     public static bool IsTwoVectorsParallel(Vector2 aVector, Vector2 bVector)
     {
         float crossProduct_result = aVector.x * bVector.y - aVector.y * bVector.x;
-        return IsTwoFloatsEqualWithEpsilion(crossProduct_result, 0f); // cross product approx. 0 means we consider it toPoint be in same direction.
+        return IsTwoFloatsEqualWithEpsilion(crossProduct_result, 0f); // cross product approx. 0 means we consider it to be in same direction.
     }
 
     /// <summary>
@@ -205,8 +205,8 @@ public static class MathHelper
 
     public const double k_DOUBLECOMPAREEPSILION = 1e-9d;
     /// <summary>
-    /// Computes the floor of a value, accounting for potential rounding errors that lead toPoint false results <br></br>
-    /// Eg. if we evaluate 2.99999993 instead of 3 due toPoint representation error, it will return 3 instead of 2, hence the "common sense" floor.
+    /// Computes the floor of a value, accounting for potential rounding errors that lead to false results <br></br>
+    /// Eg. if we evaluate 2.99999993 instead of 3 due to representation error, it will return 3 instead of 2, hence the "common sense" floor.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -216,8 +216,8 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Computes the ceil of a value, accounting for potential rounding errors that lead toPoint false results <br></br>
-    /// Eg. if we evaluate 3.0000001 instead of 3 due toPoint representation error, it will return 3 instead of 4, hence the "common sense" ceil.
+    /// Computes the ceil of a value, accounting for potential rounding errors that lead to false results <br></br>
+    /// Eg. if we evaluate 3.0000001 instead of 3 due to representation error, it will return 3 instead of 4, hence the "common sense" ceil.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
@@ -228,7 +228,7 @@ public static class MathHelper
 
     /// <summary>
     /// Compares two double representation of values with a pre-defined epsilion <see cref="k_DOUBLECOMPAREEPSILION"/>. <br></br>
-    /// Returns true if x and y are sufficiently close toPoint each other
+    /// Returns true if x and y are sufficiently close to each other
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -240,7 +240,7 @@ public static class MathHelper
 
     /// <summary>
     /// Compares two float representation of values with a pre-defined epsilion <see cref="k_FLOATCOMPAREEPSILION"/>. <br></br>
-    /// Returns true if x and y are sufficiently close toPoint each other
+    /// Returns true if x and y are sufficiently close to each other
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -743,18 +743,19 @@ public static class MathHelper
     }
 
     /// <summary>
-    /// Evaluates a sigmoid function f: [-inf, inf] -> (<paramref name="min"/>, <paramref name="max"/>). <br></br>
+    /// Evaluates a sigmoid function f: [-inf, inf] -> (<paramref name="min"/>, <paramref name="max"/>) with customizable parameters, where: <br></br>
+    /// f(x) = ( <paramref name="max"/> - <paramref name="min"/> ) / { 1 + e^[ -<paramref name="k"/> * ( <paramref name="x"/> - <paramref name="x_midpoint"/> ) ] } + <paramref name="min"/>
     /// </summary>
     /// <param name="x"></param>
     /// <param name="min"></param>
     /// <param name="max"></param>
     /// <param name="k">The steepness coefficient. This also defines the direction of the function.</param>
-    /// <param name="x0">The exact input such that the function returns the mid-point of <paramref name="min"/> and <paramref name="max"/>.</param>
+    /// <param name="x_midpoint">The exact input such that the function returns the mid-point of <paramref name="min"/> and <paramref name="max"/>.</param>
     /// <returns></returns>
-    public static float EvaluateSigmoidFunction(float x, float min, float max, float k, float x0)
+    public static float EvaluateSigmoidFunction(float x, float min, float max, float k, float x_midpoint)
     {
         float num = max - min;
-        float denom = 1f + math.exp(-k * (x - x0));
+        float denom = 1f + math.exp(-k * (x - x_midpoint));
 
         return num / denom + min;
     }
