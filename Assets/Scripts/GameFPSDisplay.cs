@@ -95,7 +95,7 @@ public class GameFPSDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void UpdateFPSDisplay()
     {
-        fpsDisplayText.SetText($"{calculatedFps:F1} FPS");
+        fpsDisplayText.SetText($"{calculatedFps:F1}\nFPS");
     }
 
     private const float k_FPSDISPLAYFADETIMER = 0.25f;

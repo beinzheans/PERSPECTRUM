@@ -834,7 +834,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";KB&M"",
                     ""action"": ""EscapeMenuInput"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
