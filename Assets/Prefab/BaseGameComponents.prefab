@@ -2817,6 +2817,7 @@ GameObject:
   - component: {fileID: 4681279834613601856}
   - component: {fileID: 3025693897579689320}
   - component: {fileID: 7574112646392885113}
+  - component: {fileID: 3350255572044207881}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2872,6 +2873,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseModules:
   - {fileID: 7595476794094567935}
+  - {fileID: 3350255572044207881}
   - {fileID: 4681279834613601856}
   - {fileID: 3025693897579689320}
   - {fileID: 7574112646392885113}
@@ -2898,35 +2900,6 @@ MonoBehaviour:
 
       To calibrate,
       go to the offset calibration screen in the Main Menu.'
-  - groupLabel: Cursor Move Method
-    groupType: 8
-    groupDescription: 'Controls the method used to move the game cursor.
-
-      Relative
-      moves the game cursor by the raw input of your device.
-
-      Absolute moves
-      the game cursor to the position of your device.'
-  - groupLabel: Cursor Sensitivity Scale
-    groupType: 34
-    groupDescription: 'Adjusts the game cursor sensitivity by scaling. This has no
-      effect when Cursor Move Method is set to Absolute.
-
-      Note using fullscreen
-      on a non-native resolution will require different sensitivity. To fix, use
-      Windowed mode.'
-  - groupLabel: Invert X
-    groupType: 4
-    groupDescription: 'Inverts the cursor movement on the X-axis (left and right).
-
-      This
-      has no effect if Cursor Move Method is set to Absolute.'
-  - groupLabel: Invert Y
-    groupType: 4
-    groupDescription: 'Inverts the cursor movement on the Y-axis (up and down).
-
-      This
-      has no effect if Cursor Move Method is set to Absolute.'
   - groupLabel: Use Prescheduled Hitsounds
     groupType: 4
     groupDescription: 'Whether or not prescheduled hitsounds are used. This will
@@ -2991,12 +2964,6 @@ MonoBehaviour:
   - groupLabel: Background Darken
     groupType: 34
     groupDescription: How much to darken the background.
-  - groupLabel: Rebind Red Key
-    groupType: 48
-    groupDescription: Set the current keybind to become Red (Hitbox Type A).
-  - groupLabel: Rebind Blue Key
-    groupType: 48
-    groupDescription: Set the current keybind to become Blue (Hitbox Type B).
   moduleName: Gameplay
   pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
@@ -3064,6 +3031,57 @@ MonoBehaviour:
       Set
       this to zero (or negative integer) for no custom limit.'
   moduleName: Graphics
+  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  groupContentRectTransform: {fileID: 2617089836302549600}
+--- !u!114 &3350255572044207881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5620176167719096081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40f5958c29c1cc4c81579f9870e5e1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseMenuGroupInfo:
+  - groupLabel: Cursor Move Method
+    groupType: 8
+    groupDescription: 'Controls the method used to move the game cursor.
+
+      Relative
+      moves the game cursor by the raw input of your device.
+
+      Absolute moves
+      the game cursor to the position of your device.'
+  - groupLabel: Cursor Sensitivity Scale
+    groupType: 34
+    groupDescription: 'Adjusts the game cursor sensitivity by scaling. This has no
+      effect when Cursor Move Method is set to Absolute.
+
+      Note using fullscreen
+      on a non-native resolution will require different sensitivity. To fix, use
+      Windowed mode.'
+  - groupLabel: Invert X
+    groupType: 4
+    groupDescription: 'Inverts the cursor movement on the X-axis (left and right).
+
+      This
+      has no effect if Cursor Move Method is set to Absolute.'
+  - groupLabel: Invert Y
+    groupType: 4
+    groupDescription: 'Inverts the cursor movement on the Y-axis (up and down).
+
+      This
+      has no effect if Cursor Move Method is set to Absolute.'
+  - groupLabel: Rebind Red Key
+    groupType: 48
+    groupDescription: Set the current keybind to become Red (Hitbox Type A).
+  - groupLabel: Rebind Blue Key
+    groupType: 48
+    groupDescription: Set the current keybind to become Blue (Hitbox Type B).
+  moduleName: Controls
   pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
 --- !u!1 &5638263883382110480

@@ -575,6 +575,95 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 219655453}
   m_CullTransparentMesh: 1
+--- !u!1 &328098951 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5620176167719096081, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+  m_PrefabInstance: {fileID: 1751869812}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &328098953 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7574112646392885113, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+  m_PrefabInstance: {fileID: 1751869812}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328098951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89dbc796af2b654895808f014f273b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &328098954 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3025693897579689320, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+  m_PrefabInstance: {fileID: 1751869812}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328098951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e20fec6008dcf13408109c8b25958db8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &328098955 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4681279834613601856, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+  m_PrefabInstance: {fileID: 1751869812}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328098951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc0f448bf7d75e34cad29b7fd1429e0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &328098959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328098951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40f5958c29c1cc4c81579f9870e5e1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseMenuGroupInfo:
+  - groupLabel: Cursor Move Method
+    groupType: 8
+    groupDescription: 'Controls the method used to move the game cursor.
+
+      Relative
+      moves the game cursor by the raw input of your device.
+
+      Absolute moves
+      the game cursor to the position of your device.'
+  - groupLabel: Cursor Sensitivity Scale
+    groupType: 34
+    groupDescription: 'Adjusts the game cursor sensitivity by scaling. This has no
+      effect when Cursor Move Method is set to Absolute.
+
+      Note using fullscreen
+      on a non-native resolution will require different sensitivity. To fix, use
+      Windowed mode.'
+  - groupLabel: Invert X
+    groupType: 4
+    groupDescription: 'Inverts the cursor movement on the X-axis (left and right).
+
+      This
+      has no effect if Cursor Move Method is set to Absolute.'
+  - groupLabel: Invert Y
+    groupType: 4
+    groupDescription: 'Inverts the cursor movement on the Y-axis (up and down).
+
+      This
+      has no effect if Cursor Move Method is set to Absolute.'
+  - groupLabel: Rebind Red Key
+    groupType: 48
+    groupDescription: Set the current keybind to become Red (Hitbox Type A).
+  - groupLabel: Rebind Blue Key
+    groupType: 48
+    groupDescription: Set the current keybind to become Blue (Hitbox Type B).
+  moduleName: Controls
+  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  groupContentRectTransform: {fileID: 1701783908}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -2884,6 +2973,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 460011ddec0735b439b54fdfc8296b53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &1701783908 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2617089836302549600, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+  m_PrefabInstance: {fileID: 1751869812}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1710237603
 GameObject:
   m_ObjectHideFlags: 0
@@ -3042,6 +3136,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseGameComponents
       objectReference: {fileID: 0}
+    - target: {fileID: 4681279834613601856, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4681279834613601856, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[5].groupLabel
+      value: Rebind Blue Key
+      objectReference: {fileID: 0}
+    - target: {fileID: 4681279834613601856, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[5].groupDescription
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4884719525742736750, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseModules.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4884719525742736750, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: 'pauseModules.Array.data[1]'
+      value: 
+      objectReference: {fileID: 328098959}
+    - target: {fileID: 4884719525742736750, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: 'pauseModules.Array.data[2]'
+      value: 
+      objectReference: {fileID: 328098955}
+    - target: {fileID: 4884719525742736750, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: 'pauseModules.Array.data[3]'
+      value: 
+      objectReference: {fileID: 328098954}
+    - target: {fileID: 4884719525742736750, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: 'pauseModules.Array.data[4]'
+      value: 
+      objectReference: {fileID: 328098953}
     - target: {fileID: 5066035480902132430, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3094,10 +3220,105 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[1].groupType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[2].groupType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[3].groupType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[4].groupType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[5].groupType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[6].groupType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[1].groupLabel
+      value: Use Prescheduled Hitsounds
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[2].groupLabel
+      value: Show FPS
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[3].groupLabel
+      value: Song Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[4].groupLabel
+      value: Hitsound Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[5].groupLabel
+      value: UI Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[6].groupLabel
+      value: UI Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[7].groupLabel
+      value: UI Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[8].groupLabel
+      value: UI Volume
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[1].groupDescription
+      value: 'Whether or not prescheduled hitsounds are used. This will play hitsounds
+        as if you are playing perfectly.
+
+        Turn this setting on if you have
+        a high audio latency.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[2].groupDescription
+      value: 'Shows the FPS of the game in the bottom-right corner.
+
+        You
+        can hover over the FPS counter to hide it temporarily (Only works outside
+        of pause menu).'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[3].groupDescription
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[4].groupDescription
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[5].groupDescription
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 7595476794094567935, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: pauseMenuGroupInfo.Array.data[6].groupDescription
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5620176167719096081, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 328098959}
   m_SourcePrefab: {fileID: 100100000, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
 --- !u!1 &1787546678
 GameObject:

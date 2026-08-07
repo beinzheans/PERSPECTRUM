@@ -7,8 +7,6 @@ public class GameplayPauseModule : BasePauseModule
     private const int k_BACKGROUNDENABLEINDEX = 2;
     private const int k_BACKGROUNDBLURINDEX = 3;
     private const int k_BACKGROUNDDARKENINDEX = 4;
-    private const int k_REBINDAKEYINDEX = 5;
-    private const int k_REBINDBKEYINDEX = 6;
 
     protected override void OnModuleAwake()
     {
@@ -68,24 +66,5 @@ public class GameplayPauseModule : BasePauseModule
         }, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
 
         pauseMenuGroups[k_BACKGROUNDDARKENINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount.ToString("F2"));
-
-
-        pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupAction_Button(() =>
-        {
-            pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText("Press any key...");
-            RebindHelper.StartRebindAction(GameManager.GameInstance.InputActions.Gameplay.SwitchAInput,
-                () => pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchAInput.GetBindingDisplayString()}"));
-        });
-
-        pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchAInput.GetBindingDisplayString()}");
-        pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupAction_Button(() =>
-        {
-            pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupDisplayText("Press any key...");
-            RebindHelper.StartRebindAction(GameManager.GameInstance.InputActions.Gameplay.SwitchBInput,
-                () => pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchBInput.GetBindingDisplayString()}"));
-        });
-
-        pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchBInput.GetBindingDisplayString()}");
-
     }
 }
