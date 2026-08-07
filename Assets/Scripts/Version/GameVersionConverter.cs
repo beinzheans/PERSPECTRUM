@@ -12,7 +12,8 @@ public static class GameVersionConverter
         new VersionConverter_1_0_0_to_1_0_1(),
         new VersionConverter_1_0_1_to_1_1_0(),
         new VersionConverter_1_1_0_to_1_2_0(),
-        new VersionConverter_1_2_0_to_1_2_1()
+        new VersionConverter_1_2_0_to_1_2_1(),
+        new VersionConverter_1_2_1_to_1_2_2()
     };
 
     /// <summary>

@@ -110,3 +110,10 @@ public class VersionConverter_1_2_0_to_1_2_1 : ValidVersionConverter
     public override string InVersion => "1.2.0";
     public override string OutVersion => "1.2.1";
 }
+
+public class VersionConverter_1_2_1_to_1_2_2 : ValidVersionConverter
+{
+    public override string InVersion => "1.2.1";
+
+    public override string OutVersion => "1.2.2";
+}
