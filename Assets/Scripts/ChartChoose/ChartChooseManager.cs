@@ -11,18 +11,17 @@ using UnityEngine.UI;
 public class ChartChooseManager : MonoBehaviour
 {
     public static ChartChooseManager ChartChooseInstance;
-    [SerializeField] private RectTransform ChartChooseContentRect;
-    [SerializeField] private ChartButtonBehavior chartButtonPrefab;
     [SerializeField] private Button importChartButton;
     [SerializeField] private Button returnMainMenuButton;
 
-    [SerializeField] private TMP_Text importedChartsText;
-
     public event Action<ChartGameplayRecordButtonBehavior> OnChartRecordButtonClicked;
-    public event Action<ChartButtonBehavior> OnChartButtonClicked;
-    public event Action OnChartDeleted;
-    public ChartButtonBehavior CurrentSelectedChartButton { get; private set; }
-    private List<ChartButtonBehavior> spawnedChartButtonBehaviors = new();
+    public event Action<ChartButtonBehaviorContents, int> OnChartButtonClicked;
+    public event Action<ChartButtonBehaviorContents> OnChartButtonNeededAdd;
+
+    public event Func<(ChartButtonBehaviorContents, int)> OnRequestCurrentSelectedChartButton;
+    public event Action<ChartButtonBehaviorContents> OnChartDeleted;
+
+    public int CurrentSelectChartContentID { get; private set; }
     private void Awake()
     {
         ChartChooseInstance = this;
@@ -33,12 +32,7 @@ public class ChartChooseManager : MonoBehaviour
         ChartChooseInstance = null;
     }
 
-    private void Start()
-    {
-        CurrentSelectedChartButton = null;
-        CreateChartButtons();
-    }
-    private void CreateChartButtons()
+    public void InitializeChartButtonsFromFile()
     {
         GamePersistenceManager.ReadEditorChartsInGameStorage(out string[] allPaths);
 
@@ -46,8 +40,6 @@ public class ChartChooseManager : MonoBehaviour
         {
             AddChartButton(allPaths[i]);
         }
-
-        importedChartsText.text = $"Imported Charts ({spawnedChartButtonBehaviors.Count})";
     }
 
     private void AddChartButton(string path)
@@ -56,6 +48,10 @@ public class ChartChooseManager : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(metadataJson))
         {
+            Debug.Log($"Removed chart due to null / empty JSON. Path:\n" +
+                      $"{path}");
+
+            File.Delete(path);
             return;
         }
 
@@ -64,15 +60,14 @@ public class ChartChooseManager : MonoBehaviour
         {
             Debug.Log($"Removed chart due to unsupported file. Path:\n" +
                       $"{path}");
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Ignored and deleted old chart. Check log.", 1d);
-            File.Delete(path); // the json is not valid to be our chart anymore, we are going to delete it from imported storage.
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Ignored and deleted invalid chart. Check log.", 1d);
+            File.Delete(path);
             return;
         }
 
-        ChartButtonBehavior behavior = Instantiate(chartButtonPrefab, ChartChooseContentRect, false);
-        behavior.AssignChartButtonValues(baseChartMetadata, path);
+        ChartButtonBehaviorContents contents = new ChartButtonBehaviorContents(baseChartMetadata, path);
 
-        spawnedChartButtonBehaviors.Add(behavior);
+        OnChartButtonNeededAdd?.Invoke(contents);
     }
 
     public void UI_ImportButtonClicked()
@@ -91,8 +86,6 @@ public class ChartChooseManager : MonoBehaviour
         }
 
         AddChartButton(internalChartPath);
-
-        importedChartsText.text = $"Imported Charts ({spawnedChartButtonBehaviors.Count})";
     }
 
     public void UI_ReturnMainMenuButton()
@@ -100,45 +93,68 @@ public class ChartChooseManager : MonoBehaviour
         SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
     }
 
-    public void DeleteChartWithPath(string path)
+    public void RequestRemoveChart()
     {
-
-        int deleteIndex = -1;
-        for (int i = 0; i < spawnedChartButtonBehaviors.Count; i++)
-        {
-            if (spawnedChartButtonBehaviors[i].AssociatedFullFilePath != path)
-            {
-                continue;
-            }
-
-            deleteIndex = i;
-        }
-
-        if (deleteIndex == -1)
+        var request = OnRequestCurrentSelectedChartButton?.Invoke();
+        if (request == null)
         {
             return;
         }
 
-        Destroy(spawnedChartButtonBehaviors[deleteIndex].gameObject);
-        spawnedChartButtonBehaviors.RemoveAt(deleteIndex);
+        ChartButtonBehaviorContents contentsToDelete = request.Value.Item1;
 
-        File.Delete(path);
-
-        importedChartsText.text = $"Imported Charts ({spawnedChartButtonBehaviors.Count})";
-        OnChartDeleted?.Invoke();
-    }
-
-    public void InvokeOnChartButtonClickedEvent(ChartButtonBehavior chartButton)
-    {
-        if (CurrentSelectedChartButton == chartButton)
+        if (contentsToDelete == null)
         {
             return;
         }
 
-        CurrentSelectedChartButton = chartButton;
-        OnChartButtonClicked?.Invoke(CurrentSelectedChartButton);
+        OnChartDeleted?.Invoke(contentsToDelete);
+        Debug.Log($"Deleted {contentsToDelete.AssociatedFullFilePath}");
+        File.Delete(contentsToDelete.AssociatedFullFilePath);
     }
 
+    public void RequestPlayChart()
+    {
+        var request = OnRequestCurrentSelectedChartButton?.Invoke();
+
+        if (request == null)
+        {
+            return;
+        }
+
+        ChartButtonBehaviorContents contents = request.Value.Item1;
+        
+        if (contents == null)
+        {
+            return;
+        }
+
+        GameManager.GameInstance.RequestPlayChartEvent(contents.AssociatedFullFilePath);
+    }
+
+    public void RequestReplayChart(GameplayStatisticRecord record)
+    {
+        var request = OnRequestCurrentSelectedChartButton?.Invoke();
+
+        if (request == null)
+        {
+            return;
+        }
+
+        ChartButtonBehaviorContents contents = request.Value.Item1;
+
+        if (contents == null)
+        {
+            return;
+        }
+
+        GameManager.GameInstance.RequestReplayChartEvent(contents.AssociatedFullFilePath, record);
+    }
+    public void InvokeOnChartButtonClickedEvent(ChartButtonBehaviorContents contents, int contentID)
+    {
+        CurrentSelectChartContentID = contentID;
+        OnChartButtonClicked?.Invoke(contents, contentID);
+    }
     public void InvokeOnChartRecordButtonClickedEvent(ChartGameplayRecordButtonBehavior recordButton)
     {
         OnChartRecordButtonClicked?.Invoke(recordButton);

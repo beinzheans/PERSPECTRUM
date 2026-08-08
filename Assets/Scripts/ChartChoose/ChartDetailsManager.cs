@@ -17,11 +17,17 @@ public class ChartDetailsManager : MonoBehaviour
     {
         HideSelectedUI();
         ChartChooseManager.ChartChooseInstance.OnChartButtonClicked += ChartChooseInstance_OnChartButtonClicked;
+        ChartChooseManager.ChartChooseInstance.OnChartDeleted += ChartChooseInstance_OnChartDeleted;
+    }
+
+    private void ChartChooseInstance_OnChartDeleted(ChartButtonBehaviorContents obj)
+    {
+        HideSelectedUI();
     }
 
     private readonly Vector2 k_DETAILSCALE = new Vector2(0.9f, 1.1f);
     private const double k_DETAILSCALETIME = 0.1d;
-    private void ChartChooseInstance_OnChartButtonClicked(ChartButtonBehavior obj)
+    private void ChartChooseInstance_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
         PlayChartButton.onClick.RemoveAllListeners();
         DeleteChartButton.onClick.RemoveAllListeners();
@@ -32,13 +38,8 @@ public class ChartDetailsManager : MonoBehaviour
         chartMapperText.SetText($"Charted by {obj.BaseChartMetadata.ChartMapper}", k_DETAILSCALE, k_DETAILSCALETIME);
         songCreditText.SetText($"{obj.BaseChartMetadata.SongName} by {obj.BaseChartMetadata.SongArtist}", k_DETAILSCALE, k_DETAILSCALETIME);
         chartDifficultyText.SetText($"Difficulty {obj.BaseChartMetadata.ChartDifficulty}", k_DETAILSCALE, k_DETAILSCALETIME);
-        PlayChartButton.onClick.AddListener(() => GameManager.GameInstance.RequestPlayChartEvent(obj.AssociatedFullFilePath));
-        DeleteChartButton.onClick.AddListener(() =>
-        {
-            ChartChooseManager.ChartChooseInstance.DeleteChartWithPath(obj.AssociatedFullFilePath);
-            HideSelectedUI();
-        });
-
+        PlayChartButton.onClick.AddListener(() => ChartChooseManager.ChartChooseInstance.RequestPlayChart());
+        DeleteChartButton.onClick.AddListener(() => ChartChooseManager.ChartChooseInstance.RequestRemoveChart());
     }
 
     private void OnDestroy()

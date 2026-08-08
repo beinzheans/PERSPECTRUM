@@ -22,12 +22,17 @@ public class ChartPlayHistoryManager : MonoBehaviour
         chartChooseManager.OnChartDeleted += ChartChooseManager_OnChartDeleted;
     }
 
-    private void ChartChooseManager_OnChartDeleted()
+    private void OnDestroy()
+    {
+        chartChooseManager.OnChartButtonClicked -= ChartChooseManager_OnChartButtonClicked;
+        chartChooseManager.OnChartDeleted -= ChartChooseManager_OnChartDeleted;
+    }
+    private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents contents)
     {
         ResetPlayHistoryUI();
     }
 
-    private void ChartChooseManager_OnChartButtonClicked(ChartButtonBehavior obj)
+    private void ChartChooseManager_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
         RemoveAllPlayHistoryButton();
 
