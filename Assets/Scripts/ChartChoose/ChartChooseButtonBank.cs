@@ -22,6 +22,8 @@ public class ChartChooseButtonBank : BaseListBank
         chartChooseManager.OnRequestCurrentSelectedChartButton += GetCurrentFocusedChartButton;
         chartChooseManager.OnChartDeleted += ChartChooseManager_OnChartDeleted;
 
+        importedChartsText.text = $"Imported Charts (0)"; // case where no charts present at start
+
         circularScrollingList.Initialize();
         chartChooseManager.InitializeChartButtonsFromFile();
     }
