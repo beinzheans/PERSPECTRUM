@@ -27,7 +27,7 @@ public class ChartDetailsManager : MonoBehaviour
 
     private readonly Vector2 k_DETAILSCALE = new Vector2(0.9f, 1.1f);
     private const double k_DETAILSCALETIME = 0.1d;
-    private void ChartChooseInstance_OnChartButtonClicked(ChartButtonBehaviorContents obj)
+    private void ChartChooseInstance_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
         PlayChartButton.onClick.RemoveAllListeners();
         DeleteChartButton.onClick.RemoveAllListeners();

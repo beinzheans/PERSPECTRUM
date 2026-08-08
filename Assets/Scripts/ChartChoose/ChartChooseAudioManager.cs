@@ -51,9 +51,9 @@ public class ChartChooseAudioManager : MonoBehaviour
     private const double k_MUSICPREVIEWTIME = 15d;
 
     private TimerIntervalAction playAction;
-    private async void ChartChooseManager_OnChartButtonClicked(ChartButtonBehaviorContents obj)
+    private async void ChartChooseManager_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
-        if (currentPlayingChartContents != null && currentPlayingChartContents == obj)
+        if (currentPlayingChartContents != null && currentPlayingChartContents.Equals(obj))
         {
             return;
         }

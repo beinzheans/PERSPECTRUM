@@ -11,19 +11,17 @@ using UnityEngine.UI;
 public class ChartChooseManager : MonoBehaviour
 {
     public static ChartChooseManager ChartChooseInstance;
-    [SerializeField] private ChartButtonBehavior chartButtonPrefab;
     [SerializeField] private Button importChartButton;
     [SerializeField] private Button returnMainMenuButton;
 
-    [SerializeField] private TMP_Text importedChartsText;
-
     public event Action<ChartGameplayRecordButtonBehavior> OnChartRecordButtonClicked;
-    public event Action<ChartButtonBehaviorContents> OnChartButtonClicked;
+    public event Action<ChartButtonBehaviorContents, int> OnChartButtonClicked;
     public event Action<ChartButtonBehaviorContents> OnChartButtonNeededAdd;
 
-    public event Func<ChartButtonBehaviorContents> OnRequestCurrentSelectedChartButton;
+    public event Func<(ChartButtonBehaviorContents, int)> OnRequestCurrentSelectedChartButton;
     public event Action<ChartButtonBehaviorContents> OnChartDeleted;
 
+    public int CurrentSelectChartContentID { get; private set; }
     private void Awake()
     {
         ChartChooseInstance = this;
@@ -97,7 +95,13 @@ public class ChartChooseManager : MonoBehaviour
 
     public void RequestRemoveChart()
     {
-        ChartButtonBehaviorContents contentsToDelete = OnRequestCurrentSelectedChartButton?.Invoke();
+        var request = OnRequestCurrentSelectedChartButton?.Invoke();
+        if (request == null)
+        {
+            return;
+        }
+
+        ChartButtonBehaviorContents contentsToDelete = request.Value.Item1;
 
         if (contentsToDelete == null)
         {
@@ -111,8 +115,15 @@ public class ChartChooseManager : MonoBehaviour
 
     public void RequestPlayChart()
     {
-        ChartButtonBehaviorContents contents = OnRequestCurrentSelectedChartButton?.Invoke();
+        var request = OnRequestCurrentSelectedChartButton?.Invoke();
 
+        if (request == null)
+        {
+            return;
+        }
+
+        ChartButtonBehaviorContents contents = request.Value.Item1;
+        
         if (contents == null)
         {
             return;
@@ -123,7 +134,14 @@ public class ChartChooseManager : MonoBehaviour
 
     public void RequestReplayChart(GameplayStatisticRecord record)
     {
-        ChartButtonBehaviorContents contents = OnRequestCurrentSelectedChartButton?.Invoke();
+        var request = OnRequestCurrentSelectedChartButton?.Invoke();
+
+        if (request == null)
+        {
+            return;
+        }
+
+        ChartButtonBehaviorContents contents = request.Value.Item1;
 
         if (contents == null)
         {
@@ -132,9 +150,10 @@ public class ChartChooseManager : MonoBehaviour
 
         GameManager.GameInstance.RequestReplayChartEvent(contents.AssociatedFullFilePath, record);
     }
-    public void InvokeOnChartButtonClickedEvent(ChartButtonBehaviorContents contents)
+    public void InvokeOnChartButtonClickedEvent(ChartButtonBehaviorContents contents, int contentID)
     {
-        OnChartButtonClicked?.Invoke(contents);
+        CurrentSelectChartContentID = contentID;
+        OnChartButtonClicked?.Invoke(contents, contentID);
     }
     public void InvokeOnChartRecordButtonClickedEvent(ChartGameplayRecordButtonBehavior recordButton)
     {

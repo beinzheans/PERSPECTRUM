@@ -2958,10 +2958,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b24fc2afe611874489a0ac4a20e5cf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chartButtonPrefab: {fileID: -4118336088988068102, guid: 6f617d97be64a074cbac138063e92d30, type: 3}
   importChartButton: {fileID: 589510048}
   returnMainMenuButton: {fileID: 569549743}
-  importedChartsText: {fileID: 961348937}
 --- !u!4 &1069841124
 Transform:
   m_ObjectHideFlags: 0
@@ -3956,6 +3954,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   circularScrollingList: {fileID: 1493196290}
+  behaviorContents: []
+  importedChartsText: {fileID: 961348937}
 --- !u!114 &1493196290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3986,7 +3986,7 @@ MonoBehaviour:
   _listSetting:
     _listType: 1
     _direction: 0
-    _controlMode: 3
+    _controlMode: -1
     _focusingPosition: 1
     _reverseContentOrder: 0
     _alignAtFocusingPosition: 1
@@ -4117,7 +4117,19 @@ MonoBehaviour:
           m_CallState: 2
     _onFocusingBoxChanged:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1493196289}
+          m_TargetAssemblyTypeName: ChartChooseButtonBank, ScriptReference
+          m_MethodName: UI_OnBoxMoved
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     _onMovementEnd:
       m_PersistentCalls:
         m_Calls: []

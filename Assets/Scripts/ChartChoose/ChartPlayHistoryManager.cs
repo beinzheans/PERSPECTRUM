@@ -32,7 +32,7 @@ public class ChartPlayHistoryManager : MonoBehaviour
         ResetPlayHistoryUI();
     }
 
-    private void ChartChooseManager_OnChartButtonClicked(ChartButtonBehaviorContents obj)
+    private void ChartChooseManager_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
         RemoveAllPlayHistoryButton();
 

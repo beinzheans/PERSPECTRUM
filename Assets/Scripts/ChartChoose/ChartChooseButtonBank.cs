@@ -2,12 +2,16 @@ using AirFishLab.ScrollingList;
 using AirFishLab.ScrollingList.ContentManagement;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ChartChooseButtonBank : BaseListBank
 {
     [SerializeField] private CircularScrollingList circularScrollingList;
     [SerializeField] private List<ChartButtonBehaviorContents> behaviorContents = new();
+
+    [SerializeField] private TMP_Text importedChartsText;
+
     private ChartChooseManager chartChooseManager;
 
     private void Start()
@@ -29,16 +33,16 @@ public class ChartChooseButtonBank : BaseListBank
         chartChooseManager.OnChartDeleted -= ChartChooseManager_OnChartDeleted;
     }
 
-    private ChartButtonBehaviorContents GetCurrentFocusedChartButton()
+    private (ChartButtonBehaviorContents, int) GetCurrentFocusedChartButton()
     {
         int focusedID = circularScrollingList.GetFocusingContentID();
 
         if (focusedID < 0 || focusedID >= behaviorContents.Count)
         {
-            return null;
+            return (null, -1);
         }
 
-        return behaviorContents[focusedID];
+        return (behaviorContents[focusedID], focusedID);
     }
 
     private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents obj)
@@ -49,14 +53,15 @@ public class ChartChooseButtonBank : BaseListBank
         }
 
         circularScrollingList.Refresh();
+        importedChartsText.text = $"Imported Charts ({GetContentCount()})";
 
-        ChartButtonBehaviorContents contents = GetCurrentFocusedChartButton();
+        (ChartButtonBehaviorContents contents, int id) = GetCurrentFocusedChartButton();
         if (contents == null)
         {
             return;
         }
 
-        chartChooseManager.InvokeOnChartButtonClickedEvent(contents);
+        chartChooseManager.InvokeOnChartButtonClickedEvent(contents, id);
     }
 
     private void ChartChooseManager_OnChartButtonNeededAdd(ChartButtonBehaviorContents obj)
@@ -64,13 +69,14 @@ public class ChartChooseButtonBank : BaseListBank
         behaviorContents.Add(obj);
         circularScrollingList.Refresh();
 
-        ChartButtonBehaviorContents contents = GetCurrentFocusedChartButton();
+        importedChartsText.text = $"Imported Charts ({GetContentCount()})";
+        (ChartButtonBehaviorContents contents, int id) = GetCurrentFocusedChartButton();
         if (contents == null)
         {
             return;
         }
 
-        chartChooseManager.InvokeOnChartButtonClickedEvent(contents);
+        chartChooseManager.InvokeOnChartButtonClickedEvent(contents, id);
     }
 
     public override int GetContentCount()
@@ -89,14 +95,12 @@ public class ChartChooseButtonBank : BaseListBank
         {
             return;
         }
-
-        chartChooseManager.InvokeOnChartButtonClickedEvent(behavior.Contents);
+        
+        chartChooseManager.InvokeOnChartButtonClickedEvent(behavior.Contents, box.ContentID);
     }
-
-    
-    
 }
 
+[Serializable]
 public class ChartButtonBehaviorContents : IListContent, IEquatable<ChartButtonBehaviorContents>
 {
     public ChartButtonBehaviorContents(BaseChartMetadata baseChartMetadata, string associatedFullFilePath)
