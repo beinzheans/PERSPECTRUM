@@ -25,7 +25,7 @@ public class ChartGameplayRecordButtonBehavior : MonoBehaviour
         GameplayResultRank rank = MathHelper.ConvertOverallScoreToRank(record.FinalScore);
         rankText.text = MathHelper.ConvertRankToString(rank);
 
-        watchReplayButton.onClick.AddListener(() => GameManager.GameInstance.RequestReplayChartEvent(ChartChooseManager.ChartChooseInstance.CurrentSelectedChartButton.AssociatedFullFilePath, AssociatedRecord));
+        watchReplayButton.onClick.AddListener(() => ChartChooseManager.ChartChooseInstance.RequestReplayChart(record));
     }
 
     public void OnDestroy()

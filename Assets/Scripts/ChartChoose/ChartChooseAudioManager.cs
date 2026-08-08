@@ -5,11 +5,11 @@ public class ChartChooseAudioManager : MonoBehaviour
 {
     [SerializeField] private AudioSource music_AudioSource;
     private ChartChooseManager chartChooseManager;
-
+    private ChartButtonBehaviorContents currentPlayingChartContents;
     private void Start()
     {
         chartChooseManager = ChartChooseManager.ChartChooseInstance;
-
+        currentPlayingChartContents = null;
         chartChooseManager.OnChartButtonClicked += ChartChooseManager_OnChartButtonClicked;
         GameManager.GameInstance.OnPauseMenuEnable += GameInstance_OnPauseMenuEnable;
         GameManager.GameInstance.OnPauseMenuDisable += GameInstance_OnPauseMenuDisable;
@@ -32,7 +32,7 @@ public class ChartChooseAudioManager : MonoBehaviour
         music_AudioSource.Pause();
     }
 
-    private void ChartChooseManager_OnChartDeleted()
+    private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents contents)
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
         AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME, () => music_AudioSource.Stop());
@@ -51,8 +51,14 @@ public class ChartChooseAudioManager : MonoBehaviour
     private const double k_MUSICPREVIEWTIME = 15d;
 
     private TimerIntervalAction playAction;
-    private async void ChartChooseManager_OnChartButtonClicked(ChartButtonBehavior obj)
+    private async void ChartChooseManager_OnChartButtonClicked(ChartButtonBehaviorContents obj)
     {
+        if (currentPlayingChartContents != null && currentPlayingChartContents == obj)
+        {
+            return;
+        }
+
+        currentPlayingChartContents = obj;
         GamePersistenceManager.LoadChartFile(obj.AssociatedFullFilePath, out _, out string metadataJson, out byte[] audioBytes, out _); // here we could add a preview for the BG!
 
         (bool result, AudioClip clip) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes, true);
