@@ -18,7 +18,7 @@ public class ChartChooseButtonBank : BaseListBank
     private ChartChooseManager chartChooseManager;
 
     private ChartButtonSortOptions sortOptions = ChartButtonSortOptions.ALPHABETICAL;
-    private bool shouldReverse = false;
+    private ChartSortOrder sortOrder = ChartSortOrder.ASCENDING;
     private void Start()
     {
         chartChooseManager = ChartChooseManager.ChartChooseInstance;
@@ -27,13 +27,31 @@ public class ChartChooseButtonBank : BaseListBank
         chartChooseManager.OnRequestCurrentSelectedChartButton += GetCurrentFocusedChartButton;
         chartChooseManager.OnChartDeleted += ChartChooseManager_OnChartDeleted;
         chartChooseManager.OnSortOptionSelected += ChartChooseManager_OnSortOptionSelected;
+        chartChooseManager.OnSortOrderChanged += ChartChooseManager_OnSortOrderChanged;
         importedChartsText.text = $"Imported Charts (0)"; // case where no charts present at start
 
         circularScrollingList.Initialize();
         chartChooseManager.InitializeChartButtonsFromFile();
     }
 
-    private void ChartChooseManager_OnSortOptionSelected(ChartButtonSortOptions obj)
+    private void ChartChooseManager_OnSortOrderChanged(ChartButtonBehaviorContents selectedContents, ChartSortOrder obj)
+    {
+        if (sortOrder == obj)
+        {
+            return;
+        }
+
+        sortOrder = obj;
+
+        int searchIndex = behaviorContents.FindIndex(x => x.Equals(selectedContents));
+        SortChartButtons();
+        circularScrollingList.Refresh();
+        circularScrollingList.SelectContentID(0);
+
+        chartChooseManager.InvokeOnChartButtonClickedEvent((ChartButtonBehaviorContents)GetListContent(0), 0);
+    }
+
+    private void ChartChooseManager_OnSortOptionSelected(ChartButtonBehaviorContents selectedContents, ChartButtonSortOptions obj)
     {
         if (sortOptions == obj)
         {
@@ -43,14 +61,9 @@ public class ChartChooseButtonBank : BaseListBank
         sortOptions = obj;
         SortChartButtons();
         circularScrollingList.Refresh();
+        circularScrollingList.SelectContentID(0);
 
-        (ChartButtonBehaviorContents contents, int id) = GetCurrentFocusedChartButton();
-        if (contents == null)
-        {
-            return;
-        }
-
-        chartChooseManager.InvokeOnChartButtonClickedEvent(contents, id);
+        chartChooseManager.InvokeOnChartButtonClickedEvent((ChartButtonBehaviorContents)GetListContent(0), 0);
     }
 
     private void OnDestroy()
@@ -71,6 +84,8 @@ public class ChartChooseButtonBank : BaseListBank
 
         return (behaviorContents[focusedID], focusedID);
     }
+
+
 
     private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents obj)
     {
@@ -162,7 +177,7 @@ public class ChartChooseButtonBank : BaseListBank
                 break;
         }
 
-        if (shouldReverse)
+        if (sortOrder == ChartSortOrder.DESCENDING)
         {
             behaviorContents.Reverse();
         }

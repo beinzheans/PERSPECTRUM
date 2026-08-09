@@ -33,6 +33,6 @@ public enum ChartButtonSortOptions
     ALPHABETICAL = 0,
     DIFFICULTY = 1,
     DATE_IMPORTED = 2,
-    SCORE_BEST = 3
+    SCORE_BEST = 3,
 }
 
