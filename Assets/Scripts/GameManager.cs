@@ -67,7 +67,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public const float k_AUDIOSTEREOPANNINGSCALING = 1f;
     /// <summary>
-    /// Defines a mapping f: Base Metadata -> set of records. This is used for determining the relation between charts and the gameplay records.
+    /// Defines a mapping f: Base Metadata -> set of records. This is used for determining the relation between charts and the gameplay records. <br></br>
+    /// Note the associated set of records is given in descending order.
     /// </summary>
     public Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> ChartMetadataGUIDToGameplayRecordMapping { get; private set; }
 

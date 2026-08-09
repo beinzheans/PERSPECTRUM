@@ -31,8 +31,8 @@ public abstract class EditorUIBehavior : MonoBehaviour
     /// <summary>
     /// Custom implementation of events when a tool button is clicked, defined by an index.
     /// </summary>
-    /// <param name="index"></param>
-    protected abstract void UI_OnButtonPress(int index);
+    /// <param name="enumIndex"></param>
+    protected abstract void UI_OnButtonPress(int enumIndex);
 
     /// <summary>
     /// Assigns the state of the button corresponding to the provided enumIndex

@@ -21,6 +21,7 @@ public class ChartChooseManager : MonoBehaviour
     public event Func<(ChartButtonBehaviorContents, int)> OnRequestCurrentSelectedChartButton;
     public event Action<ChartButtonBehaviorContents> OnChartDeleted;
 
+    public event Action<ChartButtonSortOptions> OnSortOptionSelected;
     public int CurrentSelectChartContentID { get; private set; }
     private void Awake()
     {
@@ -158,5 +159,10 @@ public class ChartChooseManager : MonoBehaviour
     public void InvokeOnChartRecordButtonClickedEvent(ChartGameplayRecordButtonBehavior recordButton)
     {
         OnChartRecordButtonClicked?.Invoke(recordButton);
+    }
+
+    public void InvokeOnChartSortingOptionSelectedEvent(ChartButtonSortOptions sortingOption)
+    {
+        OnSortOptionSelected?.Invoke(sortingOption);
     }
 }

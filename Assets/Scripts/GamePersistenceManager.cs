@@ -439,6 +439,7 @@ public static class GamePersistenceManager
 
     /// <summary>
     /// Creates a mapping f: Base Metadata -> set of records. This should be done at the beginning of the game load. <br></br>
+    /// Note that this will by default create the mapping in descending order of scores.
     /// </summary>
     /// <param name="mapping"></param>
     public static void CreateMetadataToRecordsMapping(out Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping)
