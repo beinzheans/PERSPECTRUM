@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Networking;
 /// <summary>
 /// A class to handle all audio logic in the game. <br></br>
@@ -13,8 +14,12 @@ public class AudioEngine : MonoBehaviour
     public static AudioEngine AudioInstance;
 
     [SerializeField] private int MAXNUMBEROFSOURCES = 99;
-
     [SerializeField] private AudioSource audioSourcePrefab;
+
+    private const int k_NUMBEROFSAMPLES = 2048;
+    public float[] AmplitudeOfSample { get; private set; } = new float[k_NUMBEROFSAMPLES];
+
+    private float sampleFrequencyWidth;
 
     private AudioSource[] audioSourcePool;
     private int poolIndex = 0;
@@ -40,13 +45,37 @@ public class AudioEngine : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        sampleFrequencyWidth = AudioSettings.outputSampleRate / (2f * k_NUMBEROFSAMPLES);
+    }
+
+
+
+    private void Update()
+    {
+        AudioListener.GetSpectrumData(AmplitudeOfSample, 0, FFTWindow.BlackmanHarris);
+    }
+
+    /// <summary>
+    /// Gets the start and end indices given a frequency band defined by <paramref name="lowFrequency"/> and <paramref name="highFrequency"/>. <br></br>
+    /// Since <see cref="AudioListener.GetSpectrumData(float[], int, FFTWindow)"/> samples at discrete frequencies, the error is half of <see cref="sampleFrequencyWidth"/>.
+    /// </summary>
+    /// <param name="lowFrequency"></param>
+    /// <param name="highFrequency"></param>
+    public void QuerySampledAudioBetweenFrequency(float lowFrequency, float highFrequency, out int startIndex, out int endIndex)
+    {
+        startIndex = Mathf.Max(Mathf.FloorToInt(lowFrequency / sampleFrequencyWidth), 0);
+        endIndex = Mathf.Min(Mathf.CeilToInt(highFrequency / sampleFrequencyWidth), k_NUMBEROFSAMPLES - 1);
+    }
+
     /// <summary>
     /// Plays an specified audio clip using a pre-generated audio source with an optional offset. <br></br>
     /// This is useful for one-shot audio.
     /// </summary>
     /// <param name="clip"></param>
     /// <param name="playOffsetTime"></param>
-    public void PlayAudioClip(AudioClip clip, double playOffsetTime, float volume, double playbackSpeed, float panning)
+    public void PlayAudioClip(AudioClip clip, double playOffsetTime, float volume, double playbackSpeed, float panning, bool useLogScale = true)
     {
         if (playOffsetTime < 0d)
         {
@@ -54,10 +83,11 @@ public class AudioEngine : MonoBehaviour
         }
 
         poolIndex = (poolIndex + 1) % MAXNUMBEROFSOURCES; // cycle through the pool index
+
         AudioSource source = audioSourcePool[poolIndex];
         source.pitch = (float)playbackSpeed;
         source.clip = clip;
-        source.volume = volume;
+        source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         source.panStereo = panning;
         audioSourcePool[poolIndex].PlayScheduled(DSPTimerEngine.TimerInstance.CurrentDSPTime + playOffsetTime);
     }
@@ -69,7 +99,7 @@ public class AudioEngine : MonoBehaviour
     /// <param name="source"></param>
     /// <param name="playOffsetTime"></param>
     /// <param name="playStartTime">The time at which the audio source starts playing.</param>
-    public void PlayAudioSource(AudioSource source, double playOffsetTime, float volume, double playStartTime, double playbackSpeed, float panning)
+    public void PlayAudioSource(AudioSource source, double playOffsetTime, float volume, double playStartTime, double playbackSpeed, float panning, bool useLogScale = true)
     {
         if (playOffsetTime < 0d)
         {
@@ -91,41 +121,43 @@ public class AudioEngine : MonoBehaviour
 
         source.timeSamples = seekSamples;
         source.pitch = (float)playbackSpeed;
-        source.volume = volume;
+        source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         source.panStereo = panning;
         source.PlayScheduled(AudioSettings.dspTime + playOffsetTime);
     }
 
     private TimerStopwatchAction fadeInStopwatch;
-    public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime, Action callback)
+    public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime, Action callback, bool useLogScale = true)
     {
         fadeInTime = math.max(0.01d, fadeInTime);
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeInStopwatch);
         fadeInStopwatch = new TimerStopwatchAction(source, x =>
         {
-            source.volume = math.lerp(0f, maxVolume, (float)(x / fadeInTime));
+            float volume = math.lerp(0f, maxVolume, (float)(x / fadeInTime));
+            source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         }, () => callback?.Invoke(), 0d, fadeInTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInStopwatch);
     }
 
     private TimerStopwatchAction fadeOutStopwatch;
 
-    public void FadeOutAudioSource(AudioSource source, double fadeOutTime, Action callback)
+    public void FadeOutAudioSource(AudioSource source, double fadeOutTime, Action callback, bool useLogScale = true)
     {
         fadeOutTime = math.max(0.01d, fadeOutTime);
         float startingVolume = source.volume;
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
         fadeOutStopwatch = new TimerStopwatchAction(source, x =>
         {
-            source.volume = math.lerp(startingVolume, 0f, (float)(x / fadeOutTime));
+            float volume = math.lerp(startingVolume, 0f, (float)(x / fadeOutTime));
+            source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         }, () => callback?.Invoke(), 0d, fadeOutTime, false);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutStopwatch);
     }
 
-    public void EditAudioSource(AudioSource source, float volume)
+    public void EditAudioSource(AudioSource source, float volume, bool useLogScale = true)
     {
-        source.volume = volume;
+        source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
     }
 
 
@@ -180,7 +212,16 @@ public class AudioEngine : MonoBehaviour
         AudioClip loadedClip = DownloadHandlerAudioClip.GetContent(webRequest);
         webRequest.Dispose();
         return (true, loadedClip);
+    }
 
-
+    /// <summary>
+    /// Converts a linear volume in [0, 1] into a scale that uses dB (log scale). <br></br>
+    /// For optimization to reduce the number of <see cref="Mathf.Pow(float, float)"/> calls, we use a cubic curve instead.
+    /// </summary>
+    /// <param name="linearVolume"></param>
+    /// <returns></returns>
+    private float RemapLinearVolumeToScale(float linearVolume)
+    {
+        return linearVolume * linearVolume * linearVolume;
     }
 }

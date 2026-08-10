@@ -90,7 +90,7 @@ public class GameplayAudioController : MonoBehaviour
 
     private void GameInstance_OnGameSettingsChanged()
     {
-        musicAudioSource.volume = GameManager.GameInstance.GlobalSettings.SongVolume;
+        AudioEngine.AudioInstance.EditAudioSource(musicAudioSource, GameManager.GameInstance.GlobalSettings.SongVolume);
     }
 
     private void OnDestroy()

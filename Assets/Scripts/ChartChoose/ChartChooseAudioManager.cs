@@ -19,7 +19,7 @@ public class ChartChooseAudioManager : MonoBehaviour
 
     private void GameInstance_OnGameSettingsChanged()
     {
-        music_AudioSource.volume = GameManager.GameInstance.GlobalSettings.SongVolume;
+        AudioEngine.AudioInstance.EditAudioSource(music_AudioSource, GameManager.GameInstance.GlobalSettings.SongVolume);
     }
 
     private void GameInstance_OnPauseMenuDisable()
