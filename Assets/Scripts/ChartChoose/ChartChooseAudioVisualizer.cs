@@ -16,5 +16,5 @@ public class ChartChooseAudioVisualizer : BaseDynamicSpectrumObject
         visualizerRectTransform.localScale = enlargedScale;
     }
 
-    private readonly Vector3 maxEnlargedScale = new Vector3(1.15f, 1.15f, 1f);
+    private readonly Vector3 maxEnlargedScale = new Vector3(1.05f, 1.05f, 1f);
 }
