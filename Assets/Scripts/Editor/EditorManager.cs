@@ -878,6 +878,8 @@ public class EditorChartMetadata : IEquatable<EditorChartMetadata>
     [DefaultValue(0d)]
     [JsonProperty(GameManager.k_CHARTSTARTPREVIEWTIMEKEY)]
     public double PreviewStartTime { get; private set; }
+
+    public double PreviewBPM { get; private set; }
     public EditorChartMetadata(BaseChartMetadata baseChartMetadata, double previewStartTime)
     {
         BaseMetadata = baseChartMetadata;

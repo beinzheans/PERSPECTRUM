@@ -135,12 +135,12 @@ public class DSPTimerEngine : MonoBehaviour
 
         audioActionsToRemove.Enqueue(action);
     }
+    private HashSet<TimerAction> alreadyPausedTimers = new();
 
     /// <summary>
     /// Pauses all DSP timers globally.
     /// </summary>
 
-    private HashSet<TimerAction> alreadyPausedTimers = new();
     public void PauseDSPTimer()
     {
         alreadyPausedTimers = new();
