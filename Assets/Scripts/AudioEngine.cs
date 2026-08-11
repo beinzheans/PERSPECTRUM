@@ -133,7 +133,8 @@ public class AudioEngine : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeInStopwatch);
         fadeInStopwatch = new TimerStopwatchAction(source, x =>
         {
-            float volume = math.lerp(0f, maxVolume, (float)(x / fadeInTime));
+            double progress = x / fadeInTime;
+            float volume = math.lerp(0f, maxVolume, Mathf.Pow((float)progress, 1f / 3f));
             source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         }, () => callback?.Invoke(), 0d, fadeInTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInStopwatch);
@@ -148,7 +149,8 @@ public class AudioEngine : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
         fadeOutStopwatch = new TimerStopwatchAction(source, x =>
         {
-            float volume = math.lerp(startingVolume, 0f, (float)(x / fadeOutTime));
+            double progress = x / fadeOutTime;
+            float volume = math.lerp(startingVolume, 0f, Mathf.Pow((float)progress, 1f / 3f));
             source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         }, () => callback?.Invoke(), 0d, fadeOutTime, false);
 

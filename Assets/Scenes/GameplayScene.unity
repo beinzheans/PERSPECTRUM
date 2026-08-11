@@ -9818,7 +9818,6 @@ MonoBehaviour:
   gameplay_accuracySlider: {fileID: 1014772530}
   gameplay_progress: {fileID: 698185168}
   gameplay_progressSlider: {fileID: 745544989}
-  gameplay_accuracySlider_elasticUI: {fileID: 1014772531}
   gameplay_matchIcon: {fileID: 743915302}
   gameplay_mismatchIcon: {fileID: 1429289287}
   gameplay_missIcon: {fileID: 1752677216}
