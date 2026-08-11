@@ -134,7 +134,7 @@ public class AudioEngine : MonoBehaviour
         fadeInStopwatch = new TimerStopwatchAction(source, x =>
         {
             double progress = x / fadeInTime;
-            float volume = math.lerp(0f, maxVolume, Mathf.Pow((float)progress, 1f / 3f));
+            float volume = math.lerp(0f, maxVolume, MathF.Cbrt((float)progress));
             source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         }, () => callback?.Invoke(), 0d, fadeInTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInStopwatch);
@@ -145,12 +145,12 @@ public class AudioEngine : MonoBehaviour
     public void FadeOutAudioSource(AudioSource source, double fadeOutTime, Action callback, bool useLogScale = true)
     {
         fadeOutTime = math.max(0.01d, fadeOutTime);
-        float startingVolume = source.volume;
+        float startingVolume = RemapScaledVolumeToLinearVolume(source.volume);
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
         fadeOutStopwatch = new TimerStopwatchAction(source, x =>
         {
             double progress = x / fadeOutTime;
-            float volume = math.lerp(startingVolume, 0f, Mathf.Pow((float)progress, 1f / 3f));
+            float volume = math.lerp(startingVolume, 0f, MathF.Cbrt((float)progress));
             source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
         }, () => callback?.Invoke(), 0d, fadeOutTime, false);
 
@@ -225,5 +225,10 @@ public class AudioEngine : MonoBehaviour
     private float RemapLinearVolumeToScale(float linearVolume)
     {
         return linearVolume * linearVolume * linearVolume;
+    }
+
+    private float RemapScaledVolumeToLinearVolume(float scaledVolume)
+    {
+        return MathF.Cbrt(scaledVolume);
     }
 }
