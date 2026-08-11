@@ -330,7 +330,8 @@ namespace AirFishLab.ScrollingList
                 throw new InvalidOperationException(
                     $"The 'BoxDensity' shouldn't be 0 in the list '{name}'");
 
-            switch (_focusingPosition) {
+            switch (_focusingPosition)
+            {
                 case CircularScrollingList.FocusingPosition.Top:
                     _reverseContentOrder = false;
                     break;

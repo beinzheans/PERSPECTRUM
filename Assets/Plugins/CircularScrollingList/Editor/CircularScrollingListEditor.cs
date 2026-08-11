@@ -74,7 +74,8 @@ namespace AirFishLab.ScrollingList.Editor
 
             var listBoxesProperty = serializedObject.FindProperty("_listBoxes");
             var toShowBoxes = listBoxesProperty.isExpanded;
-            if (GUILayout.Button(toShowBoxes ? hideBoxesText : showBoxesText)) {
+            if (GUILayout.Button(toShowBoxes ? hideBoxesText : showBoxesText))
+            {
                 toShowBoxes = !toShowBoxes;
                 listBoxesProperty.isExpanded = toShowBoxes;
             }
@@ -132,13 +133,15 @@ namespace AirFishLab.ScrollingList.Editor
             ++EditorGUI.indentLevel;
             if (HasFlag(
                     _controlMode.intValue,
-                    (int)CircularScrollingList.ControlMode.Pointer)) {
+                    (int)CircularScrollingList.ControlMode.Pointer))
+            {
                 DrawListSettingProperty("_alignAtFocusingPosition");
             }
 
             if (HasFlag(
                     _controlMode.intValue,
-                    (int)CircularScrollingList.ControlMode.MouseWheel)) {
+                    (int)CircularScrollingList.ControlMode.MouseWheel))
+            {
                 DrawListSettingProperty("_reverseScrollingDirection");
             }
             --EditorGUI.indentLevel;
@@ -172,7 +175,8 @@ namespace AirFishLab.ScrollingList.Editor
         private void DrawEvents()
         {
             var boldFoldout =
-                new GUIStyle(EditorStyles.foldout) {
+                new GUIStyle(EditorStyles.foldout)
+                {
                     fontStyle = FontStyle.Bold
                 };
 

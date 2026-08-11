@@ -60,7 +60,8 @@ namespace AirFishLab.ScrollingList
             var deltaTime = curTime - _lastInputTime;
             _lastInputTime = curTime;
 
-            return new InputInfo {
+            return new InputInfo
+            {
                 Phase = phase,
                 DeltaLocalPos = deltaPos,
                 DeltaLocalPosNormalized = deltaPosNormalized,
@@ -87,7 +88,8 @@ namespace AirFishLab.ScrollingList
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 _rectTransform, screenInputPos, _canvasRefCamera, out var localPos);
 
-            if (phase == InputPhase.Began) {
+            if (phase == InputPhase.Began)
+            {
                 _lastLocalInputPos = localPos;
                 return Vector2.zero;
             }

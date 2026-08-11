@@ -1,5 +1,5 @@
-﻿using System;
-using AirFishLab.ScrollingList.ContentManagement;
+﻿using AirFishLab.ScrollingList.ContentManagement;
+using System;
 using UnityEngine;
 
 namespace AirFishLab.ScrollingList.Demo

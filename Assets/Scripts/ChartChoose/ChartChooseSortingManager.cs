@@ -1,6 +1,3 @@
-using System;
-using UnityEngine;
-
 public class ChartChooseSortingManager : EditorUIBehavior
 {
     protected override void InitializeButtons()
@@ -19,7 +16,7 @@ public class ChartChooseSortingManager : EditorUIBehavior
         {
             SetButtonState(enumIndices[i], enumIndex == enumIndices[i]);
         }
-        
+
         ChartChooseManager.ChartChooseInstance.InvokeOnChartSortingOptionSelectedEvent((ChartButtonSortOptions)enumIndex);
     }
 }

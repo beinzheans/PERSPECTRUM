@@ -116,15 +116,20 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
         {
             _isDragging = isDragging;
 
-            if (isDragging) {
+            if (isDragging)
+            {
                 _draggingDistance = value;
 
                 // End the last movement when start dragging
                 _aligningMovementCurve.EndMovement();
                 _releasingMovementCurve.EndMovement();
-            } else if (_getFocusingStateFunc() != ListFocusingState.Middle) {
+            }
+            else if (_getFocusingStateFunc() != ListFocusingState.Middle)
+            {
                 _aligningMovementCurve.SetMovement(-_getFocusingPositionOffset());
-            } else {
+            }
+            else
+            {
                 _releasingMovementCurve.SetMovement(value);
             }
         }
@@ -149,7 +154,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             var state = _getFocusingStateFunc();
 
             // ===== Dragging ===== //
-            if (_isDragging) {
+            if (_isDragging)
+            {
                 if (Mathf.Approximately(_draggingDistance, 0f))
                     return 0f;
 
@@ -165,11 +171,13 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
                 distance = limit - curDistance;
             }
             // ===== Aligning ===== //
-            else if (!_aligningMovementCurve.IsMovementEnded()) {
+            else if (!_aligningMovementCurve.IsMovementEnded())
+            {
                 distance = _aligningMovementCurve.GetDistance(deltaTime);
             }
             // ===== Releasing ===== //
-            else if (!_releasingMovementCurve.IsMovementEnded()) {
+            else if (!_releasingMovementCurve.IsMovementEnded())
+            {
                 distance =
                     LimitMovingDistance(_releasingMovementCurve.GetDistance(deltaTime));
 

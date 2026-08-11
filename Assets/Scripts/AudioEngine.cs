@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.Networking;
 /// <summary>
 /// A class to handle all audio logic in the game. <br></br>

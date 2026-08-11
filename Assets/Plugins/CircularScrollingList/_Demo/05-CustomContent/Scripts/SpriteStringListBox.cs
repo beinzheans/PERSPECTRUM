@@ -13,7 +13,7 @@ namespace AirFishLab.ScrollingList.Demo
 
         protected override void UpdateDisplayContent(IListContent content)
         {
-            var data = (SpriteStringData) content;
+            var data = (SpriteStringData)content;
             _image.sprite = data.sprite;
             _title.text = data.title;
         }

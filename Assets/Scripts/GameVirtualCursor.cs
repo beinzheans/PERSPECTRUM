@@ -109,7 +109,7 @@ public class GameVirtualCursor : MonoBehaviour
             delta = new Vector2(GameManager.GameInstance.GlobalSettings.MouseInvert_XAxis ? -delta.x : delta.x, GameManager.GameInstance.GlobalSettings.MouseInvert_YAxis ? -delta.y : delta.y);
 
             float sensitivity = GameManager.GameInstance.GlobalSettings.MouseSensitivityScaleFactor * k_DEFAULTMOUSESENSITIVITY; // even though the execution order is earlier, everything is already instantiatied in GameManager.
-            
+
             MouseDisplacement = delta * sensitivity;
 
             VirtualMousePosition += MouseDisplacement;

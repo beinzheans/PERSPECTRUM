@@ -1,5 +1,3 @@
-using Unity.Mathematics;
-
 public class GlobalPauseModule : BasePauseModule
 {
     private const int k_OFFSETGROUPINDEX = 0;

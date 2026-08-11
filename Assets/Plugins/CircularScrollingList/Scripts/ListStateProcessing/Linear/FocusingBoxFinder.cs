@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using AirFishLab.ScrollingList.ContentManagement;
+﻿using AirFishLab.ScrollingList.ContentManagement;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
@@ -114,7 +114,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             var distanceOffset = Mathf.Infinity;
             IListBox candidateBox = null;
 
-            foreach (var box in _boxes) {
+            foreach (var box in _boxes)
+            {
                 var idState =
                     ListContentProvider.GetIDState(box.ContentID, contentCount);
                 if (idState == ContentIDState.Overflow
@@ -129,13 +130,15 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
                 candidateBox = box;
             }
 
-            var focusingBox = new FocusingBox {
+            var focusingBox = new FocusingBox
+            {
                 Box = candidateBox,
                 DistanceOffset = distanceOffset
             };
             var focusingState = FindFocusingStateForMiddle(focusingBox, contentCount);
 
-            return new MiddleResult {
+            return new MiddleResult
+            {
                 ListFocusingState = focusingState,
                 MiddleFocusing = focusingBox
             };
@@ -164,7 +167,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             var bottomDistanceOffset = Mathf.Infinity;
             IListBox bottomCandidateBox = null;
 
-            foreach (var box in _boxes) {
+            foreach (var box in _boxes)
+            {
                 var idState =
                     ListContentProvider.GetIDState(box.ContentID, contentCount);
                 if (idState == ContentIDState.Overflow
@@ -175,22 +179,26 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
                 var boxTopDistanceOffset = positionFactor - _topBaseline;
                 var boxBottomDistanceOffset = positionFactor - _bottomBaseline;
 
-                if (Mathf.Abs(boxTopDistanceOffset) < Mathf.Abs(topDistanceOffset)) {
+                if (Mathf.Abs(boxTopDistanceOffset) < Mathf.Abs(topDistanceOffset))
+                {
                     topDistanceOffset = boxTopDistanceOffset;
                     topCandidateBox = box;
                 }
 
-                if (Mathf.Abs(boxBottomDistanceOffset) < Mathf.Abs(bottomDistanceOffset)) {
+                if (Mathf.Abs(boxBottomDistanceOffset) < Mathf.Abs(bottomDistanceOffset))
+                {
                     bottomDistanceOffset = boxBottomDistanceOffset;
                     bottomCandidateBox = box;
                 }
             }
 
-            var topFocusingBox = new FocusingBox {
+            var topFocusingBox = new FocusingBox
+            {
                 Box = topCandidateBox,
                 DistanceOffset = topDistanceOffset
             };
-            var bottomFocusingBox = new FocusingBox {
+            var bottomFocusingBox = new FocusingBox
+            {
                 Box = bottomCandidateBox,
                 DistanceOffset = bottomDistanceOffset
             };
@@ -198,7 +206,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
                 FindFocusingStateForBothEnds(
                     topFocusingBox, bottomFocusingBox, contentCount);
 
-            return new BothEndsResult {
+            return new BothEndsResult
+            {
                 ListFocusingState = focusingState,
                 TopFocusing = topFocusingBox,
                 BottomFocusing = bottomFocusingBox

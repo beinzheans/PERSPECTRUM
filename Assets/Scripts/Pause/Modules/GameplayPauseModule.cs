@@ -1,5 +1,3 @@
-using UnityEngine.InputSystem;
-
 public class GameplayPauseModule : BasePauseModule
 {
     private const int k_GAMESCROLLSPEEDGROUPINDEX = 0;

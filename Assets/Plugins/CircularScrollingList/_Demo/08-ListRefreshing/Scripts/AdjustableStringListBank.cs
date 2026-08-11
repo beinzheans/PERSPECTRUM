@@ -1,5 +1,5 @@
-﻿using System;
-using AirFishLab.ScrollingList.ContentManagement;
+﻿using AirFishLab.ScrollingList.ContentManagement;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +10,7 @@ namespace AirFishLab.ScrollingList.Demo
         [SerializeField]
         private InputField _contentInputField;
         [SerializeField]
-        private string[] _contents = {"a", "b", "c", "d", "e"};
+        private string[] _contents = { "a", "b", "c", "d", "e" };
         [SerializeField]
         private CircularScrollingList _circularList;
         [SerializeField]
@@ -25,7 +25,7 @@ namespace AirFishLab.ScrollingList.Demo
         {
             _contents =
                 _contentInputField.text.Split(
-                    new[] {',', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                    new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             _circularList.Refresh();
             _linearList.Refresh();
         }

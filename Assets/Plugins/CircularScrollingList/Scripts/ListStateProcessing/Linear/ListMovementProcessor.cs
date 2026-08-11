@@ -1,5 +1,5 @@
-﻿using System;
-using AirFishLab.ScrollingList.Util;
+﻿using AirFishLab.ScrollingList.Util;
+using System;
 using UnityEngine;
 
 namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
@@ -53,7 +53,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
 
         public void SetMovement(InputInfo inputInfo)
         {
-            switch (inputInfo.Phase) {
+            switch (inputInfo.Phase)
+            {
                 case InputPhase.Began:
                     if (!_freeMovementCtrl.IsMovementEnded())
                         _freeMovementCtrl.EndMovement();

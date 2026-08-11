@@ -1,5 +1,5 @@
-﻿using System;
-using AirFishLab.ScrollingList.Util;
+﻿using AirFishLab.ScrollingList.Util;
+using System;
 using UnityEngine;
 
 namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
@@ -119,10 +119,13 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
         /// <param name="setting">The setting of the list</param>
         private void InitializeFactorGetter(ListSetting setting)
         {
-            if (setting.Direction == CircularScrollingList.Direction.Vertical) {
+            if (setting.Direction == CircularScrollingList.Direction.Vertical)
+            {
                 _getMajorFactorFunc = FactorUtility.GetVector2Y;
                 _getLocalPositionFunc = GetPositionYMajor;
-            } else {
+            }
+            else
+            {
                 _getMajorFactorFunc = FactorUtility.GetVector2X;
                 _getLocalPositionFunc = GetPositionXMajor;
             }
@@ -161,7 +164,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
 
             // If there are even number of boxes,
             // adjust the position one half unitPos down.
-            if ((_numOfBoxes & 0x1) == 0) {
+            if ((_numOfBoxes & 0x1) == 0)
+            {
                 majorPos = _unitPos * (boxID * -1 + _numOfBoxes / 2) - _unitPos / 2;
             }
 
@@ -254,11 +258,14 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             var beyondPos = 0.0f;
             var majorPos = positionValue;
 
-            if (positionValue < _sideChangingMinPos) {
+            if (positionValue < _sideChangingMinPos)
+            {
                 beyondPos = positionValue - _minPos;
                 majorPos = _maxPos - _unitPos + beyondPos;
                 isJumpingToTop = true;
-            } else if (positionValue > _sideChangingMaxPos) {
+            }
+            else if (positionValue > _sideChangingMaxPos)
+            {
                 beyondPos = positionValue - _maxPos;
                 majorPos = _minPos + _unitPos + beyondPos;
                 isJumpingToBottom = true;

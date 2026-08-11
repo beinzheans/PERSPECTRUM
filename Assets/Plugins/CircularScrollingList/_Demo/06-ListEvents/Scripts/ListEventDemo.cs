@@ -36,7 +36,7 @@ namespace AirFishLab.ScrollingList.Demo
         {
             _autoUpdatedContentText.text =
                 "(Auto updated)\nFocusing content: "
-                + $"{((IntListBox) curFocusingBox).Content}";
+                + $"{((IntListBox)curFocusingBox).Content}";
         }
 
         public void OnMovementEnd()

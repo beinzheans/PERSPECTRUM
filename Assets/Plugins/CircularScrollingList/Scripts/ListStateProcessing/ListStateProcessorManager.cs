@@ -42,7 +42,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing
             var boxes = setupData.ListBoxes;
             var numOfBoxes = boxes.Count;
             var undoGroupID = Undo.GetCurrentGroup();
-            for (var i = 0; i < numOfBoxes; ++i) {
+            for (var i = 0; i < numOfBoxes; ++i)
+            {
                 var box = boxes[i];
                 var transform = box.GetTransform();
                 Undo.RegisterCompleteObjectUndo(

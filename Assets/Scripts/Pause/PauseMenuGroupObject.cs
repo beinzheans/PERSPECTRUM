@@ -109,7 +109,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
         }
 
         if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.DROP_DOWN))
-        {   
+        {
             groupDropdown.ClearOptions();
             groupDropdown.gameObject.SetActive(true);
 

@@ -1,8 +1,11 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using UnityEditor;
 using UnityEditor.UIElements;
+
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -40,7 +43,7 @@ namespace Zero.Editor
         }
 
         // Left panel
-        
+
         private ObjectField m_SourceField;
         private EnumFlagsField m_ModeField;
         private DropdownField m_SideField;
@@ -60,11 +63,11 @@ namespace Zero.Editor
         private Label m_SourceSizeField;
         private List<ToolbarToggle> m_SourcePreviewChannelsField;
         private Image m_SourceTextureField;
-        
+
         private Button m_GenerateButton;
-        
+
         // Middle panel
-        
+
         private Vector2Field m_PixelHoveredPositionField;
         private ColorField m_PixelHoveredColorField;
         private List<FloatField> m_PixelHoveredValuesField;
@@ -72,7 +75,7 @@ namespace Zero.Editor
         private Label m_GeneratedSizeField;
         private List<ToolbarToggle> m_GeneratedPreviewChannelsField;
         private Image m_GeneratedTextureField;
-        
+
         private Button m_SaveButton;
         private Button m_SaveAsButton;
 
@@ -92,13 +95,13 @@ namespace Zero.Editor
         private FloatField m_SuperGeneratedIntensityField;
         private Toggle m_AutoSuperposeField;
         private Toggle m_OpenRenderDocSuperpositionField;
-        
+
         private List<ToolbarToggle> m_SuperpositionPreviewChannelsField;
         private Image m_SuperpositionTextureField;
 
         private Button m_SuperposeButton;
-        
-        
+
+
         private Texture2D m_SourceTexture = null;
         private Texture2D m_SourceTextureReadable = null;
         private Vector2Int m_GeneratedTextureSize = Vector2Int.one;
@@ -117,11 +120,14 @@ namespace Zero.Editor
         private static readonly int SuperTexFlagsID = Shader.PropertyToID("_SuperTexFlags");
         private static readonly int SuperColorID = Shader.PropertyToID("_SuperColor");
         private static readonly int SuperIntensityID = Shader.PropertyToID("_SuperIntensity");
-        
+
         private bool IsTextureRescaled
         {
-            get { return (m_ResizeTextureSDFField.value && ((SDFSide) m_SideField.index != SDFSide.InsideOnly))
-                || (m_ResizeTexturePostSDFField.value && ((PostSDFEffects) m_PostSDFEffectField.index != PostSDFEffects.None)); }
+            get
+            {
+                return (m_ResizeTextureSDFField.value && ((SDFSide)m_SideField.index != SDFSide.InsideOnly))
+                || (m_ResizeTexturePostSDFField.value && ((PostSDFEffects)m_PostSDFEffectField.index != PostSDFEffects.None));
+            }
         }
 
         [MenuItem("Tools/SDF Generator %g", false, 30001)]
@@ -139,7 +145,7 @@ namespace Zero.Editor
             VisualTreeAsset tree = Resources.Load<VisualTreeAsset>("SDFToolTemplate");
             VisualElement root = tree.CloneTree();
             rootVisualElement.Add(root);
-            
+
             // Left panel
 
             m_SourceField = root.Q<ObjectField>("source-field");
@@ -155,7 +161,7 @@ namespace Zero.Editor
             m_SideField.index = 0;
             m_SideField.RegisterValueChangedCallback(OnSideChange);
             m_SideField.SetEnabled(false);
-            
+
             m_InvertField = root.Q<Toggle>("invert-field");
             m_InvertField.value = false;
             m_InvertField.RegisterCallback<ChangeEvent<bool>>(OnInvertChange);
@@ -205,7 +211,7 @@ namespace Zero.Editor
             m_AutoGenerateField.value = false;
             m_AutoGenerateField.RegisterCallback<ChangeEvent<bool>>(OnAutoGenerateToggle);
             m_AutoGenerateField.SetEnabled(false);
-            
+
             m_ImageSizeRatioField = root.Q<Vector2Field>("image-size-ratio-field");
             UpdateImageSizeRatio();
             m_ImageSizeRatioField.SetEnabled(false);
@@ -215,7 +221,7 @@ namespace Zero.Editor
             m_OpenRenderDocGenerationField.SetEnabled(false);
 
             m_SourceSizeField = root.Q<Label>("source-image-size-field");
-            
+
             m_SourcePreviewChannelsField = new List<ToolbarToggle>();
             m_SourcePreviewChannelsField.Add(root.Q<ToolbarToggle>("source-preview-channel-r"));
             m_SourcePreviewChannelsField.Add(root.Q<ToolbarToggle>("source-preview-channel-g"));
@@ -227,7 +233,7 @@ namespace Zero.Editor
                 previewChannel.RegisterCallback<ChangeEvent<bool>>(OnSourcePreviewChannelsChange);
                 previewChannel.SetEnabled(false);
             }
-            
+
             m_SourceTextureField = rootVisualElement.Q<Image>("source-view");
             m_SourceTextureField.RegisterCallback<MouseMoveEvent>((MouseMoveEvent evt) =>
             {
@@ -235,14 +241,14 @@ namespace Zero.Editor
             });
             m_SourceTextureField.RegisterCallback<MouseLeaveEvent>(OnTextureMouseLeave);
             SetTextureSizeField(m_SourceSizeField, m_SourceTextureField);
-            
+
             m_GenerateButton = root.Q<Button>("generate-button");
             m_GenerateButton.clicked += GenerateStatic;
             m_GenerateButton.SetEnabled(false);
-            
-            
+
+
             // Middle panel
-            
+
             m_PixelHoveredPositionField = root.Q<Vector2Field>("pixel-position-field");
             m_PixelHoveredPositionField.SetEnabled(false);
             m_PixelHoveredPositionField.value = new Vector2Int(-1, -1);
@@ -262,7 +268,7 @@ namespace Zero.Editor
             {
                 pixelHoveredValue.value = 0;
             }
-            
+
             m_GeneratedPreviewChannelsField = new List<ToolbarToggle>();
             m_GeneratedPreviewChannelsField.Add(root.Q<ToolbarToggle>("generated-preview-channel-r"));
             m_GeneratedPreviewChannelsField.Add(root.Q<ToolbarToggle>("generated-preview-channel-g"));
@@ -274,7 +280,7 @@ namespace Zero.Editor
                 previewChannel.RegisterCallback<ChangeEvent<bool>>(OnGeneratedPreviewChannelsChange);
                 previewChannel.SetEnabled(false);
             }
-            
+
             m_GeneratedTextureField = rootVisualElement.Q<Image>("generated-view");
             m_GeneratedTextureField.RegisterCallback<MouseMoveEvent>((MouseMoveEvent evt) =>
             {
@@ -282,11 +288,11 @@ namespace Zero.Editor
             });
             m_GeneratedTextureField.RegisterCallback<MouseLeaveEvent>(OnTextureMouseLeave);
             SetTextureSizeField(m_GeneratedSizeField, m_GeneratedTextureField);
-            
+
             m_SaveButton = root.Q<Button>("save-button");
             m_SaveButton.clicked += SaveGeneratedTexture;
             m_SaveButton.SetEnabled(false);
-        
+
             m_SaveAsButton = root.Q<Button>("save-as-button");
             m_SaveAsButton.clicked += SaveAsGeneratedTexture;
             m_SaveAsButton.SetEnabled(false);
@@ -297,13 +303,13 @@ namespace Zero.Editor
             m_SuperKeepSourceField.value = true;
             m_SuperKeepSourceField.RegisterCallback<ChangeEvent<bool>>(OnSuperReplaceSourceChange);
             m_SuperKeepSourceField.SetEnabled(false);
-            
-            
+
+
             m_SuperNewSourceField = root.Q<ObjectField>("super-new-source-field");
             m_SuperNewSourceField.objectType = typeof(Texture2D);
             m_SuperNewSourceField.RegisterValueChangedCallback(OnSuperNewSourceValueChange);
             m_SuperNewSourceField.SetEnabled(false);
-            
+
             m_SuperSourceOnField = root.Q<Toggle>("super-source-on-field");
             m_SuperSourceOnField.value = true;
             m_SuperSourceOnField.RegisterCallback<ChangeEvent<bool>>(OnSuperSourceOnChange);
@@ -344,7 +350,7 @@ namespace Zero.Editor
             m_SuperGeneratedColorField.value = Color.yellow;
             m_SuperGeneratedColorField.RegisterValueChangedCallback(OnSuperGeneratedColorChange);
             m_SuperGeneratedColorField.SetEnabled(false);
-            
+
             m_SuperGeneratedIntensityField = root.Q<FloatField>("super-sdf-intensity-field");
             m_SuperGeneratedIntensityField.value = 1;
             m_SuperGeneratedIntensityField.RegisterCallback<ChangeEvent<float>>(OnSuperGeneratedIntensityChange);
@@ -358,8 +364,8 @@ namespace Zero.Editor
             m_OpenRenderDocSuperpositionField = root.Q<Toggle>("open-renderdoc-superposition-field");
             m_OpenRenderDocSuperpositionField.value = false;
             m_OpenRenderDocSuperpositionField.SetEnabled(false);
-            
-            
+
+
             m_SuperpositionPreviewChannelsField = new List<ToolbarToggle>();
             m_SuperpositionPreviewChannelsField.Add(root.Q<ToolbarToggle>("superposition-preview-channel-r"));
             m_SuperpositionPreviewChannelsField.Add(root.Q<ToolbarToggle>("superposition-preview-channel-g"));
@@ -371,7 +377,7 @@ namespace Zero.Editor
                 previewChannel.RegisterCallback<ChangeEvent<bool>>(OnSuperpositionPreviewChannelsChange);
                 previewChannel.SetEnabled(false);
             }
-            
+
             m_SuperpositionTextureField = rootVisualElement.Q<Image>("superposition-view");
             m_SuperpositionTextureField.RegisterCallback<MouseMoveEvent>((MouseMoveEvent evt) =>
             {
@@ -382,26 +388,26 @@ namespace Zero.Editor
             m_SuperposeButton = root.Q<Button>("superpose-button");
             m_SuperposeButton.clicked += SuperposeSourceAndSDFTextures;
             m_SuperposeButton.SetEnabled(false);
-            
+
         }
 
         private void UpdateImageSizeRatio()
         {
             if (m_SourceTexture)
             {
-                
-            int radius = 0;
-            if (m_ResizeTextureSDFField.value && ((SDFSide) m_SideField.index != SDFSide.InsideOnly))
-                radius = m_GradientSizePXField.value;
-            
-            if ((SDFSide) m_SideField.index == SDFSide.OutsideOnly)
-                radius *= 2;
-            
-            if (m_ResizeTexturePostSDFField.value && (PostSDFEffects) m_PostSDFEffectField.index != PostSDFEffects.None)
-                radius += m_PostSDFRadiusField.value * 2;
 
-            m_GeneratedTextureSize = new Vector2Int(m_SourceTexture.width + radius, m_SourceTexture.height + radius);
-            m_ImageSizeRatioField.value = new Vector2((float) m_GeneratedTextureSize.x / m_SourceTexture.width, (float) m_GeneratedTextureSize.y / m_SourceTexture.height);
+                int radius = 0;
+                if (m_ResizeTextureSDFField.value && ((SDFSide)m_SideField.index != SDFSide.InsideOnly))
+                    radius = m_GradientSizePXField.value;
+
+                if ((SDFSide)m_SideField.index == SDFSide.OutsideOnly)
+                    radius *= 2;
+
+                if (m_ResizeTexturePostSDFField.value && (PostSDFEffects)m_PostSDFEffectField.index != PostSDFEffects.None)
+                    radius += m_PostSDFRadiusField.value * 2;
+
+                m_GeneratedTextureSize = new Vector2Int(m_SourceTexture.width + radius, m_SourceTexture.height + radius);
+                m_ImageSizeRatioField.value = new Vector2((float)m_GeneratedTextureSize.x / m_SourceTexture.width, (float)m_GeneratedTextureSize.y / m_SourceTexture.height);
             }
             else
             {
@@ -413,7 +419,7 @@ namespace Zero.Editor
         private void OnDisable()
         {
             // Left panel
-            
+
             m_SourceField.UnregisterValueChangedCallback(OnSourceValueChange);
             m_ModeField.UnregisterValueChangedCallback(OnModeValueChange);
             m_SideField.UnregisterValueChangedCallback(OnSideChange);
@@ -427,7 +433,7 @@ namespace Zero.Editor
             m_PostSDFRadiusField.UnregisterCallback<ChangeEvent<int>>(OnPostSDFRadiusChange);
             m_ResizeTexturePostSDFField.UnregisterCallback<ChangeEvent<bool>>(OnResizeTextureChange);
             m_AutoGenerateField.UnregisterCallback<ChangeEvent<bool>>(OnAutoGenerateToggle);
-            
+
             foreach (var previewChannelField in m_SourcePreviewChannelsField)
             {
                 previewChannelField.UnregisterCallback<ChangeEvent<bool>>(OnSourcePreviewChannelsChange);
@@ -437,11 +443,11 @@ namespace Zero.Editor
                 OnTextureMouseMove(evt, m_SourceTextureField);
             });
             m_SourceTextureField.UnregisterCallback<MouseLeaveEvent>(OnTextureMouseLeave);
-            
+
             m_GenerateButton.clicked -= GenerateStatic;
-            
+
             // Middle panel
-            
+
             foreach (var previewChannelField in m_GeneratedPreviewChannelsField)
             {
                 previewChannelField.UnregisterCallback<ChangeEvent<bool>>(OnGeneratedPreviewChannelsChange);
@@ -451,10 +457,10 @@ namespace Zero.Editor
                 OnTextureMouseMove(evt, m_GeneratedTextureField);
             });
             m_GeneratedTextureField.UnregisterCallback<MouseLeaveEvent>(OnTextureMouseLeave);
-            
+
             m_SaveButton.clicked -= SaveGeneratedTexture;
             m_SaveAsButton.clicked -= SaveAsGeneratedTexture;
-            
+
             // Right panel
 
             m_SuperKeepSourceField.UnregisterCallback<ChangeEvent<bool>>(OnSuperReplaceSourceChange);
@@ -468,8 +474,8 @@ namespace Zero.Editor
             m_SuperGeneratedColorField.UnregisterValueChangedCallback(OnSuperGeneratedColorChange);
             m_SuperGeneratedIntensityField.UnregisterCallback<ChangeEvent<float>>(OnSuperGeneratedIntensityChange);
             m_AutoSuperposeField.UnregisterCallback<ChangeEvent<bool>>(OnAutoSuperposeToggle);
-            
-            
+
+
             foreach (var previewChannelField in m_SuperpositionPreviewChannelsField)
             {
                 previewChannelField.UnregisterCallback<ChangeEvent<bool>>(OnSuperpositionPreviewChannelsChange);
@@ -485,9 +491,9 @@ namespace Zero.Editor
 
         private void OnSourceValueChange(ChangeEvent<UnityEngine.Object> evt)
         {
-            bool enable = UpdateSourceTexture((Texture2D) evt.newValue);
-            
-            
+            bool enable = UpdateSourceTexture((Texture2D)evt.newValue);
+
+
             m_ModeField.SetEnabled(enable);
             m_SideField.SetEnabled(enable);
             m_GenerateButton.SetEnabled(enable);
@@ -502,8 +508,8 @@ namespace Zero.Editor
             m_ResizeTexturePostSDFField.SetEnabled(enable);
             m_AutoGenerateField.SetEnabled(enable);
             m_OpenRenderDocGenerationField.SetEnabled(enable);
-            
-            
+
+
             UpdateImageSizeRatio();
             OnGenerationParameterChange();
         }
@@ -517,28 +523,34 @@ namespace Zero.Editor
         private void OnSideChange(ChangeEvent<string> evt)
         {
             UpdateImageSizeRatio();
-            if (evt.newValue == "Inside only") {
+            if (evt.newValue == "Inside only")
+            {
                 m_ResizeTextureSDFField.style.display = DisplayStyle.None;
                 m_ClampBorderField.style.display = DisplayStyle.None;
                 m_BorderColorField.style.display = DisplayStyle.None;
-            } else {
+            }
+            else
+            {
                 m_ResizeTextureSDFField.style.display = DisplayStyle.Flex;
-                if (m_ResizeTextureSDFField.value) {
+                if (m_ResizeTextureSDFField.value)
+                {
                     m_ClampBorderField.style.display = DisplayStyle.Flex;
                     m_BorderColorField.style.display = m_ClampBorderField.value
                                                     ? DisplayStyle.None
                                                     : DisplayStyle.Flex;
-                } else {
+                }
+                else
+                {
                     m_ClampBorderField.style.display = DisplayStyle.None;
                     m_BorderColorField.style.display = DisplayStyle.None;
                 }
             }
-                m_ResizeTextureSDFField.style.display = (evt.newValue == "Inside only")
-                ? DisplayStyle.None
-                : DisplayStyle.Flex;
-            
+            m_ResizeTextureSDFField.style.display = (evt.newValue == "Inside only")
+            ? DisplayStyle.None
+            : DisplayStyle.Flex;
+
             AutoDisplayImageSizeRatio();
-            
+
             OnGenerationParameterChange();
         }
 
@@ -596,7 +608,7 @@ namespace Zero.Editor
                 : DisplayStyle.Flex;
             m_PostSDFRadiusField.style.display = resizePostSdfDisplay;
             m_ResizeTexturePostSDFField.style.display = resizePostSdfDisplay;
-            
+
             AutoDisplayImageSizeRatio();
 
             OnGenerationParameterChange();
@@ -615,7 +627,7 @@ namespace Zero.Editor
                 : DisplayStyle.None;
             m_ImageSizeRatioField.style.display = display;
         }
-        
+
         private void OnAutoGenerateToggle(ChangeEvent<bool> evt)
         {
             DisplayStyle display = m_AutoGenerateField.value
@@ -643,10 +655,10 @@ namespace Zero.Editor
             m_SuperNewSourceField.style.display = display;
             OnSuperpositionParameterChange();
         }
-        
+
         private void OnSuperNewSourceValueChange(ChangeEvent<UnityEngine.Object> evt)
         {
-            m_SuperNewSourceTexture = (Texture2D) evt.newValue;
+            m_SuperNewSourceTexture = (Texture2D)evt.newValue;
             OnSuperpositionParameterChange();
         }
 
@@ -671,7 +683,7 @@ namespace Zero.Editor
         {
             OnSuperpositionParameterChange();
         }
-        
+
         private void OnSuperGeneratedOnChange(ChangeEvent<bool> evt)
         {
             OnSuperpositionParameterChange();
@@ -686,12 +698,12 @@ namespace Zero.Editor
         {
             OnSuperpositionParameterChange();
         }
-        
+
         private void OnSuperGeneratedColorChange(ChangeEvent<Color> evt)
         {
             OnSuperpositionParameterChange();
         }
-        
+
         private void OnSuperGeneratedIntensityChange(ChangeEvent<float> evt)
         {
             if (evt.newValue < 0)
@@ -700,7 +712,7 @@ namespace Zero.Editor
             }
             OnSuperpositionParameterChange();
         }
-        
+
         private void OnAutoSuperposeToggle(ChangeEvent<bool> evt)
         {
             m_SuperposeButton.style.display = m_AutoSuperposeField.value
@@ -724,7 +736,7 @@ namespace Zero.Editor
         {
             UpdateSuperpositionPreviewTexture();
         }
-        
+
 
         private void OnGenerationParameterChange()
         {
@@ -765,7 +777,7 @@ namespace Zero.Editor
 
             // Generate based on source textures
             material.SetFloat(FeatherID,
-                m_GradientSizePXField.value / (float) Mathf.Max(m_SourceTexture.width, m_SourceTexture.height));
+                m_GradientSizePXField.value / (float)Mathf.Max(m_SourceTexture.width, m_SourceTexture.height));
             material.SetFloat(EdgeValueID, m_EdgeValueField.value);
             GenerateAsset(material);
 
@@ -787,7 +799,7 @@ namespace Zero.Editor
                 IsTextureRescaled ? m_GeneratedTextureSize.x : -1,
                 IsTextureRescaled ? m_GeneratedTextureSize.y : -1)
                 );
-            
+
         }
 
         public static Texture2D Generate(Texture2D texture, Material material, TextureModes mode,
@@ -798,35 +810,35 @@ namespace Zero.Editor
             {
                 RenderDoc.BeginCaptureRenderDoc(focusedWindow);
             }
-            
+
             if (width == -1) width = texture.width;
             if (height == -1) height = texture.height;
             TextureFormat format = GetTextureFormat(mode);
-            
+
             Texture2D result = new Texture2D(width, height, format, false);
             result.filterMode = FilterMode.Point;
             Color[] pixels = result.GetPixels();
             for (int c = 3; c >= 0; c--)
             {
-                if (((int) mode & (1 << c)) == 0) continue;
+                if (((int)mode & (1 << c)) == 0) continue;
                 material.SetInteger(ChannelID, c);
                 var resultC = GenerateSDF(texture, material, side, invertValues, rescaleTexture, clampBorder, borderColor, effect, effectRadius, width, height);
                 var resPx = resultC.GetPixels();
                 for (int i = 0; i < pixels.Length; i++)
-                    {
-                        pixels[i][c] = resPx[i][0];
-                    }
+                {
+                    pixels[i][c] = resPx[i][0];
+                }
                 DestroyImmediate(resultC);
             }
 
             result.SetPixels(pixels);
             result.Apply();
-            
+
             if (openRenderDoc)
             {
                 RenderDoc.EndCaptureRenderDoc(focusedWindow);
             }
-            
+
             return result;
         }
 
@@ -870,7 +882,7 @@ namespace Zero.Editor
                     material.SetColor(BorderColorID, borderColor);
                 }
                 material.SetVector(ScaleID,
-                    new Vector2((float) width / texture.width, (float) height / texture.height));
+                    new Vector2((float)width / texture.width, (float)height / texture.height));
                 Graphics.Blit(texture, target0, material, blitCenterPass);
             }
             else
@@ -912,7 +924,7 @@ namespace Zero.Editor
                 case SDFSide.OutsideOnly:
                     material.EnableKeyword("OUTSIDE_ONLY");
                     break;
-                    
+
             }
 
             if (invertValues)
@@ -924,7 +936,7 @@ namespace Zero.Editor
                 material.DisableKeyword("INVERT_SDF");
             }
             Graphics.Blit(target2, resultTarget, material, finalPass);
-            
+
             // If a post-SDF effect was selected, apply it here
             if (effect != PostSDFEffects.None)
             {
@@ -951,7 +963,7 @@ namespace Zero.Editor
                 Swap(ref resultTarget, ref resultTarget2);
                 RenderTexture.ReleaseTemporary(resultTarget2);
             }
-            
+
             var result = new Texture2D(width, height, TextureFormat.R8, false);
 
             // Copy to CPU
@@ -967,25 +979,25 @@ namespace Zero.Editor
 
         private void SuperposeSourceAndSDFTextures()
         {
-            
+
             if (m_GeneratedTexture == null)
             {
                 return;
             }
-            
+
             bool openRenderDoc = (m_OpenRenderDocSuperpositionField.value && !m_AutoSuperposeField.value);
-            
+
             Texture2D sourceTexture = m_SuperKeepSourceField.value ? m_SourceTexture : m_SuperNewSourceTexture;
-            
+
             Material material = CoreUtils.CreateEngineMaterial(Shader.Find("Internal/SDFGenerator"));
             if (material == null)
             {
                 Debug.LogError("Error during sdf superposition: no shader were found at Internal/SDFGenerator, or the material generated was corrupted.");
                 return;
             }
-            
+
             material.SetFloat(FeatherID,
-                m_GradientSizePXField.value / (float) Mathf.Max(m_SourceTexture.width, m_SourceTexture.height));
+                m_GradientSizePXField.value / (float)Mathf.Max(m_SourceTexture.width, m_SourceTexture.height));
             material.SetFloat(EdgeValueID, m_EdgeValueField.value);
             UpdateSuperpositionTexture(SuperposeSourceAndSDFTextures(sourceTexture,
                 m_GeneratedTexture, material,
@@ -1024,7 +1036,7 @@ namespace Zero.Editor
                     material.EnableKeyword("MEAN_BLENDING");
                     break;
             }
-            
+
             material.SetTexture(SourceTexID, sourceTexture);
             material.SetTextureScale(SourceTexID, sourceScaling);
             material.SetTextureOffset(SourceTexID, sourceOffset);
@@ -1034,13 +1046,13 @@ namespace Zero.Editor
             material.SetFloat(SuperIntensityID, sdfIntensity);
 
             Graphics.Blit(sdfTexture, target, material, superpositionPass);
-            
-            
+
+
             Texture2D superposedTexture = new Texture2D(sdfTexture.width, sdfTexture.height,
                 TextureFormat.RGBA32, false);
             superposedTexture.ReadPixels(new Rect(0, 0, sdfTexture.width, sdfTexture.height), 0, 0);
             RenderTexture.ReleaseTemporary(target);
-            
+
             if (openRenderDoc)
             {
                 RenderDoc.EndCaptureRenderDoc(focusedWindow);
@@ -1089,7 +1101,7 @@ namespace Zero.Editor
         {
             m_SourceTexture = newSourceTexture;
             bool textureNonNull = m_SourceTexture != null;
-            
+
             // Get a readable copy of the source texture.
             if (m_SourceTextureReadable != null)
             {
@@ -1101,7 +1113,7 @@ namespace Zero.Editor
                 RenderTexture renderTex = RenderTexture.GetTemporary(
                     m_SourceTexture.width,
                     m_SourceTexture.height);
- 
+
                 Graphics.Blit(m_SourceTexture, renderTex);
                 RenderTexture previous = RenderTexture.active;
                 RenderTexture.active = renderTex;
@@ -1116,9 +1128,9 @@ namespace Zero.Editor
             {
                 previewChannel.SetEnabled(textureNonNull);
             }
-            
+
             UpdateSourcePreviewTexture();
-            
+
             return textureNonNull;
         }
 
@@ -1139,10 +1151,10 @@ namespace Zero.Editor
             {
                 previewChannel.SetEnabled(textureNonNull);
             }
-            
+
             m_SaveButton.SetEnabled(textureNonNull);
             m_SaveAsButton.SetEnabled(textureNonNull);
-            
+
             m_SuperKeepSourceField.SetEnabled(textureNonNull);
             m_SuperNewSourceField.SetEnabled(textureNonNull);
             m_SuperSourceOnField.SetEnabled(textureNonNull);
@@ -1158,7 +1170,7 @@ namespace Zero.Editor
             m_AutoSuperposeField.SetEnabled(textureNonNull);
             m_OpenRenderDocSuperpositionField.SetEnabled(textureNonNull);
             m_SuperposeButton.SetEnabled(textureNonNull);
-            
+
             UpdateSDFGeneratedPreviewTexture();
             OnSuperpositionParameterChange();
             return textureNonNull;
@@ -1177,7 +1189,7 @@ namespace Zero.Editor
                 DestroyImmediate(m_SuperpositionTexture);
             }
             m_SuperpositionTexture = texture;
-            
+
             bool textureNonNull = m_SuperpositionTexture != null;
             foreach (var previewChannel in m_SuperpositionPreviewChannelsField)
             {
@@ -1200,7 +1212,7 @@ namespace Zero.Editor
                 SetNewTextureField(textureField, null);
                 return;
             }
-            
+
             Texture2D previewTexture = new Texture2D(newTexture.width, newTexture.height, format, false);
             previewTexture.filterMode = FilterMode.Point;
             Color previewMask = new Color();
@@ -1208,7 +1220,7 @@ namespace Zero.Editor
             {
                 previewMask[i] = previewChannels[i].value ? 1 : 0;
             }
-            
+
             Color[] texturePixels = newTexture.GetPixels();
             for (int i = 0; i < texturePixels.Length; ++i)
             {
@@ -1237,7 +1249,7 @@ namespace Zero.Editor
                     "Please enter a file name to save the sdf to",
                     Path.GetDirectoryName(path)));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.LogException(e);
             }
@@ -1254,15 +1266,15 @@ namespace Zero.Editor
         {
             if (string.IsNullOrEmpty(path))
                 return;
-            
+
             // Generate the new asset
             File.WriteAllBytes(path, m_GeneratedTexture.EncodeToPNG());
             AssetDatabase.Refresh();
-            
+
             // Recreate a new generated texture, as the generated texture needs to be distinct from the new texture file.
             GenerateStatic();
-            
-            Texture2D sdfTexture = (Texture2D) AssetDatabase.LoadMainAssetAtPath(path);
+
+            Texture2D sdfTexture = (Texture2D)AssetDatabase.LoadMainAssetAtPath(path);
             Selection.activeObject = sdfTexture;
 
             // Disable compression and use simple format
@@ -1279,8 +1291,8 @@ namespace Zero.Editor
                     importer.npotScale = TextureImporterNPOTScale.None;
 
                     TextureImporterPlatformSettings sourceSettings = sourceImporter.GetDefaultPlatformTextureSettings();
-                    sourceSettings.format = (TextureImporterFormat) GetTextureFormat((TextureModes)m_ModeField.value);
-                    
+                    sourceSettings.format = (TextureImporterFormat)GetTextureFormat((TextureModes)m_ModeField.value);
+
                     importer.SetPlatformTextureSettings(sourceSettings);
                     importer.SaveAndReimport();
                 }
@@ -1307,11 +1319,11 @@ namespace Zero.Editor
                 ? $"{textureField.image.width}*{textureField.image.height}px"
                 : "No image";
         }
-        
-        
+
+
         private void OnTextureMouseMove(MouseMoveEvent evt, Image textureField)
         {
-            
+
             if (textureField.image != null)
             {
                 float textureImageRatio = Math.Max(textureField.image.width / textureField.layout.width,
@@ -1329,7 +1341,7 @@ namespace Zero.Editor
                 }
                 else
                 {
-                    Color currentPixelColor = ((Texture2D) textureField.image).GetPixel(texturePos.x, texturePos.y);
+                    Color currentPixelColor = ((Texture2D)textureField.image).GetPixel(texturePos.x, texturePos.y);
                     UpdatePixelHovered(texturePos, currentPixelColor);
                 }
             }
@@ -1337,7 +1349,7 @@ namespace Zero.Editor
 
         private void OnTextureMouseLeave(MouseLeaveEvent evt)
         {
-            
+
             UpdatePixelHovered(new Vector2Int(-1, -1), new Color(0, 0, 0, 0));
         }
 
@@ -1352,3 +1364,4 @@ namespace Zero.Editor
         }
     }
 }
+#endif

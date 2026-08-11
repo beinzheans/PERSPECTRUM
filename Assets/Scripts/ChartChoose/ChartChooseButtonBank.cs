@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ChartChooseButtonBank : BaseListBank
 {
@@ -124,7 +123,7 @@ public class ChartChooseButtonBank : BaseListBank
 
     public override int GetContentCount()
     {
-        return behaviorContents.Count;   
+        return behaviorContents.Count;
     }
 
     public override IListContent GetListContent(int index)
@@ -138,7 +137,7 @@ public class ChartChooseButtonBank : BaseListBank
         {
             return;
         }
-        
+
         chartChooseManager.InvokeOnChartButtonClickedEvent(behavior.Contents, box.ContentID);
     }
 

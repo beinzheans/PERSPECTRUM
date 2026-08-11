@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class ChartChooseAscendingDescendingOrder : EditorUIBehavior
 {
     protected override void InitializeButtons()

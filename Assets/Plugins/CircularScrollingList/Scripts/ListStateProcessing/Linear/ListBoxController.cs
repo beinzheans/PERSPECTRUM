@@ -1,6 +1,6 @@
-﻿using System;
+﻿using AirFishLab.ScrollingList.ContentManagement;
+using System;
 using System.Collections.Generic;
-using AirFishLab.ScrollingList.ContentManagement;
 using UnityEngine;
 
 namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
@@ -83,7 +83,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
                     _transformController.MiddleBaseline,
                     _transformController.BottomBaseline);
 
-            switch (_setting.FocusingPosition) {
+            switch (_setting.FocusingPosition)
+            {
                 case CircularScrollingList.FocusingPosition.Top:
                     _updateFocusingBoxFunc = UpdateTopFocusingBox;
                     _recalculateAllBoxContentFunc = RecalculateAllBoxContentForBothEnds;
@@ -107,7 +108,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
         private void InitializeBoxes(ListSetupData setupData)
         {
             var numOfBoxes = _boxes.Count;
-            for (var boxID = 0; boxID < numOfBoxes; ++boxID) {
+            for (var boxID = 0; boxID < numOfBoxes; ++boxID)
+            {
                 var box = _boxes[boxID];
                 var lastListBox =
                     _boxes[(int)Mathf.Repeat(boxID - 1, numOfBoxes)];
@@ -156,7 +158,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
                 return;
 
             var allPositionStatuses = BoxPositionState.Nothing;
-            foreach (var box in _boxes) {
+            foreach (var box in _boxes)
+            {
                 var positionStatus =
                     _transformController.UpdateLocalTransform(box, movementValue);
 
@@ -206,13 +209,15 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             if (positionState == BoxPositionState.Nothing)
                 return;
 
-            switch (positionState) {
+            switch (positionState)
+            {
                 case BoxPositionState.JumpToTop:
                     // The lower one is updated first
                     boxes.Sort((a, b) =>
                         a.GetPositionFactor().CompareTo(b.GetPositionFactor()));
 
-                    foreach (var box in boxes) {
+                    foreach (var box in boxes)
+                    {
                         var contentID =
                             _contentProvider.GetContentIDByNextBox(
                                 box.NextListBox.ContentID);
@@ -227,7 +232,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
                     boxes.Sort((a, b) =>
                         b.GetPositionFactor().CompareTo(a.GetPositionFactor()));
 
-                    foreach (var box in boxes) {
+                    foreach (var box in boxes)
+                    {
                         var contentID =
                             _contentProvider.GetContentIDByLastBox(
                                 box.LastListBox.ContentID);
@@ -334,7 +340,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             var focusingBoxID = _focusingBox.ListBoxID;
             var reverseFactor = _setting.ReverseContentOrder ? -1 : 1;
 
-            foreach (var box in _boxes) {
+            foreach (var box in _boxes)
+            {
                 var posFactor = box.GetPositionFactor();
                 var tempBoxID = box.ListBoxID;
 
@@ -377,14 +384,16 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             }
             else if (numOfContents <= numOfBoxes)
                 newFocusingContentID = 0;
-            else {
+            else
+            {
                 var numOfLackingContents =
                     numOfContents - newFocusingContentID - numOfBoxes;
                 if (numOfLackingContents < 0)
                     newFocusingContentID += numOfLackingContents;
             }
 
-            foreach (var box in tempBoxList) {
+            foreach (var box in tempBoxList)
+            {
                 var newContentID =
                     _contentProvider.GetRefreshedContentID(newFocusingContentID);
                 UpdateBoxContent(box, newContentID);
@@ -418,7 +427,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
         {
             // If there has no content in the content provider,
             // just inactivate the box.
-            if (idState == ContentIDState.NoContent) {
+            if (idState == ContentIDState.NoContent)
+            {
                 box.IsActivated = false;
                 return;
             }

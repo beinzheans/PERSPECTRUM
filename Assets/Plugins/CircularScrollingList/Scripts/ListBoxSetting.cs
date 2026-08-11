@@ -85,7 +85,8 @@ namespace AirFishLab.ScrollingList
         {
             var listName = listObject.name;
 
-            if (!BoxRootTransform) {
+            if (!BoxRootTransform)
+            {
                 Debug.LogWarning(
                     $"The 'BoxRootTransform' is not assigned in the list '{listName}'. "
                     + "Use itself as the 'BoxRootTransform'");

@@ -1,10 +1,8 @@
 using Newtonsoft.Json.Linq;
 using SFB;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -126,7 +124,7 @@ public class ChartChooseManager : MonoBehaviour
         }
 
         ChartButtonBehaviorContents contents = request.Value.Item1;
-        
+
         if (contents == null)
         {
             return;

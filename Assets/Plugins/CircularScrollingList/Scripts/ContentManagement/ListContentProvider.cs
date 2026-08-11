@@ -74,7 +74,8 @@ namespace AirFishLab.ScrollingList.ContentManagement
 
             var contentID = 0;
             var initFocusedContentID = _listSetting.InitFocusingContentID;
-            switch (_listSetting.FocusingPosition) {
+            switch (_listSetting.FocusingPosition)
+            {
                 case CircularScrollingList.FocusingPosition.Top:
                 case CircularScrollingList.FocusingPosition.Bottom:
                     if (_listSetting.ListType
@@ -83,7 +84,8 @@ namespace AirFishLab.ScrollingList.ContentManagement
                         contentID = 0;
                     else if (contentCount <= _numOfBoxes)
                         initFocusedContentID = 0;
-                    else {
+                    else
+                    {
                         var numOfLackingContents =
                             contentCount - initFocusedContentID - _numOfBoxes;
                         if (numOfLackingContents < 0)
@@ -205,7 +207,7 @@ namespace AirFishLab.ScrollingList.ContentManagement
             var halfNumOfContents = numOfContents / 2;
 
             if (Mathf.Abs(length) > halfNumOfContents)
-                length -= (int) Mathf.Sign(length) * numOfContents;
+                length -= (int)Mathf.Sign(length) * numOfContents;
 
             return length;
         }

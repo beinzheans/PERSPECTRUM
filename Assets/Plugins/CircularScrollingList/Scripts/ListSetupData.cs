@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using AirFishLab.ScrollingList.ContentManagement;
+﻿using AirFishLab.ScrollingList.ContentManagement;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AirFishLab.ScrollingList

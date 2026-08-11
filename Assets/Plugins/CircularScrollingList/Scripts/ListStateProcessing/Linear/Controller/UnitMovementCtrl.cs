@@ -98,11 +98,14 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             var movingDirection = Mathf.Sign(distanceAdded);
 
             if ((state.HasFlag(ListFocusingState.Top) && movingDirection < 0)
-                || (state.HasFlag(ListFocusingState.Bottom) && movingDirection > 0)) {
+                || (state.HasFlag(ListFocusingState.Bottom) && movingDirection > 0))
+            {
                 _bouncingOffCurve.SetMovement(
                     movingDirection * _exceedingDistanceLimit - curDistance);
                 _unitMovementCurve.EndMovement();
-            } else {
+            }
+            else
+            {
                 var distanceRemaining = _unitMovementCurve.distanceRemaining;
                 // If the moving direction is the same, just add it
                 if (!Mathf.Approximately(distanceRemaining, 0f)
@@ -137,7 +140,8 @@ namespace AirFishLab.ScrollingList.ListStateProcessing.Linear
             var distance = 0f;
 
             // ===== Bouncing Off ===== //
-            if (!_bouncingOffCurve.IsMovementEnded()) {
+            if (!_bouncingOffCurve.IsMovementEnded())
+            {
                 distance = _bouncingOffCurve.GetDistance(deltaTime);
                 if (_bouncingOffCurve.IsMovementEnded())
                     _bouncingBackCurve.SetMovement(-(curDistance + distance));

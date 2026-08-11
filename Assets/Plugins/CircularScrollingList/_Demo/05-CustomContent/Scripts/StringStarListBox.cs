@@ -13,7 +13,7 @@ namespace AirFishLab.ScrollingList.Demo
 
         protected override void UpdateDisplayContent(IListContent content)
         {
-            var stringStarData = (StringStarData) content;
+            var stringStarData = (StringStarData)content;
             _text.text = stringStarData.Title;
             for (var i = 0; i < _stars.Length; ++i)
                 _stars[i].SetActive(i < stringStarData.NumOfStars);

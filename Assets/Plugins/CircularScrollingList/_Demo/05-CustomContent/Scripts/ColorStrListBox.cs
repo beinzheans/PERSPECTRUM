@@ -13,7 +13,7 @@ namespace AirFishLab.ScrollingList.Demo
 
         protected override void UpdateDisplayContent(IListContent content)
         {
-            var colorString = (ColorString) content;
+            var colorString = (ColorString)content;
             _contentImage.color = colorString.color;
             _contentText.text = colorString.name;
         }

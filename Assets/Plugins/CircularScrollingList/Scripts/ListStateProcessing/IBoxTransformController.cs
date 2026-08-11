@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace AirFishLab.ScrollingList.ListStateProcessing
+﻿namespace AirFishLab.ScrollingList.ListStateProcessing
 {
     /// <summary>
     /// The interface for controlling the box transform

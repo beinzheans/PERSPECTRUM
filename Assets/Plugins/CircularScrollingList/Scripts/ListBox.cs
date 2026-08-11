@@ -1,6 +1,6 @@
-﻿using System;
-using AirFishLab.ScrollingList.ContentManagement;
+﻿using AirFishLab.ScrollingList.ContentManagement;
 using AirFishLab.ScrollingList.Util;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -75,7 +75,7 @@ namespace AirFishLab.ScrollingList
         }
 
         public virtual void OnBoxMoved(float positionRatio)
-        {}
+        { }
 
         public void SetContentID(int contentID)
         {
@@ -106,7 +106,8 @@ namespace AirFishLab.ScrollingList
         /// </summary>
         private void RegisterClickEvent()
         {
-            if (TryGetComponent<Button>(out var button)) {
+            if (TryGetComponent<Button>(out var button))
+            {
                 button.onClick.AddListener(OnButtonClick);
             }
         }
@@ -124,7 +125,7 @@ namespace AirFishLab.ScrollingList
         /// This function is called after the box is initialized
         /// </summary>
         protected virtual void OnInitialized()
-        {}
+        { }
 
         /// <summary>
         /// Update the displaying content on the ListBox

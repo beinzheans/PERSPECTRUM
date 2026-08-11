@@ -12,8 +12,8 @@ namespace AirFishLab.ScrollingList
         public abstract int GetContentCount();
     }
 
-/* The example of the ListBank
- */
+    /* The example of the ListBank
+     */
     public class ListBank : BaseListBank
     {
         private int[] contents = {

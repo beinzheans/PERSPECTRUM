@@ -1,7 +1,7 @@
-using TMPro;
-using UnityEngine;
 using AirFishLab.ScrollingList;
 using AirFishLab.ScrollingList.ContentManagement;
+using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 /// <summary>
 /// A class to handle the behavior of the chart buttons in the chart choose screen.
