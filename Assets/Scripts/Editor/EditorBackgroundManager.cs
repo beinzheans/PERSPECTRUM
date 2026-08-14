@@ -15,11 +15,6 @@ public class EditorBackgroundManager : EditorUIBehavior
         EditorManager.EditorInstance.OnBackgroundTextureLoaded += EditorInstance_OnBackgroundTextureLoaded;
     }
 
-    private void OnDestroy()
-    {
-        EditorManager.EditorInstance.OnBackgroundTextureLoaded -= EditorInstance_OnBackgroundTextureLoaded;
-    }
-
     private void EditorInstance_OnBackgroundTextureLoaded(Texture2D obj)
     {
         if (obj == null)

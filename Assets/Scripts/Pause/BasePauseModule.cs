@@ -48,6 +48,7 @@ public abstract class BasePauseModule : MonoBehaviour
     {
         if (isModuleActive)
         {
+            OnModuleInitialized(); // only reset the values
             return;
         }
 

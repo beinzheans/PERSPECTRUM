@@ -19,14 +19,11 @@ public class AudioCalibrationManager : MonoBehaviour
 
     [SerializeField] private TMP_Text offsetText;
     [SerializeField] private Slider offsetSlider;
-    private bool predictiveHitsoundStorage; // store the user preference before modifying it
 
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
-        predictiveHitsoundStorage = GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds;
 
-        GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, true);
         string chartFilePath = Path.Combine(Application.streamingAssetsPath, $"{k_CALIBRATIONCHARTNAME}.{GameManager.k_FILEEXTENSION}");
 
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
@@ -86,6 +83,5 @@ public class AudioCalibrationManager : MonoBehaviour
     {
         gameplayManager.OnGameplayStarted -= GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded -= GameplayManager_OnGameplayEnded;
-        GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, predictiveHitsoundStorage);
     }
 }
