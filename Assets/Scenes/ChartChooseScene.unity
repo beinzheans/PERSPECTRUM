@@ -4121,7 +4121,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -14.148315}
+  m_AnchoredPosition: {x: 0, y: -14.148254}
   m_SizeDelta: {x: -88, y: -539.7034}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1290301939
@@ -5494,19 +5494,7 @@ MonoBehaviour:
           m_CallState: 2
     _onFocusingBoxChanged:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1493196289}
-          m_TargetAssemblyTypeName: ChartChooseButtonBank, ScriptReference
-          m_MethodName: UI_OnBoxMoved
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
     _onMovementEnd:
       m_PersistentCalls:
         m_Calls: []
@@ -5870,7 +5858,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00038871556, y: 0}
+  m_AnchoredPosition: {x: 0.00031427207, y: 0}
   m_SizeDelta: {x: 0, y: 110.78}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1676601379
@@ -6738,12 +6726,28 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5661855899909660476, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -48.400146
+      objectReference: {fileID: 0}
+    - target: {fileID: 5661855899909660476, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 45.80005
+      objectReference: {fileID: 0}
     - target: {fileID: 6669326423293162349, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6669326423293162349, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6669326423293162349, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6669326423293162349, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -53,6 +53,11 @@ public class ChartChooseAudioManager : MonoBehaviour
     private TimerIntervalAction playAction;
     private async void ChartChooseManager_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
+        if (obj == null || id == -1)
+        {
+            return;
+        }
+
         if (currentPlayingChartContents != null && currentPlayingChartContents.Equals(obj))
         {
             return;

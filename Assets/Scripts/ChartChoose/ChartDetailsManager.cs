@@ -29,6 +29,11 @@ public class ChartDetailsManager : MonoBehaviour
     private const double k_DETAILSCALETIME = 0.1d;
     private void ChartChooseInstance_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
+        if (obj == null || id == -1)
+        {
+            return;
+        }
+
         PlayChartButton.onClick.RemoveAllListeners();
         DeleteChartButton.onClick.RemoveAllListeners();
 

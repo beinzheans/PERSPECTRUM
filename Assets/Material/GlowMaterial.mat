@@ -119,7 +119,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _GlowRadius: 0.4
+    - _GlowRadius: 0.32811248
     - _GlowSoftnessFactor: 8
     - _Metallic: 0
     - _OcclusionStrength: 1

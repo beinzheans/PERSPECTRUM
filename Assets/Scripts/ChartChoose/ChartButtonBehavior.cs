@@ -20,14 +20,14 @@ public class ChartButtonBehavior : ListBox
     private void Start()
     {
         ChartChooseManager.ChartChooseInstance.OnChartButtonClicked += ChartChooseInstance_OnChartButtonClicked;
-
         previousContentID = ContentID;
     }
 
     private void ChartChooseInstance_OnChartButtonClicked(ChartButtonBehaviorContents obj, int id)
     {
-        if (obj == null)
+        if (obj == null || id == -1)
         {
+            image.color = new Color(Color.white.r, Color.white.g, Color.white.b, k_DEFAULTALPHA);
             return;
         }
 

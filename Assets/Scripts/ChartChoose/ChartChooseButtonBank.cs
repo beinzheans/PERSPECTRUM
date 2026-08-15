@@ -18,6 +18,8 @@ public class ChartChooseButtonBank : BaseListBank
 
     private ChartButtonSortOptions sortOptions = ChartButtonSortOptions.ALPHABETICAL;
     private ChartSortOrder sortOrder = ChartSortOrder.ASCENDING;
+
+    private int currentSelectedContentID = -1;
     private void Start()
     {
         chartChooseManager = ChartChooseManager.ChartChooseInstance;
@@ -33,7 +35,25 @@ public class ChartChooseButtonBank : BaseListBank
         chartChooseManager.InitializeChartButtonsFromFile();
     }
 
-    private void ChartChooseManager_OnSortOrderChanged(ChartButtonBehaviorContents selectedContents, ChartSortOrder obj)
+    /// <summary>
+    /// Selects a new chart based on content ID as the link. <br></br>
+    /// Pass in "-1" to reset, indicating none selected.
+    /// </summary>
+    /// <param name="contentID"></param>
+    private void SelectNewContentID(int contentID)
+    {
+        if (contentID == -1)
+        {
+            currentSelectedContentID = contentID;
+            chartChooseManager.InvokeOnChartButtonClickedEvent(null, contentID);
+            return;
+        }
+
+        circularScrollingList.SelectContentID(contentID);
+        currentSelectedContentID = contentID;
+        chartChooseManager.InvokeOnChartButtonClickedEvent((ChartButtonBehaviorContents)GetListContent(contentID), contentID);
+    }
+    private void ChartChooseManager_OnSortOrderChanged(ChartSortOrder obj)
     {
         if (sortOrder == obj)
         {
@@ -42,15 +62,12 @@ public class ChartChooseButtonBank : BaseListBank
 
         sortOrder = obj;
 
-        int searchIndex = behaviorContents.FindIndex(x => x.Equals(selectedContents));
         SortChartButtons();
         circularScrollingList.Refresh();
-        circularScrollingList.SelectContentID(0);
-
-        chartChooseManager.InvokeOnChartButtonClickedEvent((ChartButtonBehaviorContents)GetListContent(0), 0);
+        SelectNewContentID(0);
     }
 
-    private void ChartChooseManager_OnSortOptionSelected(ChartButtonBehaviorContents selectedContents, ChartButtonSortOptions obj)
+    private void ChartChooseManager_OnSortOptionSelected(ChartButtonSortOptions obj)
     {
         if (sortOptions == obj)
         {
@@ -60,9 +77,7 @@ public class ChartChooseButtonBank : BaseListBank
         sortOptions = obj;
         SortChartButtons();
         circularScrollingList.Refresh();
-        circularScrollingList.SelectContentID(0);
-
-        chartChooseManager.InvokeOnChartButtonClickedEvent((ChartButtonBehaviorContents)GetListContent(0), 0);
+        SelectNewContentID(0);
     }
 
     private void OnDestroy()
@@ -74,17 +89,8 @@ public class ChartChooseButtonBank : BaseListBank
 
     private (ChartButtonBehaviorContents, int) GetCurrentFocusedChartButton()
     {
-        int focusedID = circularScrollingList.GetFocusingContentID();
-
-        if (focusedID < 0 || focusedID >= behaviorContents.Count)
-        {
-            return (null, -1);
-        }
-
-        return (behaviorContents[focusedID], focusedID);
+        return ((ChartButtonBehaviorContents)GetListContent(currentSelectedContentID), currentSelectedContentID);
     }
-
-
 
     private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents obj)
     {
@@ -96,13 +102,7 @@ public class ChartChooseButtonBank : BaseListBank
         circularScrollingList.Refresh();
         importedChartsText.text = $"Imported Charts ({GetContentCount()})";
 
-        (ChartButtonBehaviorContents contents, int id) = GetCurrentFocusedChartButton();
-        if (contents == null)
-        {
-            return;
-        }
-
-        chartChooseManager.InvokeOnChartButtonClickedEvent(contents, id);
+        SelectNewContentID(-1);
     }
 
     private void ChartChooseManager_OnChartButtonNeededAdd(ChartButtonBehaviorContents obj)
@@ -112,13 +112,6 @@ public class ChartChooseButtonBank : BaseListBank
         circularScrollingList.Refresh();
 
         importedChartsText.text = $"Imported Charts ({GetContentCount()})";
-        (ChartButtonBehaviorContents contents, int id) = GetCurrentFocusedChartButton();
-        if (contents == null)
-        {
-            return;
-        }
-
-        chartChooseManager.InvokeOnChartButtonClickedEvent(contents, id);
     }
 
     public override int GetContentCount()
@@ -138,7 +131,7 @@ public class ChartChooseButtonBank : BaseListBank
             return;
         }
 
-        chartChooseManager.InvokeOnChartButtonClickedEvent(behavior.Contents, box.ContentID);
+        SelectNewContentID(box.ContentID);
     }
 
     private void SortChartButtons()

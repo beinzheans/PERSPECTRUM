@@ -19,8 +19,8 @@ public class ChartChooseManager : MonoBehaviour
     public event Func<(ChartButtonBehaviorContents, int)> OnRequestCurrentSelectedChartButton;
     public event Action<ChartButtonBehaviorContents> OnChartDeleted;
 
-    public event Action<ChartButtonBehaviorContents, ChartButtonSortOptions> OnSortOptionSelected;
-    public event Action<ChartButtonBehaviorContents, ChartSortOrder> OnSortOrderChanged;
+    public event Action<ChartButtonSortOptions> OnSortOptionSelected;
+    public event Action<ChartSortOrder> OnSortOrderChanged;
 
     public int CurrentSelectChartContentID { get; private set; }
     private void Awake()
@@ -103,7 +103,6 @@ public class ChartChooseManager : MonoBehaviour
         }
 
         ChartButtonBehaviorContents contentsToDelete = request.Value.Item1;
-
         if (contentsToDelete == null)
         {
             return;
@@ -163,31 +162,11 @@ public class ChartChooseManager : MonoBehaviour
 
     public void InvokeOnChartSortingOptionSelectedEvent(ChartButtonSortOptions sortingOption)
     {
-        var request = OnRequestCurrentSelectedChartButton?.Invoke();
-
-        if (request == null)
-        {
-            OnSortOptionSelected?.Invoke(null, sortingOption);
-            return;
-        }
-
-        ChartButtonBehaviorContents selectedContent = request.Value.Item1;
-
-        OnSortOptionSelected?.Invoke(selectedContent, sortingOption);
+        OnSortOptionSelected?.Invoke(sortingOption);
     }
 
     public void InvokeOnChartOrderingOptionEvent(ChartSortOrder sortOrder)
     {
-        var request = OnRequestCurrentSelectedChartButton?.Invoke();
-
-        if (request == null)
-        {
-            OnSortOrderChanged?.Invoke(null, sortOrder);
-            return;
-        }
-
-        ChartButtonBehaviorContents selectedContent = request.Value.Item1;
-
-        OnSortOrderChanged?.Invoke(selectedContent, sortOrder);
+        OnSortOrderChanged?.Invoke(sortOrder);
     }
 }
