@@ -210,7 +210,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""MoveSelectedObjects"",
+                    ""name"": ""MoveSelectedObjects_Special"",
                     ""type"": ""Button"",
                     ""id"": ""89f285b0-902c-4b2e-8f35-fcffb757851a"",
                     ""expectedControlType"": """",
@@ -249,6 +249,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""EditorStartPlayback"",
                     ""type"": ""Button"",
                     ""id"": ""309b94a0-25d4-4f86-bf91-e6bda3c814d8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveSelectedObjects_MouseDelta"",
+                    ""type"": ""Button"",
+                    ""id"": ""051f1329-75e8-4eb5-9b00-38d543c8c75c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -450,7 +459,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MoveSelectedObjects"",
+                    ""action"": ""MoveSelectedObjects_Special"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -461,7 +470,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""MoveSelectedObjects"",
+                    ""action"": ""MoveSelectedObjects_Special"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -472,7 +481,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KB&M"",
-                    ""action"": ""MoveSelectedObjects"",
+                    ""action"": ""MoveSelectedObjects_Special"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -750,6 +759,39 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""EditorStartPlayback"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""b23ae0d9-852c-4e04-bc59-27becaf75140"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveSelectedObjects_MouseDelta"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""1a174ce6-5a3d-4e2c-be55-2386e18c8482"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""MoveSelectedObjects_MouseDelta"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""730eb417-7165-4ead-af2a-bd232555597b"",
+                    ""path"": ""<Mouse>{VirtualMouseTag}/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""MoveSelectedObjects_MouseDelta"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -876,11 +918,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Editor_CopyObjects = m_Editor.FindAction("CopyObjects", throwIfNotFound: true);
         m_Editor_PasteObjects = m_Editor.FindAction("PasteObjects", throwIfNotFound: true);
         m_Editor_CutObjects = m_Editor.FindAction("CutObjects", throwIfNotFound: true);
-        m_Editor_MoveSelectedObjects = m_Editor.FindAction("MoveSelectedObjects", throwIfNotFound: true);
+        m_Editor_MoveSelectedObjects_Special = m_Editor.FindAction("MoveSelectedObjects_Special", throwIfNotFound: true);
         m_Editor_ToolPositiveNegativeInput = m_Editor.FindAction("ToolPositiveNegativeInput", throwIfNotFound: true);
         m_Editor_UndoEditorCommand = m_Editor.FindAction("UndoEditorCommand", throwIfNotFound: true);
         m_Editor_RedoEditorCommand = m_Editor.FindAction("RedoEditorCommand", throwIfNotFound: true);
         m_Editor_EditorStartPlayback = m_Editor.FindAction("EditorStartPlayback", throwIfNotFound: true);
+        m_Editor_MoveSelectedObjects_MouseDelta = m_Editor.FindAction("MoveSelectedObjects_MouseDelta", throwIfNotFound: true);
         // Gameplay
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_MousePosition = m_Gameplay.FindAction("MousePosition", throwIfNotFound: true);
@@ -981,11 +1024,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Editor_CopyObjects;
     private readonly InputAction m_Editor_PasteObjects;
     private readonly InputAction m_Editor_CutObjects;
-    private readonly InputAction m_Editor_MoveSelectedObjects;
+    private readonly InputAction m_Editor_MoveSelectedObjects_Special;
     private readonly InputAction m_Editor_ToolPositiveNegativeInput;
     private readonly InputAction m_Editor_UndoEditorCommand;
     private readonly InputAction m_Editor_RedoEditorCommand;
     private readonly InputAction m_Editor_EditorStartPlayback;
+    private readonly InputAction m_Editor_MoveSelectedObjects_MouseDelta;
     /// <summary>
     /// Provides access to input actions defined in input action map "Editor".
     /// </summary>
@@ -1050,9 +1094,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @CutObjects => m_Wrapper.m_Editor_CutObjects;
         /// <summary>
-        /// Provides access to the underlying input action "Editor/MoveSelectedObjects".
+        /// Provides access to the underlying input action "Editor/MoveSelectedObjects_Special".
         /// </summary>
-        public InputAction @MoveSelectedObjects => m_Wrapper.m_Editor_MoveSelectedObjects;
+        public InputAction @MoveSelectedObjects_Special => m_Wrapper.m_Editor_MoveSelectedObjects_Special;
         /// <summary>
         /// Provides access to the underlying input action "Editor/ToolPositiveNegativeInput".
         /// </summary>
@@ -1069,6 +1113,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Editor/EditorStartPlayback".
         /// </summary>
         public InputAction @EditorStartPlayback => m_Wrapper.m_Editor_EditorStartPlayback;
+        /// <summary>
+        /// Provides access to the underlying input action "Editor/MoveSelectedObjects_MouseDelta".
+        /// </summary>
+        public InputAction @MoveSelectedObjects_MouseDelta => m_Wrapper.m_Editor_MoveSelectedObjects_MouseDelta;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1134,9 +1182,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @CutObjects.started += instance.OnCutObjects;
             @CutObjects.performed += instance.OnCutObjects;
             @CutObjects.canceled += instance.OnCutObjects;
-            @MoveSelectedObjects.started += instance.OnMoveSelectedObjects;
-            @MoveSelectedObjects.performed += instance.OnMoveSelectedObjects;
-            @MoveSelectedObjects.canceled += instance.OnMoveSelectedObjects;
+            @MoveSelectedObjects_Special.started += instance.OnMoveSelectedObjects_Special;
+            @MoveSelectedObjects_Special.performed += instance.OnMoveSelectedObjects_Special;
+            @MoveSelectedObjects_Special.canceled += instance.OnMoveSelectedObjects_Special;
             @ToolPositiveNegativeInput.started += instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.performed += instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.canceled += instance.OnToolPositiveNegativeInput;
@@ -1149,6 +1197,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @EditorStartPlayback.started += instance.OnEditorStartPlayback;
             @EditorStartPlayback.performed += instance.OnEditorStartPlayback;
             @EditorStartPlayback.canceled += instance.OnEditorStartPlayback;
+            @MoveSelectedObjects_MouseDelta.started += instance.OnMoveSelectedObjects_MouseDelta;
+            @MoveSelectedObjects_MouseDelta.performed += instance.OnMoveSelectedObjects_MouseDelta;
+            @MoveSelectedObjects_MouseDelta.canceled += instance.OnMoveSelectedObjects_MouseDelta;
         }
 
         /// <summary>
@@ -1199,9 +1250,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @CutObjects.started -= instance.OnCutObjects;
             @CutObjects.performed -= instance.OnCutObjects;
             @CutObjects.canceled -= instance.OnCutObjects;
-            @MoveSelectedObjects.started -= instance.OnMoveSelectedObjects;
-            @MoveSelectedObjects.performed -= instance.OnMoveSelectedObjects;
-            @MoveSelectedObjects.canceled -= instance.OnMoveSelectedObjects;
+            @MoveSelectedObjects_Special.started -= instance.OnMoveSelectedObjects_Special;
+            @MoveSelectedObjects_Special.performed -= instance.OnMoveSelectedObjects_Special;
+            @MoveSelectedObjects_Special.canceled -= instance.OnMoveSelectedObjects_Special;
             @ToolPositiveNegativeInput.started -= instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.performed -= instance.OnToolPositiveNegativeInput;
             @ToolPositiveNegativeInput.canceled -= instance.OnToolPositiveNegativeInput;
@@ -1214,6 +1265,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @EditorStartPlayback.started -= instance.OnEditorStartPlayback;
             @EditorStartPlayback.performed -= instance.OnEditorStartPlayback;
             @EditorStartPlayback.canceled -= instance.OnEditorStartPlayback;
+            @MoveSelectedObjects_MouseDelta.started -= instance.OnMoveSelectedObjects_MouseDelta;
+            @MoveSelectedObjects_MouseDelta.performed -= instance.OnMoveSelectedObjects_MouseDelta;
+            @MoveSelectedObjects_MouseDelta.canceled -= instance.OnMoveSelectedObjects_MouseDelta;
         }
 
         /// <summary>
@@ -1488,12 +1542,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnCutObjects(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "MoveSelectedObjects" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MoveSelectedObjects_Special" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnMoveSelectedObjects(InputAction.CallbackContext context);
+        void OnMoveSelectedObjects_Special(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "ToolPositiveNegativeInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -1522,6 +1576,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnEditorStartPlayback(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MoveSelectedObjects_MouseDelta" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMoveSelectedObjects_MouseDelta(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Gameplay" which allows adding and removing callbacks.

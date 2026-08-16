@@ -27,6 +27,13 @@ public class EditorPoint : EditorDynamicObject
         NormalizedPosition = MathHelper.GetRotatedPosition(NormalizedPosition, moveMode);
         EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
+
+    public override void Move_Delta(Vector2 normalizedMoveDelta)
+    {
+        NormalizedPosition += normalizedMoveDelta;
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
+    }
+
     public override bool GetPosition(out Vector2 position)
     {
         position = NormalizedPosition;

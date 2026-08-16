@@ -124,7 +124,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "MoveSelectedObjects",
+                    "name": "MoveSelectedObjects_Special",
                     "type": "Button",
                     "id": "89f285b0-902c-4b2e-8f35-fcffb757851a",
                     "expectedControlType": "",
@@ -163,6 +163,15 @@
                     "name": "EditorStartPlayback",
                     "type": "Button",
                     "id": "309b94a0-25d4-4f86-bf91-e6bda3c814d8",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MoveSelectedObjects_MouseDelta",
+                    "type": "Button",
+                    "id": "051f1329-75e8-4eb5-9b00-38d543c8c75c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -364,7 +373,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MoveSelectedObjects",
+                    "action": "MoveSelectedObjects_Special",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -375,7 +384,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KB&M",
-                    "action": "MoveSelectedObjects",
+                    "action": "MoveSelectedObjects_Special",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -386,7 +395,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KB&M",
-                    "action": "MoveSelectedObjects",
+                    "action": "MoveSelectedObjects_Special",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -664,6 +673,39 @@
                     "action": "EditorStartPlayback",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "One Modifier",
+                    "id": "b23ae0d9-852c-4e04-bc59-27becaf75140",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MoveSelectedObjects_MouseDelta",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "1a174ce6-5a3d-4e2c-be55-2386e18c8482",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KB&M",
+                    "action": "MoveSelectedObjects_MouseDelta",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "730eb417-7165-4ead-af2a-bd232555597b",
+                    "path": "<Mouse>{VirtualMouseTag}/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KB&M",
+                    "action": "MoveSelectedObjects_MouseDelta",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         },

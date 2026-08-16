@@ -486,6 +486,12 @@ public class EditorManager : MonoBehaviour
         undoCommandStack.Clear(); // remove undo history
     }
 
+    public void PushEditorCommand(EditorCommand command)
+    {
+        executeCommandStack.Push(command);
+        undoCommandStack.Clear();
+    }
+
     public void UndoEditorCommand()
     {
         bool popResult = executeCommandStack.TryPop(out EditorCommand command);

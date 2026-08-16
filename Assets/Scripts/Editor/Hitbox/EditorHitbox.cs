@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem.Processors;
 
 [Serializable]
 public class EditorHitbox : EditorDynamicObject, IConvertable<VisualHitbox>
@@ -29,6 +30,12 @@ public class EditorHitbox : EditorDynamicObject, IConvertable<VisualHitbox>
     public override void Move_Rotate(MoveSelectedMode moveMode)
     {
         NormalizedPosition = MathHelper.GetRotatedPosition(NormalizedPosition, moveMode);
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
+    }
+
+    public override void Move_Delta(Vector2 normalizedMoveDelta)
+    {
+        NormalizedPosition += normalizedMoveDelta;
         EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 

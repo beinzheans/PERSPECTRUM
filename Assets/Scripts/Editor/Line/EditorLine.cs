@@ -124,6 +124,13 @@ public class EditorLine : EditorDynamicObject, IConvertable<VisualLine>
         EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 
+    public override void Move_Delta(Vector2 normalizedMoveDelta)
+    {
+        FromNormalizedPosition += normalizedMoveDelta;
+        ToNormalizedPosition += normalizedMoveDelta;
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
+    }
+
     public override void AddDeltaTime(double deltaTime)
     {
         FromTime += deltaTime;

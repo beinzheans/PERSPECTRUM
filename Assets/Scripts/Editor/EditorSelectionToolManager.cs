@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EditorSelectionToolManager : EditorUIBehavior
@@ -7,21 +8,111 @@ public class EditorSelectionToolManager : EditorUIBehavior
     [SerializeField] private MoveSelectedMode moveMode;
     private EditorManager editorInstance;
     private PlayerInputActions inputActions;
+
+    private bool startRecordingMouseDelta;
+    private Vector2 initialNormalizedMousePosition;
+
+    private List<Vector2> initialSelectedObjectPositions = new List<Vector2>();
     protected override void Start()
     {
         base.Start();
         editorInstance = EditorManager.EditorInstance;
         inputActions = GameManager.GameInstance.InputActions;
         moveMode = MoveSelectedMode.None;
-        inputActions.Editor.MoveSelectedObjects.performed += MoveSelectedObjects_performed;
+        inputActions.Editor.MoveSelectedObjects_Special.performed += MoveSelectedObjects_Special_performed;
+        inputActions.Editor.MoveSelectedObjects_MouseDelta.performed += MoveSelectedObjects_MouseDelta_performed;
+        inputActions.Editor.MoveSelectedObjects_MouseDelta.canceled += MoveSelectedObjects_MouseDelta_canceled;
+    }
+
+    private void MoveSelectedObjects_MouseDelta_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
+        startRecordingMouseDelta = false;
+
+        List<Vector2> finalSelectedObjectPositions = editorInstance.CurrentSelectedRenderables.Select(x => { x.GetPosition(out Vector2 position); return position; }).ToList();
+        List<EditorDynamicObject> selectedObjects = editorInstance.CurrentSelectedRenderables;
+
+        Action executeCommand = () =>
+        {
+            for (int i = 0; i < selectedObjects.Count; i++)
+            {
+                bool result = selectedObjects[i].GetPosition(out Vector2 position);
+                if (!result)
+                {
+                    Debug.LogWarning($"Selected object has no implementation for getting position, yet there was attempt to move by mouse delta.");
+                    continue;
+                }
+
+                selectedObjects[i].Move_Delta(finalSelectedObjectPositions[i] - position);
+            }
+        };
+
+        Action undoCommand = () =>
+        {
+            for (int i = 0; i < selectedObjects.Count; i++)
+            {
+                bool result = selectedObjects[i].GetPosition(out Vector2 position);
+                if (!result)
+                {
+                    Debug.LogWarning($"Selected object has no implementation for getting position, yet there was attempt to move by mouse delta.");
+                    continue;
+                }
+
+                selectedObjects[i].Move_Delta(initialSelectedObjectPositions[i] - position);
+            }
+        };
+
+
+        EditorCommand command = new EditorCommand(executeCommand, undoCommand);
+        editorInstance.ExecuteEditorCommand(command);
+    }
+
+    private void MoveSelectedObjects_MouseDelta_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
+        startRecordingMouseDelta = true;
+        initialNormalizedMousePosition = editorInstance.EditorMousePosition;
+
+        List<EditorDynamicObject> selected = editorInstance.CurrentSelectedRenderables;
+        initialSelectedObjectPositions = selected.Select(x => { x.GetPosition(out Vector2 position); return position; }).ToList();
+}
+
+    private void Update()
+    {
+        if (!startRecordingMouseDelta)
+        {
+            return;
+        }
+
+        Vector2 delta = editorInstance.EditorMousePosition - initialNormalizedMousePosition;
+
+        if (MathHelper.IsTwoFloatsEqualWithEpsilion(delta.magnitude, 0f))
+        {
+            return;
+        }
+
+        for (int i = 0; i < editorInstance.CurrentSelectedRenderables.Count; i++)
+        {
+            editorInstance.CurrentSelectedRenderables[i].Move_Delta(delta);
+        }
+
+        initialNormalizedMousePosition = editorInstance.EditorMousePosition;
     }
 
     private void OnDestroy()
     {
-        inputActions.Editor.MoveSelectedObjects.performed -= MoveSelectedObjects_performed;
+        inputActions.Editor.MoveSelectedObjects_Special.performed -= MoveSelectedObjects_Special_performed;
     }
 
-    private void MoveSelectedObjects_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void MoveSelectedObjects_Special_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
         {

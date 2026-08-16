@@ -63,6 +63,11 @@ public class EditorDynamicObject : EditorObject, IPlaceDeleteable, IEditable
         return;
     }
 
+    public virtual void Move_Delta(Vector2 normalizedMoveDelta)
+    {
+        return;
+    }
+
     /// <summary>
     /// Edits a property of this object to a new value using an expression tree.
     /// </summary>
