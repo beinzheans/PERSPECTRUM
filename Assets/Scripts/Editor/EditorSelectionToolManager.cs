@@ -33,9 +33,10 @@ public class EditorSelectionToolManager : EditorUIBehavior
 
         startRecordingMouseDelta = false;
 
-        List<Vector2> finalSelectedObjectPositions = editorInstance.CurrentSelectedRenderables.Select(x => { x.GetPosition(out Vector2 position); return position; }).ToList();
-        List<EditorDynamicObject> selectedObjects = editorInstance.CurrentSelectedRenderables;
+        List<EditorDynamicObject> selectedObjects = new List<EditorDynamicObject>(editorInstance.CurrentSelectedRenderables);
 
+        List<Vector2> finalSelectedObjectPositions = selectedObjects.Select(x => { x.GetPosition(out Vector2 position); return position; }).ToList();
+        List<Vector2> initialSelectedObjectPositions = new List<Vector2>(this.initialSelectedObjectPositions);
         Action executeCommand = () =>
         {
             for (int i = 0; i < selectedObjects.Count; i++)
@@ -81,8 +82,7 @@ public class EditorSelectionToolManager : EditorUIBehavior
         startRecordingMouseDelta = true;
         initialNormalizedMousePosition = editorInstance.EditorMousePosition;
 
-        List<EditorDynamicObject> selected = editorInstance.CurrentSelectedRenderables;
-        initialSelectedObjectPositions = selected.Select(x => { x.GetPosition(out Vector2 position); return position; }).ToList();
+        initialSelectedObjectPositions = editorInstance.CurrentSelectedRenderables.Select(x => { x.GetPosition(out Vector2 position); return position; }).ToList();
 }
 
     private void Update()
