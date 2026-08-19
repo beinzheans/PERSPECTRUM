@@ -24,6 +24,7 @@ public class GameplayUIBehavior : MonoBehaviour
 
     [SerializeField] private TMP_Text gameplay_progress;
     [SerializeField] private Slider gameplay_progressSlider;
+    [SerializeField] private UIElastic gameplay_progressSlider_Handle;
 
     [SerializeField] private UIElastic gameplay_matchIcon;
     [SerializeField] private UIElastic gameplay_mismatchIcon;
@@ -74,9 +75,10 @@ public class GameplayUIBehavior : MonoBehaviour
         {
             return;
         }
-
         TimerIntervalAction tickAction = new TimerIntervalAction(this, (x) =>
         {
+            gameplayResume_tickText.gameObject.SetActive(true);
+
             gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA * (float)tick / GameplayResumeManager.k_NUMBEROFLEADINTICKS);
             gameplayResume_tickText.UIText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA * (float)tick / GameplayResumeManager.k_NUMBEROFLEADINTICKS);
             gameplayResume_tickText.SetText(tick.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
@@ -89,16 +91,15 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void GameplayManager_OnGameplayWaitingForResume()
     {
+        gameplayResume_tickText.gameObject.SetActive(false);
         gameplayResume_UI.SetActive(true);
         tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
         gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA);
-        gameplayResume_tickText.UIText.color = new Color(1f, 1f, 1f, k_GAMERESUMEBACKGROUNDALPHA);
-        gameplayResume_tickText.SetText(tick.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
     }
 
     private void GameplayManager_OnGameplayResumed()
     {
-        TimerIntervalAction tickAction = new TimerIntervalAction(this, (x) => gameplayResume_UI.SetActive(false), () => { }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
+        TimerIntervalAction tickAction = new TimerIntervalAction(this, (x) => gameplayResume_UI.SetActive(false), () => { }, GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(tickAction);
 
@@ -115,6 +116,8 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplay_score.SetText(((int)math.round(gameplayManager.CurrentScore)).ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
         gameplay_progress.text = $"{gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount} | {gameplayManager.MaxHitboxCount}";
         gameplay_progressSlider.value = (float)(gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount) / gameplayManager.MaxHitboxCount;
+        gameplay_progressSlider_Handle.PulseElasticSize(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
+
     }
     private void GameplayManager_OnHitboxBombHit(VisualHitbox hitbox)
     {

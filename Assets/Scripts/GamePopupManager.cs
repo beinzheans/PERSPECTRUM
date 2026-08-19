@@ -140,6 +140,7 @@ public class GamePopupManager : MonoBehaviour
         }
 
         popupPanel.SetActive(false);
+        gameInstance.InvokeConfirmPanelHide();
     }
 
     private void ShowPanel()
@@ -149,6 +150,7 @@ public class GamePopupManager : MonoBehaviour
             return;
         }
         popupPanel.SetActive(true);
+        gameInstance.InvokeConfirmPanelShow();
     }
 }
 

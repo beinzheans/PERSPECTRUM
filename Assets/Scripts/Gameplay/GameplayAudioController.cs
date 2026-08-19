@@ -48,7 +48,7 @@ public class GameplayAudioController : MonoBehaviour
 
     private void GameplayManager_OnGameplayResumed()
     {
-        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, 0d, GameManager.GameInstance.GlobalSettings.SongVolume, gameplayManager.CurrentGameplayTime, 1f, 0f);
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, gameplayManager.CurrentGameplayTime, 1f, 0f);
     }
 
     private void GameplayManager_OnGameplayWaitingForResume()

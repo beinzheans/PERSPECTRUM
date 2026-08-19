@@ -7,39 +7,34 @@ using UnityEngine.UI;
 /// Creates a blurred background image in gameplay, if one exists, otherwise creates a base color background. <br></br>
 /// Additionally handles the pulse of the background.
 /// </summary>
-public class GameplayImageBlurManager : MonoBehaviour
+public class GameplayBackgroundManager : MonoBehaviour
 {
     private static readonly int k_SHADER_BLURAMOUNT = Shader.PropertyToID("_Sigma");
+    private static readonly int k_SHADER_GRADIENTCOLORAKEY = Shader.PropertyToID("_ColorA");
+    private static readonly int k_SHADER_GRADIENTCOLORBKEY = Shader.PropertyToID("_ColorB");
 
     private Texture2D textureCache;
-    [SerializeField] private Camera backgroundCamera;
 
     [SerializeField] private RawImage rawImage;
     [SerializeField] private AspectRatioFitter aspectRatioFitter;
-    private Material blurMaterial;
+    [SerializeField] private Material blurMaterial;
+    [SerializeField] private Material gradientMaterial;
+
+    [SerializeField] private Color gradientAColor_Default;
+    [SerializeField] private Color gradientBColor_Default;
+
+    [SerializeField] private Color gradientAColor_Pulse;
+    [SerializeField] private Color gradientBColor_Pulse;
 
     [SerializeField] private Image darkPanelImage;
 
     private GameplayManager gameplayManager;
-    [SerializeField] private Color defaultBackgroundColor;
-    [SerializeField] private Color pulseBackgroundColor_default;
-
-    /// <summary>
-    /// How much we change the alpha of <see cref="darkPanelImage"/> for a pulse. Note this value is signed assumes the value given is 0 - 255.
-    /// </summary>
-    [SerializeField] private float pulseBackgroundAlpha_custom;
-
 
     int metronomeLoopIndex = 0;
 
     TimerStopwatchAction pulseAction;
 
     private bool isUsingCustomBackground = false;
-
-    private void Awake()
-    {
-        blurMaterial = rawImage.material;
-    }
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
@@ -48,6 +43,7 @@ public class GameplayImageBlurManager : MonoBehaviour
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
         gameplayManager.OnGameplayMetronomeFired += GameplayManager_OnGameplayMetronomeFired;
+
     }
 
     private void OnDestroy()
@@ -78,14 +74,16 @@ public class GameplayImageBlurManager : MonoBehaviour
 
         if (metronomeLoopIndex == 0)
         {
+            float darkenAmount = GetDarkenAmountBasedOnSettings();
+
             if (isUsingCustomBackground)
             {
-                float darkenAmount = math.remap(0f, 1f, 0.8f, 0.99f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
-                darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount + pulseBackgroundAlpha_custom / 255));
+                float pulseAmount = -math.remap(0f, 1f, 0f, 0.2f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
+                darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount + pulseAmount));
             }
             else
             {
-                backgroundCamera.backgroundColor = pulseBackgroundColor_default;
+                darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount));
             }
 
             pulseAction = new TimerStopwatchAction(this, (x) => PulseBackground(x), () => { }, 0d, GetPulseLength(), false);
@@ -99,16 +97,23 @@ public class GameplayImageBlurManager : MonoBehaviour
     {
         double progress = timeElapsed / GetPulseLength();
 
+        float darkenAmount = GetDarkenAmountBasedOnSettings();
         if (isUsingCustomBackground)
         {
-            float darkenAmount = math.remap(0f, 1f, 0.8f, 0.99f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
-            float dAlpha = Mathf.Lerp(pulseBackgroundAlpha_custom, 0f, (float)progress) / 255;
+            float pulseAmount = -math.remap(0f, 1f, 0f, 0.2f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
+
+            float dAlpha = Mathf.Lerp(pulseAmount, 0f, (float)progress);
             darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount + dAlpha));
         }
         else
         {
-            Color pulseColor = Color.Lerp(pulseBackgroundColor_default, defaultBackgroundColor, (float)progress);
-            backgroundCamera.backgroundColor = pulseColor;
+            Color colorA_pulse = Color.Lerp(gradientAColor_Default, gradientAColor_Pulse, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
+            Color colorB_pulse = Color.Lerp(gradientBColor_Default, gradientBColor_Pulse, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
+
+            Color colorA = Color.Lerp(colorA_pulse, gradientAColor_Default, (float)progress);
+            Color colorB = Color.Lerp(colorB_pulse,gradientBColor_Default, (float)progress);
+            gradientMaterial.SetColor(k_SHADER_GRADIENTCOLORAKEY, colorA);
+            gradientMaterial.SetColor(k_SHADER_GRADIENTCOLORBKEY, colorB);
         }
     }
     private void GameplayManager_OnGameplayRestarted()
@@ -128,6 +133,7 @@ public class GameplayImageBlurManager : MonoBehaviour
 
     private void SetupFog()
     {
+        RenderSettings.fogColor = Color.black;
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Linear;
         RenderSettings.fogStartDistance = GameplayManager.k_HITPLANEDEPTH;
@@ -140,30 +146,47 @@ public class GameplayImageBlurManager : MonoBehaviour
         if (texture == null || !GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground)
         {
             isUsingCustomBackground = false;
-            rawImage.gameObject.SetActive(false);
-            darkPanelImage.gameObject.SetActive(false);
-            backgroundCamera.backgroundColor = defaultBackgroundColor;
+            rawImage.texture = null;
+            rawImage.material = gradientMaterial;
 
-            RenderSettings.fogColor = defaultBackgroundColor;
-            return;
+            gradientMaterial.SetColor(k_SHADER_GRADIENTCOLORAKEY, gradientAColor_Default);
+            gradientMaterial.SetColor(k_SHADER_GRADIENTCOLORBKEY, gradientBColor_Default);
+        }
+        else
+        {
+            isUsingCustomBackground = true;
+            rawImage.texture = texture;
+            rawImage.material = blurMaterial;
+
+
+            float blurAmount = math.remap(0f, 1f, 0.1f, 3f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount);
+            blurMaterial.SetFloat(k_SHADER_BLURAMOUNT, blurAmount);
         }
 
-        isUsingCustomBackground = true;
-
-        rawImage.gameObject.SetActive(true);
-        rawImage.texture = texture;
-        float darkenAmount = math.remap(0f, 1f, 0.8f, 0.99f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
+        float darkenAmount = GetDarkenAmountBasedOnSettings();
         darkPanelImage.color = new Color(0f, 0f, 0f, darkenAmount);
-
-        float blurAmount = math.remap(0f, 1f, 0.1f, 3f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount);
-        blurMaterial.SetFloat(k_SHADER_BLURAMOUNT, blurAmount);
-
-        RenderSettings.fogColor = Color.black;
     }
 
     private double GetPulseLength()
     {
         return 60d / gameplayManager.CurrentActiveGameplayMarker.BPM * (k_CAMERABACKGROUNDPULSEBEAT / 2);
 
+    }
+
+    /// <summary>
+    /// Gets the alpha of <see cref="darkPanelImage"/> based on the settings and usage of custom backgrounds. <br></br>
+    /// Note the mapping is vastly different.
+    /// </summary>
+    /// <returns></returns>
+    private float GetDarkenAmountBasedOnSettings()
+    {
+        if (isUsingCustomBackground)
+        {
+            return math.remap(0f, 1f, 0.8f, 0.99f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
+        }
+        else
+        {
+            return GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount;
+        }
     }
 }

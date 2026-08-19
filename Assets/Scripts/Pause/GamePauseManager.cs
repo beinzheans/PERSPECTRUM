@@ -18,6 +18,8 @@ public class GamePauseManager : MonoBehaviour
     private Button[] pauseModuleButtons;
 
     [SerializeField] private Button ReturnMainMenuButton;
+    [SerializeField] private Button ContinueGameButton;
+
     [SerializeField] private TMP_Text PauseDescriptionText;
 
     private GameManager gameManager;
@@ -38,21 +40,49 @@ public class GamePauseManager : MonoBehaviour
         gameManager.PauseCanvas.gameObject.SetActive(false);
         gameManager.InputActions.Gameplay.EscapeMenuInput.performed += EscapeMenuInput_performed;
         gameManager.OnPauseMenuDescriptionChanged += GameManager_OnPauseMenuDescriptionChanged;
-
-
-        // resubscribe to escape action
+        gameManager.OnRequestOverridePauseMenuActiveState += OverridePauseMenuState;
+        gameManager.OnConfirmPanelShow += GameManager_OnConfirmPanelShow;
+        gameManager.OnConfirmPanelHide += GameManager_OnConfirmPanelHide;
         returnMainMenuConfirmAction = new(() =>
         {
-            gameManager.InputActions.Gameplay.EscapeMenuInput.performed += EscapeMenuInput_performed;
             SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
-            isInPauseMenu = false;
-            RemovePauseMenu();
+            gameManager.RequestOverrideGamePauseState(false);
         }, () =>
         {
-            gameManager.InputActions.Gameplay.EscapeMenuInput.performed += EscapeMenuInput_performed;
             gameManager.PauseCanvas.gameObject.SetActive(true);
         },
         "Are you sure you want to go back to the main menu?");
+    }
+
+    // we don't want to be able to bring the pause menu when waiting for a confirm action!
+    private void GameManager_OnConfirmPanelShow()
+    {
+        gameManager.InputActions.Gameplay.EscapeMenuInput.performed -= EscapeMenuInput_performed;
+    }
+
+    // resubscribe to action listener
+    private void GameManager_OnConfirmPanelHide()
+    {
+        gameManager.InputActions.Gameplay.EscapeMenuInput.performed += EscapeMenuInput_performed;
+    }
+
+    private void OverridePauseMenuState(bool obj)
+    {
+        if (isInPauseMenu == obj)
+        {
+            return;
+        }
+
+        isInPauseMenu = obj;
+
+        if (isInPauseMenu)
+        {
+            SetupPauseMenu();
+        }
+        else
+        {
+            RemovePauseMenu();
+        }
     }
 
     private void GameManager_OnPauseMenuDescriptionChanged(string obj)
@@ -78,6 +108,8 @@ public class GamePauseManager : MonoBehaviour
     {
         for (int i = 0; i < pauseModules.Length; i++)
         {
+            pauseModules[i].DeactiviateModule(); // remove all listeners, since it could be stale.
+
             if (i == index)
             {
                 pauseModules[index].InitializeModule();
@@ -85,7 +117,6 @@ public class GamePauseManager : MonoBehaviour
             }
             else
             {
-                pauseModules[i].DeactiviateModule();
                 pauseModuleButtons[i].image.color = Color.white;
             }
         }
@@ -141,13 +172,17 @@ public class GamePauseManager : MonoBehaviour
         ReturnMainMenuButton.onClick.AddListener(() =>
         {
             gameManager.PauseCanvas.gameObject.SetActive(false);
-            gameManager.InputActions.Gameplay.EscapeMenuInput.performed -= EscapeMenuInput_performed; // we don't want the user to be able to unpause when confirm action
             GameManager.GameInstance.InvokeConfirmActionNeeded(returnMainMenuConfirmAction);
         });
+
+        ContinueGameButton.onClick.AddListener(() => gameManager.RequestOverrideGamePauseState(false)); // we can call it privately, but it's best to invoke the game manager event in case other scripts need to listen!
     }
 
     private void RemoveListeners()
     {
         ReturnMainMenuButton.onClick.RemoveAllListeners();
+        ContinueGameButton.onClick.RemoveAllListeners();
     }
+
+    
 }

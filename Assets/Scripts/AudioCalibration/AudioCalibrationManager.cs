@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -83,5 +84,15 @@ public class AudioCalibrationManager : MonoBehaviour
     {
         gameplayManager.OnGameplayStarted -= GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded -= GameplayManager_OnGameplayEnded;
+    }
+
+    public void UI_MainMenuButton()
+    {
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
+    }
+
+    public void UI_SettingsButton()
+    {
+        GameManager.GameInstance.RequestOverrideGamePauseState(true);
     }
 }

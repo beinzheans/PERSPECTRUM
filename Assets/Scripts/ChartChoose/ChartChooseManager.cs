@@ -94,6 +94,11 @@ public class ChartChooseManager : MonoBehaviour
         SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
     }
 
+    public void UI_SettingsButton()
+    {
+        GameManager.GameInstance.RequestOverrideGamePauseState(true);
+    }
+
     public void RequestRemoveChart()
     {
         var request = OnRequestCurrentSelectedChartButton?.Invoke();

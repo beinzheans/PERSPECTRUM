@@ -38,7 +38,7 @@ public class ChartPlayHistoryManager : MonoBehaviour
 
         if (obj == null || id == -1)
         {
-            playHistoryLabelText.text = "Play History (0)";
+            playHistoryLabelText.text = "History (0)";
             return;
         }
 
@@ -46,11 +46,11 @@ public class ChartPlayHistoryManager : MonoBehaviour
 
         if (!GameManager.GameInstance.ChartMetadataGUIDToGameplayRecordMapping.TryGetValue(baseMetadata, out List<GameplayStatisticRecord> records))
         {
-            playHistoryLabelText.text = "Play History (0)";
+            playHistoryLabelText.text = "History (0)";
             return;
         }
 
-        playHistoryLabelText.text = $"Play History ({records.Count})";
+        playHistoryLabelText.text = $"History ({records.Count})";
 
         for (int i = 0; i < records.Count; i++)
         {
@@ -74,6 +74,6 @@ public class ChartPlayHistoryManager : MonoBehaviour
     private void ResetPlayHistoryUI()
     {
         RemoveAllPlayHistoryButton();
-        playHistoryLabelText.text = "Play History (0)";
+        playHistoryLabelText.text = "History (0)";
     }
 }

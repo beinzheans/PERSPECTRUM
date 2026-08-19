@@ -18,6 +18,9 @@ public class GameplayManager : MonoBehaviour
     public event Action OnGameplayEnded;
     public event Action OnGameplayRestarted;
     public event Action OnGameplayWaitingForResume;
+    /// <summary>
+    /// Note that the ticks are already delayed by <see cref="k_TIMEOFFSET"/>. No need to delay it further in the listeners.
+    /// </summary>
     public event Action OnGameplayResumeTick;
     public event Action OnGameplayResumed;
 
@@ -296,8 +299,10 @@ public class GameplayManager : MonoBehaviour
 
         GameplayMousePosition = MathHelper.ClampVectorByComponent(normalizedPoint, 0f, 1f);
     }
-
-    public const double k_TIMEOFFSET = 1d; // this allows for offset for the chart to be earlier than the dsp time
+    /// <summary>
+    /// This allows for offset for the chart to be earlier than the dsp time, giving a buffer to the audio offset.
+    /// </summary>
+    public const double k_TIMEOFFSET = 1d;
 
     private void UpdateGameplayTimeByDeltatime(double dt)
     {
@@ -602,7 +607,7 @@ public class GameplayManager : MonoBehaviour
 
     public void InvokeGameplayResumeTimerEnded()
     {
-        stopwatchAction.UnpauseTimer(GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
+        stopwatchAction.UnpauseTimer(k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
         OnGameplayResumed?.Invoke();
     }
 

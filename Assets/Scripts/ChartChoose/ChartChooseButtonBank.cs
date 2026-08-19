@@ -29,7 +29,7 @@ public class ChartChooseButtonBank : BaseListBank
         chartChooseManager.OnChartDeleted += ChartChooseManager_OnChartDeleted;
         chartChooseManager.OnSortOptionSelected += ChartChooseManager_OnSortOptionSelected;
         chartChooseManager.OnSortOrderChanged += ChartChooseManager_OnSortOrderChanged;
-        importedChartsText.text = $"Imported Charts (0)"; // case where no charts present at start
+        importedChartsText.text = "0"; // case where no charts present at start
 
         circularScrollingList.Initialize();
         chartChooseManager.InitializeChartButtonsFromFile();
@@ -100,7 +100,7 @@ public class ChartChooseButtonBank : BaseListBank
         }
 
         circularScrollingList.Refresh();
-        importedChartsText.text = $"Imported Charts ({GetContentCount()})";
+        importedChartsText.text = GetContentCount().ToString();
 
         SelectNewContentID(-1);
     }
@@ -111,7 +111,7 @@ public class ChartChooseButtonBank : BaseListBank
         SortChartButtons();
         circularScrollingList.Refresh();
 
-        importedChartsText.text = $"Imported Charts ({GetContentCount()})";
+        importedChartsText.text = GetContentCount().ToString();
     }
 
     public override int GetContentCount()

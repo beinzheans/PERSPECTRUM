@@ -55,4 +55,9 @@ public class TitleUIBehavior : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void UI_OnSettingsButtonPressed()
+    {
+        GameManager.GameInstance.RequestOverrideGamePauseState(true);
+    }
 }

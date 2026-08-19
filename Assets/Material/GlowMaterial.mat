@@ -114,13 +114,13 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
-    - _EdgeRadius: 0.186
+    - _EdgeRadius: 0.499
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _GlowRadius: 0.2
-    - _GlowSoftnessFactor: 8
+    - _GlowRadius: 0.2155364
+    - _GlowSoftnessFactor: 5.4
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -146,8 +146,8 @@ Material:
     - _ClipRect: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GlowColor: {r: 0.7075472, g: 0.4463711, b: 0.20358667, a: 1}
-    - _ObjectColor: {r: 0.34607512, g: 0.71554834, b: 0.7264151, a: 1}
+    - _GlowColor: {r: 0.10840159, g: 0.5523731, b: 0.7924528, a: 1}
+    - _ObjectColor: {r: 0.8962264, g: 0.5429296, b: 0.17332679, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

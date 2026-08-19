@@ -16,7 +16,7 @@ public class GameplayResumeManager : MonoBehaviour
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
-        resumeTimer = new TimerIntervalAction(this, x => gameplayManager.InvokeGameplayResumeTick(), () => gameplayManager.InvokeGameplayResumeTimerEnded(), 0d, k_DEFAULTTICKINTERVAL, k_NUMBEROFLEADINTICKS + 1);
+        resumeTimer = new TimerIntervalAction(this, x => gameplayManager.InvokeGameplayResumeTick(), () => gameplayManager.InvokeGameplayResumeTimerEnded(), GameplayManager.k_TIMEOFFSET, k_DEFAULTTICKINTERVAL, k_NUMBEROFLEADINTICKS);
 
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
@@ -36,6 +36,7 @@ public class GameplayResumeManager : MonoBehaviour
     {
         if (gameplayManager.IsInReplayMode) // no need to timer if in replay mode, just directly invoke resumed
         {
+            gameplayManager.InvokeGameplayResumeTimerStarted(); // we do this in case some other listeners are required!
             gameplayManager.InvokeGameplayResumeTimerEnded();
             return;
         }

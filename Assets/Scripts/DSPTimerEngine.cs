@@ -279,14 +279,14 @@ public abstract class TimerAction : IEquatable<TimerAction>
     /// <summary>
     /// Unpauses the timer with an additional offset time before resuming.
     /// </summary>
-    public void UnpauseTimer(double offset)
+    public void UnpauseTimer(double offset, bool overrideExistingProgress = false)
     {
         if (!IsTimerPaused)
         {
             return;
         }
 
-        OnTimerUnpausedEvent(offset);
+        OnTimerUnpausedEvent(offset, overrideExistingProgress);
         IsTimerPaused = false;
     }
 
@@ -298,7 +298,7 @@ public abstract class TimerAction : IEquatable<TimerAction>
     /// <summary>
     /// Custom implementations of events when the timer is unpaused.
     /// </summary>
-    protected abstract void OnTimerUnpausedEvent(double offset);
+    protected abstract void OnTimerUnpausedEvent(double offset, bool overrideExistingProgress);
 
     public override bool Equals(object obj)
     {
@@ -410,9 +410,9 @@ public class TimerIntervalAction : TimerAction, IEquatable<TimerIntervalAction>
         pauseTimeProgress = ExecuteTime - AudioSettings.dspTime;
     }
 
-    protected override void OnTimerUnpausedEvent(double offset)
+    protected override void OnTimerUnpausedEvent(double offset, bool overrideExistingProgress)
     {
-        ExecuteTime = AudioSettings.dspTime + offset + pauseTimeProgress;
+        ExecuteTime = AudioSettings.dspTime + offset + (overrideExistingProgress ? 0d : pauseTimeProgress);
     }
 
     public override bool Equals(object obj)
@@ -490,7 +490,7 @@ public class TimerStopwatchAction : TimerAction, IEquatable<TimerStopwatchAction
         return;
     }
 
-    protected override void OnTimerUnpausedEvent(double offset)
+    protected override void OnTimerUnpausedEvent(double offset, bool overrideExistingProgress)
     {
         ExecuteTime = AudioSettings.dspTime + offset;
         previousDSPTime = AudioSettings.dspTime + offset;

@@ -34,7 +34,21 @@ public class GameplayMetronomeManager : MonoBehaviour
             return;
         }
 
-        metronomeTimer.UnpauseTimer(GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
+        if (gameplayManager.IsMetronomeDisabled)
+        {
+            return;
+        }
+
+        if (currentMarkerInGameplay == null && initialMarker != null)
+        {
+            double timeUntilFirstBeat = initialMarker.RenderTime - gameplayManager.CurrentGameplayTime;
+
+            metronomeTimer.UnpauseTimer(timeUntilFirstBeat + GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, true);
+        }
+        else
+        {
+            metronomeTimer.UnpauseTimer(GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
+        }
     }
 
     private void GameplayManager_OnGameplayWaitingForResume()

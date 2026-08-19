@@ -48,6 +48,10 @@ public class GameManager : MonoBehaviour
     public event Action<ConfirmAction> OnConfirmActionNeeded;
     public event Action<string, double> OnInformationDisplayNeeded;
 
+    public event Action OnConfirmPanelShow;
+    public event Action OnConfirmPanelHide;
+
+    public event Action<bool> OnRequestOverridePauseMenuActiveState;
     public event Action OnPauseMenuEnable;
     public event Action OnPauseMenuDisable;
     public event Action<string> OnPauseMenuDescriptionChanged;
@@ -189,7 +193,7 @@ public class GameManager : MonoBehaviour
         string defaultKeybindJson = InputActions.SaveBindingOverridesAsJson();
 
         DefaultGlobalSettings = new GlobalSettings(0d, CursorMovementTypes.Relative, 1f, false, false, false, 0.25f, 0.5f, 0.5f, defaultKeybindJson, true,
-                                                  new GameSettings(3d, 1.5d, 0.5f, 0.85f, true),
+                                                  new GameSettings(3d, 1.5d, 0.5f, 0.5f, 0.5f, true),
                                                   new EditorSettings(1d, 1d),
                                                   new GraphicSettings(new Vector2Int(Display.main.systemWidth, Display.main.systemHeight), true, AntiAliasingMSAA.Off, 1f, true, 0),
                                                   new GameEvents(false, false));
@@ -297,6 +301,16 @@ public class GameManager : MonoBehaviour
         OnInformationDisplayNeeded?.Invoke(infoMessage, time);
     }
 
+    public void InvokeConfirmPanelShow()
+    {
+        OnConfirmPanelShow?.Invoke();
+    }
+
+    public void InvokeConfirmPanelHide()
+    {
+        OnConfirmPanelHide?.Invoke();
+    }
+
     /// <summary>
     /// Request to play the chart at the designated <paramref name="path"/>. This will automatically load the scene and invoke <see cref="GameplayManager.RequestGameplayStartedEvent(string)"/>.
     /// </summary>
@@ -321,6 +335,16 @@ public class GameManager : MonoBehaviour
     {
         SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord));
     }
+
+    /// <summary>
+    /// Overrides the current pause state kept track in <see cref="GamePauseManager"/>.
+    /// </summary>
+    /// <param name="isPaused"></param>
+    public void RequestOverrideGamePauseState(bool isPaused)
+    {
+        OnRequestOverridePauseMenuActiveState?.Invoke(isPaused);
+    }
+
     public void InvokeGamePauseMenuEnable()
     {
         DSPTimerEngine.TimerInstance.PauseDSPTimer();
@@ -473,14 +497,18 @@ public class GameSettings
     [DefaultValue(0.5f)]
     public float BackgroundDarkenAmount { get; private set; }
 
+    [DefaultValue(0.5f)]
+    public float BackgroundPulseStrength { get; private set; }
+
     [DefaultValue(true)]
     public bool UseCustomBackground { get; private set; }
-    public GameSettings(double gameScrollSpeed, double gameLookaheadTime, float backgroundBlurAmount, float backgroundDarkenAmount, bool useCustomBackground)
+    public GameSettings(double gameScrollSpeed, double gameLookaheadTime, float backgroundBlurAmount, float backgroundDarkenAmount, float backgroundPulseStrength, bool useCustomBackground)
     {
         GameScrollSpeed = gameScrollSpeed;
         GameLookaheadTime = gameLookaheadTime;
         BackgroundBlurAmount = backgroundBlurAmount;
         BackgroundDarkenAmount = backgroundDarkenAmount;
+        BackgroundPulseStrength = backgroundPulseStrength;
         UseCustomBackground = useCustomBackground;
     }
 }

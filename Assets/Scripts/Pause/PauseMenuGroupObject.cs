@@ -219,6 +219,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
         groupInputField.onEndEdit.RemoveAllListeners();
         groupSlider.onValueChanged.RemoveAllListeners();
         groupToggle.onValueChanged.RemoveAllListeners();
+        groupButton.onClick.RemoveAllListeners();
     }
 }
 /// <summary>
