@@ -40,6 +40,7 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
 
         for (int i = currentActiveObjects.Count - 1; i >= 0; i--)
         {
+            currentActiveObjects[i].IsRendered = false;
             UnrenderObject_ReturnToPool(currentActiveObjects[i]);
         }
 

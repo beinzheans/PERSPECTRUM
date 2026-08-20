@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class GameplayUIBehavior : MonoBehaviour
@@ -31,6 +32,12 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private UIElastic gameplay_missIcon;
 
     [SerializeField] private UIDynamic[] dynamicUIElements = new UIDynamic[0];
+
+    [Header("Gameplay Start UI")]
+    [SerializeField] private CanvasGroup gameplayStart_UICanvasGroup;
+    [SerializeField] private TMP_Text gameplayStart_colorText;
+    [SerializeField] private TMP_Text gameplayStart_restartText;
+
     [Header("Gameplay Resume UI")]
     [SerializeField] private GameObject gameplayResume_UI;
     [SerializeField] private Image gameplayResume_background;
@@ -92,16 +99,21 @@ public class GameplayUIBehavior : MonoBehaviour
     private void GameplayManager_OnGameplayWaitingForResume()
     {
         gameplayResume_tickText.gameObject.SetActive(false);
+        gameplayStart_UICanvasGroup.gameObject.SetActive(true);
         gameplayResume_UI.SetActive(true);
         tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
         gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA);
+
+        SetupStartGameplayUI(GameplayManager.k_TIMEOFFSET);
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(resumeUI_setInactiveTimer);
     }
 
+    private TimerIntervalAction resumeUI_setInactiveTimer;
     private void GameplayManager_OnGameplayResumed()
     {
-        TimerIntervalAction tickAction = new TimerIntervalAction(this, (x) => gameplayResume_UI.SetActive(false), () => { }, GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
+        resumeUI_setInactiveTimer = new TimerIntervalAction(this, (x) => gameplayResume_UI.SetActive(false), () => { }, GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
 
-        DSPTimerEngine.TimerInstance.AddActionToTimer(tickAction);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(resumeUI_setInactiveTimer);
 
     }
 
@@ -152,6 +164,7 @@ public class GameplayUIBehavior : MonoBehaviour
     private void GameplayManager_OnGameplayEnded()
     {
         gameplayUI.gameObject.SetActive(false);
+        gameplayStart_UICanvasGroup.gameObject.SetActive(false);
         endscreenUI.SetActive(true);
         SetupEndscreenUI();
     }
@@ -159,8 +172,10 @@ public class GameplayUIBehavior : MonoBehaviour
     private void GameplayManager_OnGameplayStarted()
     {
         gameplayUI.gameObject.SetActive(true);
+        gameplayStart_UICanvasGroup.gameObject.SetActive(true);
         endscreenUI.SetActive(false);
         SetupGameplayUI();
+        SetupStartGameplayUI(GameplayManager.k_STARTTIMEOFFSET);
     }
 
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
@@ -195,6 +210,48 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplay_progress.text = $"0 | {gameplayManager.MaxHitboxCount}";
         gameplay_progressSlider.value = 0f;
         gameplay_accuracySlider.value = 1f;
+    }
+
+    private const double k_GAMEPLAYSTART_FADEINTIME = 0.25d;
+    private const double k_GAMEPLAYSTART_FADEOUTTIME = 0.25d;
+
+    TimerStopwatchAction fadeInTimer;
+    TimerStopwatchAction fadeOutTimer;
+    TimerIntervalAction setInactiveTimer;
+    private void SetupStartGameplayUI(double aliveTime)
+    {
+        if (k_GAMEPLAYSTART_FADEINTIME + k_GAMEPLAYSTART_FADEOUTTIME > aliveTime)
+        {
+            Debug.LogWarning($"Tried to show the start UI, but the alive time parameter was too short.");
+            return;
+        }
+
+        gameplayStart_UICanvasGroup.alpha = 0f;
+
+        fadeInTimer = new TimerStopwatchAction(this, x =>
+        {
+            double t = x / k_GAMEPLAYSTART_FADEINTIME;
+            gameplayStart_UICanvasGroup.alpha = Mathf.Lerp(0f, 1f, (float)t);
+        }, () => { }, 0d, k_GAMEPLAYSTART_FADEINTIME, false);
+
+        fadeOutTimer = new TimerStopwatchAction(this, x =>
+        {
+            double t = x / k_GAMEPLAYSTART_FADEOUTTIME;
+            gameplayStart_UICanvasGroup.alpha = Mathf.Lerp(1f, 0f, (float)t);
+        }, () => { }, aliveTime - k_GAMEPLAYSTART_FADEOUTTIME, k_GAMEPLAYSTART_FADEOUTTIME, false);
+
+        setInactiveTimer = new TimerIntervalAction(this, x => gameplayStart_UICanvasGroup.gameObject.SetActive(false), () => { }, aliveTime, 0d);
+
+        DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInTimer);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutTimer);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(setInactiveTimer);
+
+        gameplayStart_colorText.text = "Switch Color\n" +
+                                       $"{GameManager.GameInstance.InputActions.Gameplay.SwitchAInput.GetBindingDisplayString()} | {GameManager.GameInstance.InputActions.Gameplay.SwitchBInput.GetBindingDisplayString()}";
+
+        gameplayStart_restartText.text = "Restart\n" +
+                                         GameManager.GameInstance.InputActions.Gameplay.RestartInput.GetBindingDisplayString();
+
     }
 
     private void SetupEndscreenUI()

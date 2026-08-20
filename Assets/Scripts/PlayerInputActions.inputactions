@@ -748,6 +748,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "RestartInput",
+                    "type": "Button",
+                    "id": "84f21d9c-140d-43d4-ae4f-406050adebb1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -792,6 +801,17 @@
                     "processors": "",
                     "groups": ";KB&M",
                     "action": "EscapeMenuInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eed9b723-7fcd-4697-a70b-f7eded2d1c5f",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KB&M",
+                    "action": "RestartInput",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

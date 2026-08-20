@@ -143,6 +143,6 @@ public class GameplayAudioController : MonoBehaviour
 
     private void GameplayManager_OnGameplayStarted()
     {
-        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, 0d, 1d, 0f);
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_STARTTIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, 0d, 1d, 0f);
     }
 }

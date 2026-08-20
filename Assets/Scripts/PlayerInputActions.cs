@@ -834,6 +834,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RestartInput"",
+                    ""type"": ""Button"",
+                    ""id"": ""84f21d9c-140d-43d4-ae4f-406050adebb1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Hold"",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -878,6 +887,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";KB&M"",
                     ""action"": ""EscapeMenuInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eed9b723-7fcd-4697-a70b-f7eded2d1c5f"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";KB&M"",
+                    ""action"": ""RestartInput"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -930,6 +950,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Gameplay_SwitchAInput = m_Gameplay.FindAction("SwitchAInput", throwIfNotFound: true);
         m_Gameplay_SwitchBInput = m_Gameplay.FindAction("SwitchBInput", throwIfNotFound: true);
         m_Gameplay_EscapeMenuInput = m_Gameplay.FindAction("EscapeMenuInput", throwIfNotFound: true);
+        m_Gameplay_RestartInput = m_Gameplay.FindAction("RestartInput", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -1309,6 +1330,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_SwitchAInput;
     private readonly InputAction m_Gameplay_SwitchBInput;
     private readonly InputAction m_Gameplay_EscapeMenuInput;
+    private readonly InputAction m_Gameplay_RestartInput;
     /// <summary>
     /// Provides access to input actions defined in input action map "Gameplay".
     /// </summary>
@@ -1336,6 +1358,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Gameplay/EscapeMenuInput".
         /// </summary>
         public InputAction @EscapeMenuInput => m_Wrapper.m_Gameplay_EscapeMenuInput;
+        /// <summary>
+        /// Provides access to the underlying input action "Gameplay/RestartInput".
+        /// </summary>
+        public InputAction @RestartInput => m_Wrapper.m_Gameplay_RestartInput;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1374,6 +1400,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @EscapeMenuInput.started += instance.OnEscapeMenuInput;
             @EscapeMenuInput.performed += instance.OnEscapeMenuInput;
             @EscapeMenuInput.canceled += instance.OnEscapeMenuInput;
+            @RestartInput.started += instance.OnRestartInput;
+            @RestartInput.performed += instance.OnRestartInput;
+            @RestartInput.canceled += instance.OnRestartInput;
         }
 
         /// <summary>
@@ -1397,6 +1426,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @EscapeMenuInput.started -= instance.OnEscapeMenuInput;
             @EscapeMenuInput.performed -= instance.OnEscapeMenuInput;
             @EscapeMenuInput.canceled -= instance.OnEscapeMenuInput;
+            @RestartInput.started -= instance.OnRestartInput;
+            @RestartInput.performed -= instance.OnRestartInput;
+            @RestartInput.canceled -= instance.OnRestartInput;
         }
 
         /// <summary>
@@ -1619,5 +1651,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnEscapeMenuInput(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RestartInput" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRestartInput(InputAction.CallbackContext context);
     }
 }

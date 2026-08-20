@@ -118,6 +118,7 @@ public class GameplayBackgroundManager : MonoBehaviour
     }
     private void GameplayManager_OnGameplayRestarted()
     {
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(pulseAction);
         metronomeLoopIndex = 0;
     }
 

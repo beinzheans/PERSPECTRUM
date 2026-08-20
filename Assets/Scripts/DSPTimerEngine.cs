@@ -106,6 +106,7 @@ public class DSPTimerEngine : MonoBehaviour
 
             if (overrideExisting)
             {
+                RemoveActionFromTimer(action);
                 audioActionsToRegister.Enqueue(action);
                 return;
             }

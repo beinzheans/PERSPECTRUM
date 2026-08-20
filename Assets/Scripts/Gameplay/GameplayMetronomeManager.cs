@@ -68,6 +68,7 @@ public class GameplayMetronomeManager : MonoBehaviour
 
     private void GameplayManager_OnGameplayRestarted()
     {
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(metronomeTimer);
         currentMarkerInGameplay = null;
         gameplayManager.IsMetronomeDisabled = false;
         previousSearchIndex = 0;
@@ -108,7 +109,7 @@ public class GameplayMetronomeManager : MonoBehaviour
             return;
         }
 
-        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 60d / initialMarker.BPM, 0);
+        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 60d / initialMarker.BPM, 0);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(metronomeTimer);
     }

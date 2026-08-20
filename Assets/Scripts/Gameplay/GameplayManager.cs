@@ -167,7 +167,20 @@ public class GameplayManager : MonoBehaviour
 
         GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        GameManager.GameInstance.InputActions.Gameplay.RestartInput.performed += RestartInput_performed;
         GeneratePlayAreaMesh();
+    }
+
+    private void RestartInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
+        {
+            return;
+        }
+
+        Debug.Log($"Request restart!");
+        InvokeGameplayRestartEvent();
+        GameManager.GameInstance.InvokeInformationDisplayNeeded("Restarted", k_TIMEOFFSET);
     }
 
     private void CreateGameplayReferencePoints()
@@ -285,6 +298,8 @@ public class GameplayManager : MonoBehaviour
         GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
+        GameManager.GameInstance.InputActions.Gameplay.RestartInput.performed -= RestartInput_performed;
+
         GameplayInstance = null;
     }
 
@@ -300,14 +315,26 @@ public class GameplayManager : MonoBehaviour
         GameplayMousePosition = MathHelper.ClampVectorByComponent(normalizedPoint, 0f, 1f);
     }
     /// <summary>
-    /// This allows for offset for the chart to be earlier than the dsp time, giving a buffer to the audio offset.
+    /// This allows for offset for the chart to be earlier than the dsp time, giving a buffer to the audio offset. <br></br>
     /// </summary>
     public const double k_TIMEOFFSET = 1d;
 
+    /// <summary>
+    /// A time buffer for the very start of the chart. <br></br>
+    /// This is intended to show information to the player at the beginning.
+    /// </summary>
+    public const double k_STARTTIMEOFFSET = 3d;
     private void UpdateGameplayTimeByDeltatime(double dt)
     {
         CurrentGameplayTime += dt;
-        GameplayCamera.transform.Translate((float)(dt * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed) * Vector3.forward);
+
+        if (CurrentGameplayTime >= EndTime)
+        {
+            InvokeGameplayEndedEvent();
+            return;
+        }
+
+        gameplayCamera.transform.Translate((float)(dt * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed) * Vector3.forward);
         OnGameplayTimeUpdated?.Invoke(CurrentGameplayTime);
     }
 
@@ -358,6 +385,7 @@ public class GameplayManager : MonoBehaviour
         BombHitCount = 0;
         CurrentScore = 0d;
 
+        gameplayCamera.transform.position = Vector3.zero;
         StartChart();
     }
 
@@ -370,11 +398,9 @@ public class GameplayManager : MonoBehaviour
     private TimerStopwatchAction stopwatchAction;
     private void StartChart()
     {
-        EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime; // note it is sorted
-        Action<double> timerElaspedAction = (x) => UpdateGameplayTimeByDeltatime(x);
-        Action timerEndAction = () => InvokeGameplayEndedEvent();
+        EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime + k_TIMEOFFSET;
 
-        stopwatchAction = new TimerStopwatchAction(this, timerElaspedAction, timerEndAction, k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, EndTime + k_TIMEOFFSET, true);
+        stopwatchAction = new TimerStopwatchAction(this, UpdateGameplayTimeByDeltatime, () => { }, k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, EndTime + k_TIMEOFFSET, true);
         DSPTimerEngine.TimerInstance.AddActionToTimer(stopwatchAction);
 
         InvokeGameplayStartedEvent();
@@ -534,6 +560,7 @@ public class GameplayManager : MonoBehaviour
 
     public void InvokeGameplayEndedEvent()
     {
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         if (MatchHitCount + MismatchHitCount + MissCount == MaxHitboxCount && CurrentPath == GameManager.GameInstance.k_TUTORIALFILEPATHSTRING)
         {
             GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial, true);
