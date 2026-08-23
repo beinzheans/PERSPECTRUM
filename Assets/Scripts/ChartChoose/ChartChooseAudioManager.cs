@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class ChartChooseAudioManager : MonoBehaviour
 {
@@ -40,6 +41,8 @@ public class ChartChooseAudioManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
+
         chartChooseManager.OnChartButtonClicked -= ChartChooseManager_OnChartButtonClicked;
         GameManager.GameInstance.OnPauseMenuEnable -= GameInstance_OnPauseMenuEnable;
         GameManager.GameInstance.OnPauseMenuDisable -= GameInstance_OnPauseMenuDisable;
@@ -47,7 +50,7 @@ public class ChartChooseAudioManager : MonoBehaviour
         chartChooseManager.OnChartDeleted -= ChartChooseManager_OnChartDeleted;
     }
 
-    private const double k_MUSICFADETIME = 0.15d;
+    private const double k_MUSICFADETIME = 0.25d;
     private const double k_MUSICPREVIEWTIME = 15d;
 
     private TimerIntervalAction playAction;
@@ -55,6 +58,8 @@ public class ChartChooseAudioManager : MonoBehaviour
     {
         if (obj == null || id == -1)
         {
+            AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME, () => { });
+            DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
             return;
         }
 
@@ -85,21 +90,20 @@ public class ChartChooseAudioManager : MonoBehaviour
             return;
         }
 
-        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
+        
         playAction = new TimerIntervalAction(this, x =>
         {
             AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME,
                 () =>
                 {
                     music_AudioSource.Stop();
-
                     music_AudioSource.clip = null;
                     music_AudioSource.clip = clip; // we do this because we are handling streaming audio clip.
 
                     AudioEngine.AudioInstance.PlayAudioSource(music_AudioSource, 0d, 0f, metadata.PreviewStartTime, 1d, 0f);
                     AudioEngine.AudioInstance.FadeInAudioSource(music_AudioSource, GameManager.GameInstance.GlobalSettings.SongVolume, k_MUSICFADETIME, () => { });
                 });
-        }, () => { }, 0d, k_MUSICPREVIEWTIME, 0);
+        }, () => { }, 0d, TimerBehavior.TEMPORARY, k_MUSICPREVIEWTIME, 0);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(playAction);
     }

@@ -75,18 +75,11 @@ public class GameplayBackgroundManager : MonoBehaviour
         if (metronomeLoopIndex == 0)
         {
             float darkenAmount = GetDarkenAmountBasedOnSettings();
+            float pulseAmount = -math.remap(0f, 1f, 0f, 0.2f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
 
-            if (isUsingCustomBackground)
-            {
-                float pulseAmount = -math.remap(0f, 1f, 0f, 0.2f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
-                darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount + pulseAmount));
-            }
-            else
-            {
-                darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount));
-            }
+            darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount + pulseAmount));
 
-            pulseAction = new TimerStopwatchAction(this, (x) => PulseBackground(x), () => { }, 0d, GetPulseLength(), false);
+            pulseAction = new TimerStopwatchAction(this, (x) => PulseBackground(x), () => { }, 0d, TimerBehavior.TEMPORARY, GetPulseLength(), false);
             DSPTimerEngine.TimerInstance.AddActionToTimer(pulseAction);
         }
 
@@ -187,7 +180,7 @@ public class GameplayBackgroundManager : MonoBehaviour
         }
         else
         {
-            return GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount;
+            return math.remap(0f, 1f, 0f, 0.5f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
         }
     }
 }

@@ -10172,6 +10172,7 @@ GameObject:
   - component: {fileID: 1167072942}
   - component: {fileID: 1167072941}
   - component: {fileID: 1167072945}
+  - component: {fileID: 1167072947}
   - component: {fileID: 1167072946}
   m_Layer: 0
   m_Name: GameplayManager
@@ -10504,6 +10505,18 @@ MonoBehaviour:
   gradientAColor_Pulse: {r: 0.25490198, g: 0.07058824, b: 0.2627451, a: 1}
   gradientBColor_Pulse: {r: 0.07058824, g: 0.13333334, b: 0.2627451, a: 1}
   darkPanelImage: {fileID: 1603871331}
+--- !u!114 &1167072947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167072926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4628d801155325d48aed3f7c0039ac86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1256400924
 GameObject:
   m_ObjectHideFlags: 0
@@ -14298,7 +14311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2216981, g: 0.5554374, b: 0.8867924, a: 0.39215687}
+  m_Color: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.39215687}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0

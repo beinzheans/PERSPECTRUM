@@ -23,7 +23,7 @@ public class UIElasticColor : UIElastic
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(pulseTimer);
 
-        pulseTimer = new TimerStopwatchAction(this, x => Graphic.color = Color.Lerp(newColor, initialColor, (float)(x / pulseTime)), () => { }, 0d, pulseTime, false);
+        pulseTimer = new TimerStopwatchAction(this, x => Graphic.color = Color.Lerp(newColor, initialColor, (float)(x / pulseTime)), () => { }, 0d, TimerBehavior.TEMPORARY, pulseTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(pulseTimer);
     }
 }

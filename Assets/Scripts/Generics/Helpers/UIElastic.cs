@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>
 /// A class to handle the elasticity of UI elements. That is, to allow UI elements to bounce or shrink.
@@ -40,7 +41,7 @@ public class UIElastic : MonoBehaviour
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(elasticStopwatch);
         double internal_elasticTime = math.max(0.001d, elasticTime);
-        elasticStopwatch = new TimerStopwatchAction(this, x => AnimateElasticSize(x, elasticScale, internal_elasticTime), () => { }, 0d, internal_elasticTime, false);
+        elasticStopwatch = new TimerStopwatchAction(this, x => AnimateElasticSize(x, elasticScale, internal_elasticTime), () => { }, 0d, TimerBehavior.TEMPORARY, internal_elasticTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(elasticStopwatch);
     }
 

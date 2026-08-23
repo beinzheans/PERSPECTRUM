@@ -107,8 +107,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(bounceTimer);
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(shrinkTimer);
 
-        bounceTimer = new TimerStopwatchAction(this, BounceAction, null, 0d, pulseInterval, false);
-        DSPTimerEngine.TimerInstance.AddActionToTimer(bounceTimer, true);
+        bounceTimer = new TimerStopwatchAction(this, BounceAction, null, 0d, TimerBehavior.TEMPORARY, pulseInterval, false);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(bounceTimer);
     }
 
     private void BounceAction(double time)
@@ -125,8 +125,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(shrinkTimer);
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(bounceTimer);
 
-        shrinkTimer = new TimerStopwatchAction(this, ShrinkAction, null, 0d, pulseInterval, false);
-        DSPTimerEngine.TimerInstance.AddActionToTimer(shrinkTimer, true);
+        shrinkTimer = new TimerStopwatchAction(this, ShrinkAction, null, 0d, TimerBehavior.TEMPORARY, pulseInterval, false);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(shrinkTimer);
     }
 
     private void ShrinkAction(double time)

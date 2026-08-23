@@ -31,6 +31,7 @@ public class ChartDetailsManager : MonoBehaviour
     {
         if (obj == null || id == -1)
         {
+            HideSelectedUI();
             return;
         }
 

@@ -64,7 +64,7 @@ public class ChartChooseButtonBank : BaseListBank
 
         SortChartButtons();
         circularScrollingList.Refresh();
-        SelectNewContentID(0);
+        SelectNewContentID(-1);
     }
 
     private void ChartChooseManager_OnSortOptionSelected(ChartButtonSortOptions obj)
@@ -77,7 +77,7 @@ public class ChartChooseButtonBank : BaseListBank
         sortOptions = obj;
         SortChartButtons();
         circularScrollingList.Refresh();
-        SelectNewContentID(0);
+        SelectNewContentID(-1);
     }
 
     private void OnDestroy()

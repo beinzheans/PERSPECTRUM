@@ -167,21 +167,9 @@ public class GameplayManager : MonoBehaviour
 
         GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
-        GameManager.GameInstance.InputActions.Gameplay.RestartInput.performed += RestartInput_performed;
         GeneratePlayAreaMesh();
     }
 
-    private void RestartInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
-        {
-            return;
-        }
-
-        Debug.Log($"Request restart!");
-        InvokeGameplayRestartEvent();
-        GameManager.GameInstance.InvokeInformationDisplayNeeded("Restarted", k_TIMEOFFSET);
-    }
 
     private void CreateGameplayReferencePoints()
     {
@@ -298,7 +286,6 @@ public class GameplayManager : MonoBehaviour
         GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
-        GameManager.GameInstance.InputActions.Gameplay.RestartInput.performed -= RestartInput_performed;
 
         GameplayInstance = null;
     }
@@ -400,7 +387,7 @@ public class GameplayManager : MonoBehaviour
     {
         EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime + k_TIMEOFFSET;
 
-        stopwatchAction = new TimerStopwatchAction(this, UpdateGameplayTimeByDeltatime, () => { }, k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, EndTime + k_TIMEOFFSET, true);
+        stopwatchAction = new TimerStopwatchAction(this, UpdateGameplayTimeByDeltatime, () => { }, k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, TimerBehavior.PERSISTENT, EndTime + k_TIMEOFFSET, true);
         DSPTimerEngine.TimerInstance.AddActionToTimer(stopwatchAction);
 
         InvokeGameplayStartedEvent();

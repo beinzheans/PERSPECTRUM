@@ -18,7 +18,7 @@ public class DSPTimerEngine : MonoBehaviour
 
     private Queue<TimerAction> audioActionsToRemove = new();
     private Queue<TimerAction> audioActionsToRegister = new();
-
+    private Queue<TimerAction> audioActionsToReset = new();
     private void Awake()
     {
         if (DSPTimerEngine.TimerInstance == null)
@@ -86,10 +86,10 @@ public class DSPTimerEngine : MonoBehaviour
 
     /// <summary>
     /// Adds a new non-null <see cref="TimerAction"/> to the timer engine to execute. Note removal of <see cref="TimerAction"/> is done first before adding.<br></br>
-    /// Note that creating a new instance of a <see cref="TimerAction"/> is considered a different timer in memory. <br></br>
-    /// However, our <see cref="TimerAction"/> uses value equality. You can choose to completely override the existing timer with the <paramref name="overrideExisting"/>.
+    /// Note that creating a new instance of a <see cref="TimerAction"/> is considered a different timer in memory; however, our <see cref="TimerAction"/> uses value equality. <br></br>
+    /// If an existing <see cref="TimerAction"/> is found and will not be removed, then we will follow the logic of <see cref="TimerBehavior"/>.
     /// </summary>
-    public void AddActionToTimer(TimerAction action, bool overrideExisting = true)
+    public void AddActionToTimer(TimerAction action)
     {
         if (action == null)
         {
@@ -104,18 +104,23 @@ public class DSPTimerEngine : MonoBehaviour
                 return;
             }
 
-            if (overrideExisting)
+            switch (action.TimerBehavior)
             {
-                RemoveActionFromTimer(action);
-                audioActionsToRegister.Enqueue(action);
-                return;
+                case TimerBehavior.TEMPORARY:
+                    RemoveActionFromTimer(action);
+                    audioActionsToRegister.Enqueue(action);
+                    break;
+                case TimerBehavior.MULTI:
+                    audioActionsToRegister.Enqueue(action);
+                    break;
+                case TimerBehavior.PERSISTENT:
+                    break;
             }
 
             return;
         }
 
         audioActionsToRegister.Enqueue(action);
-
     }
 
     /// <summary>
@@ -179,6 +184,24 @@ public class DSPTimerEngine : MonoBehaviour
 }
 
 /// <summary>
+/// Describes the behavior of a <see cref="TimerAction"/>. Defines the behavior when adding <see cref="TimerAction"/> to the <see cref="DSPTimerEngine"/>.
+/// </summary>
+public enum TimerBehavior
+{
+    /// <summary>
+    /// Enforces that only one instance of this timer can be created at once, and ignores new add requests if this timer is in the registered queue.
+    /// </summary>
+    PERSISTENT = 0,
+    /// <summary>
+    /// Enforces that only one instance of this timer can be created at once, but allows override if new add requests are present.
+    /// </summary>
+    TEMPORARY = 1,
+    /// <summary>
+    /// Allows many instances of this timer to be created
+    /// </summary>
+    MULTI = 2
+}
+/// <summary>
 /// A class to represent an action to be performed by <see cref="DSPTimerEngine"/>
 /// </summary>
 public abstract class TimerAction : IEquatable<TimerAction>
@@ -211,7 +234,9 @@ public abstract class TimerAction : IEquatable<TimerAction>
 
     public bool IsTimerPaused { get; protected set; }
 
-    public TimerAction(UnityEngine.Object timerCaller, Action<double> actionToExecute, Action onUnregisterEvent, double startOffsetTime)
+    public TimerBehavior TimerBehavior { get; private set; }
+
+    public TimerAction(UnityEngine.Object timerCaller, Action<double> actionToExecute, Action onUnregisterEvent, double startOffsetTime, TimerBehavior timerBehavior)
     {
         TimerCaller = timerCaller;
         ActionToExecute = actionToExecute;
@@ -220,6 +245,7 @@ public abstract class TimerAction : IEquatable<TimerAction>
 
         ExecuteTime = AudioSettings.dspTime + startOffsetTime;
         StartTime = ExecuteTime;
+        this.TimerBehavior = timerBehavior;
     }
 
 
@@ -312,12 +338,13 @@ public abstract class TimerAction : IEquatable<TimerAction>
                EqualityComparer<UnityEngine.Object>.Default.Equals(TimerCaller, other.TimerCaller) &&
                EqualityComparer<MethodInfo>.Default.Equals(ActionToExecute?.Method, other.ActionToExecute?.Method) &&
                EqualityComparer<MethodInfo>.Default.Equals(OnUnregisterEvent?.Method, other.OnUnregisterEvent?.Method) &&
-               startOffsetTime == other.startOffsetTime;
+               startOffsetTime == other.startOffsetTime &&
+               TimerBehavior == other.TimerBehavior;
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(TimerCaller, ActionToExecute?.Method, OnUnregisterEvent?.Method, startOffsetTime);
+        return HashCode.Combine(TimerCaller, ActionToExecute?.Method, OnUnregisterEvent?.Method, startOffsetTime, TimerBehavior);
     }
 }
 
@@ -346,7 +373,7 @@ public class TimerIntervalAction : TimerAction, IEquatable<TimerIntervalAction>
     /// </summary>
     protected double pauseTimeProgress;
 
-    public TimerIntervalAction(UnityEngine.Object timerCaller, Action<double> actionToExecute, Action unregisterEvent, double startOffsetTime, double repeatIntervalTime, int numberOfExecutions = 1, bool useElapsedTimeForAction = false) : base(timerCaller, actionToExecute, unregisterEvent, startOffsetTime)
+    public TimerIntervalAction(UnityEngine.Object timerCaller, Action<double> actionToExecute, Action unregisterEvent, double startOffsetTime, TimerBehavior timerBehavior, double repeatIntervalTime, int numberOfExecutions = 1, bool useElapsedTimeForAction = false) : base(timerCaller, actionToExecute, unregisterEvent, startOffsetTime, timerBehavior)
     {
         this.repeatIntervalTime = repeatIntervalTime;
         this.numberOfExecutions = numberOfExecutions;
@@ -447,7 +474,7 @@ public class TimerStopwatchAction : TimerAction, IEquatable<TimerStopwatchAction
     public bool MeasureDeltaTime { get; private set; }
     private double previousDSPTime;
     private double maxTimeElapsed;
-    public TimerStopwatchAction(UnityEngine.Object timerCaller, Action<double> executeAction, Action unregisterEvent, double startOffsetTime, double maxTimeElapsed, bool measureDeltaTime) : base(timerCaller, executeAction, unregisterEvent, startOffsetTime)
+    public TimerStopwatchAction(UnityEngine.Object timerCaller, Action<double> executeAction, Action unregisterEvent, double startOffsetTime, TimerBehavior timerBehavior, double maxTimeElapsed, bool measureDeltaTime) : base(timerCaller, executeAction, unregisterEvent, startOffsetTime, timerBehavior)
     {
         this.maxTimeElapsed = maxTimeElapsed;
         previousDSPTime = ExecuteTime;

@@ -9,7 +9,7 @@ public class ControlPauseModule : BasePauseModule
     private const int k_CURSORINVERTYINDEX = 3;
     private const int k_REBINDAKEYINDEX = 4;
     private const int k_REBINDBKEYINDEX = 5;
-
+    private const int k_REBINDRESTARTKEYINDEX = 6;
     protected override void OnModuleAwake()
     {
         return;
@@ -33,23 +33,20 @@ public class ControlPauseModule : BasePauseModule
 
         pauseMenuGroups[k_CURSORINVERTYINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.MouseInvert_YAxis, x), GameManager.GameInstance.GlobalSettings.MouseInvert_YAxis);
 
-        pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupAction_Button(() =>
-        {
-            pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText("Press any key...");
-            RebindHelper.StartRebindAction(GameManager.GameInstance.InputActions.Gameplay.SwitchAInput,
-                () => pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchAInput.GetBindingDisplayString()}"));
-        });
-
-        pauseMenuGroups[k_REBINDAKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchAInput.GetBindingDisplayString()}");
-        pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupAction_Button(() =>
-        {
-            pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupDisplayText("Press any key...");
-            RebindHelper.StartRebindAction(GameManager.GameInstance.InputActions.Gameplay.SwitchBInput,
-                () => pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchBInput.GetBindingDisplayString()}"));
-        });
-
-        pauseMenuGroups[k_REBINDBKEYINDEX].SetGroupDisplayText($"Current: {GameManager.GameInstance.InputActions.Gameplay.SwitchBInput.GetBindingDisplayString()}");
-
+        InitializeRebindAction_Button(k_REBINDAKEYINDEX, GameManager.GameInstance.InputActions.Gameplay.SwitchAInput);
+        InitializeRebindAction_Button(k_REBINDBKEYINDEX, GameManager.GameInstance.InputActions.Gameplay.SwitchBInput);
+        InitializeRebindAction_Button(k_REBINDRESTARTKEYINDEX, GameManager.GameInstance.InputActions.Gameplay.RestartInput);
     }
 
+    private void InitializeRebindAction_Button(int index, InputAction action)
+    {
+        pauseMenuGroups[index].SetGroupAction_Button(() =>
+        {
+            pauseMenuGroups[index].SetGroupDisplayText("Press any key...");
+            RebindHelper.StartRebindAction(action,
+                () => pauseMenuGroups[index].SetGroupDisplayText($"Current: {action.GetBindingDisplayString()}"));
+        });
+
+        pauseMenuGroups[index].SetGroupDisplayText($"Current: {action.GetBindingDisplayString()}");
+    }
 }

@@ -118,8 +118,8 @@ public class GameplayUICursor : MonoBehaviour
         {
             if (!cursorHasStartedShrinking)
             {
-                cursorIdleShrinkTimer = new TimerIntervalAction(this, x => { targetScale = Vector3.one; cursorHasStartedShrinking = true; }, () => { }, k_CURSORIDLEWAITTIME, 0d);
-                DSPTimerEngine.TimerInstance.AddActionToTimer(cursorIdleShrinkTimer, false);
+                cursorIdleShrinkTimer = new TimerIntervalAction(this, x => { targetScale = Vector3.one; cursorHasStartedShrinking = true; }, () => { }, k_CURSORIDLEWAITTIME, TimerBehavior.TEMPORARY, 0d);
+                DSPTimerEngine.TimerInstance.AddActionToTimer(cursorIdleShrinkTimer);
             }
         }
 

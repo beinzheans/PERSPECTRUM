@@ -16,10 +16,16 @@ public class GameplayResumeManager : MonoBehaviour
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
-        resumeTimer = new TimerIntervalAction(this, x => gameplayManager.InvokeGameplayResumeTick(), () => gameplayManager.InvokeGameplayResumeTimerEnded(), GameplayManager.k_TIMEOFFSET, k_DEFAULTTICKINTERVAL, k_NUMBEROFLEADINTICKS);
+        resumeTimer = new TimerIntervalAction(this, x => gameplayManager.InvokeGameplayResumeTick(), () => gameplayManager.InvokeGameplayResumeTimerEnded(), GameplayManager.k_TIMEOFFSET, TimerBehavior.PERSISTENT, k_DEFAULTTICKINTERVAL, k_NUMBEROFLEADINTICKS);
 
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
+        gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
+    }
+
+    private void GameplayManager_OnGameplayRestarted()
+    {
+        GameManager.GameInstance.OnPauseMenuDisable -= GameInstance_OnPauseMenuDisable;
     }
 
     private void GameplayManager_OnGameplayStarted()
@@ -42,10 +48,9 @@ public class GameplayResumeManager : MonoBehaviour
         }
 
         resumeTimer.ResetTimer();
-
         tickInterval = (gameplayManager.CurrentActiveGameplayMarker == null || MathHelper.IsTwoDoublesEqualWithEpsilion(gameplayManager.CurrentActiveGameplayMarker.BPM, 0d)) ? k_DEFAULTTICKINTERVAL : 60d / gameplayManager.CurrentActiveGameplayMarker.BPM;
         resumeTimer.EditIntervalTime(tickInterval, true);
-        DSPTimerEngine.TimerInstance.AddActionToTimer(resumeTimer, false);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(resumeTimer);
 
         gameplayManager.InvokeGameplayResumeTimerStarted();
     }

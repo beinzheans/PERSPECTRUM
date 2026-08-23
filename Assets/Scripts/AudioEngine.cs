@@ -128,32 +128,50 @@ public class AudioEngine : MonoBehaviour
     private TimerStopwatchAction fadeInStopwatch;
     public void FadeInAudioSource(AudioSource source, float maxVolume, double fadeInTime, Action callback, bool useLogScale = true)
     {
+        if (source == null)
+        {
+            return;
+        }
+
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
+
         fadeInTime = math.max(0.01d, fadeInTime);
-        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeInStopwatch);
         fadeInStopwatch = new TimerStopwatchAction(source, x =>
         {
             double progress = x / fadeInTime;
             float volume = math.lerp(0f, maxVolume, MathF.Cbrt((float)progress));
             source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
-        }, () => callback?.Invoke(), 0d, fadeInTime, false);
+        }, () => { }, 0d, TimerBehavior.TEMPORARY, fadeInTime, false);
+
+        TimerIntervalAction callbackTimer = new TimerIntervalAction(source, x => callback?.Invoke(), () => { }, fadeInTime, TimerBehavior.TEMPORARY, 0d);
+
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInStopwatch);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(callbackTimer);
     }
 
     private TimerStopwatchAction fadeOutStopwatch;
 
     public void FadeOutAudioSource(AudioSource source, double fadeOutTime, Action callback, bool useLogScale = true)
     {
+        if (source == null)
+        {
+            return;
+        }
+
+        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeInStopwatch);
         fadeOutTime = math.max(0.01d, fadeOutTime);
         float startingVolume = RemapScaledVolumeToLinearVolume(source.volume);
-        DSPTimerEngine.TimerInstance.RemoveActionFromTimer(fadeOutStopwatch);
         fadeOutStopwatch = new TimerStopwatchAction(source, x =>
         {
             double progress = x / fadeOutTime;
             float volume = math.lerp(startingVolume, 0f, MathF.Cbrt((float)progress));
             source.volume = useLogScale ? RemapLinearVolumeToScale(volume) : volume;
-        }, () => callback?.Invoke(), 0d, fadeOutTime, false);
+        }, () => { }, 0d, TimerBehavior.TEMPORARY, fadeOutTime, false);
+        TimerIntervalAction callbackTimer = new TimerIntervalAction(source, x => callback?.Invoke(), () => { }, fadeOutTime, TimerBehavior.TEMPORARY, 0d);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutStopwatch);
+        DSPTimerEngine.TimerInstance.AddActionToTimer(callbackTimer);
+
     }
 
     public void EditAudioSource(AudioSource source, float volume, bool useLogScale = true)

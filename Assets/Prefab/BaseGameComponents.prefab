@@ -2993,6 +2993,9 @@ MonoBehaviour:
   - groupLabel: Rebind Blue Key
     groupType: 48
     groupDescription: Set the current keybind to become Blue (Hitbox Type B).
+  - groupLabel: Rebind Restart Key
+    groupType: 48
+    groupDescription: Set the current keybind to restart during gameplay.
   moduleName: Controls
   pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}

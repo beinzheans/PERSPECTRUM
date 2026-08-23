@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+/// <summary>
+/// A class to handle UI behavior during gameplay, except for the cursor. <br></br>
+/// The cursor UI is handled by <see cref="GameplayUICursor"/>.
+/// </summary>
 public class GameplayUIBehavior : MonoBehaviour
 {
     private GameplayManager gameplayManager;
@@ -73,7 +77,6 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplayManager.OnHitboxBombHit += GameplayManager_OnHitboxBombHit;
     }
 
-
     private int tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
     private const float k_GAMERESUMEBACKGROUNDALPHA = 0.5f;
     private void GameplayManager_OnGameplayResumeTick()
@@ -91,7 +94,7 @@ public class GameplayUIBehavior : MonoBehaviour
             gameplayResume_tickText.SetText(tick.ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
 
             tick--;
-        }, () => { }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
+        }, () => { }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, TimerBehavior.TEMPORARY, 0d);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(tickAction);
     }
@@ -111,7 +114,7 @@ public class GameplayUIBehavior : MonoBehaviour
     private TimerIntervalAction resumeUI_setInactiveTimer;
     private void GameplayManager_OnGameplayResumed()
     {
-        resumeUI_setInactiveTimer = new TimerIntervalAction(this, (x) => gameplayResume_UI.SetActive(false), () => { }, GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 0d);
+        resumeUI_setInactiveTimer = new TimerIntervalAction(this, (x) => gameplayResume_UI.SetActive(false), () => { }, GameplayManager.k_TIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, TimerBehavior.TEMPORARY, 0d);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(resumeUI_setInactiveTimer);
 
@@ -232,15 +235,15 @@ public class GameplayUIBehavior : MonoBehaviour
         {
             double t = x / k_GAMEPLAYSTART_FADEINTIME;
             gameplayStart_UICanvasGroup.alpha = Mathf.Lerp(0f, 1f, (float)t);
-        }, () => { }, 0d, k_GAMEPLAYSTART_FADEINTIME, false);
+        }, () => { }, 0d, TimerBehavior.TEMPORARY, k_GAMEPLAYSTART_FADEINTIME, false);
 
         fadeOutTimer = new TimerStopwatchAction(this, x =>
         {
             double t = x / k_GAMEPLAYSTART_FADEOUTTIME;
             gameplayStart_UICanvasGroup.alpha = Mathf.Lerp(1f, 0f, (float)t);
-        }, () => { }, aliveTime - k_GAMEPLAYSTART_FADEOUTTIME, k_GAMEPLAYSTART_FADEOUTTIME, false);
+        }, () => { }, aliveTime - k_GAMEPLAYSTART_FADEOUTTIME, TimerBehavior.TEMPORARY, k_GAMEPLAYSTART_FADEOUTTIME, false);
 
-        setInactiveTimer = new TimerIntervalAction(this, x => gameplayStart_UICanvasGroup.gameObject.SetActive(false), () => { }, aliveTime, 0d);
+        setInactiveTimer = new TimerIntervalAction(this, x => gameplayStart_UICanvasGroup.gameObject.SetActive(false), () => { }, aliveTime, TimerBehavior.TEMPORARY, 0d);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInTimer);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutTimer);

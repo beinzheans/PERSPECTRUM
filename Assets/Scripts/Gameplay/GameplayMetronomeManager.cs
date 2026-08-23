@@ -109,7 +109,7 @@ public class GameplayMetronomeManager : MonoBehaviour
             return;
         }
 
-        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 60d / initialMarker.BPM, 0);
+        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, TimerBehavior.PERSISTENT, 60d / initialMarker.BPM, 0);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(metronomeTimer);
     }
