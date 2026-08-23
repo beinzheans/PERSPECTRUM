@@ -104,6 +104,11 @@ public class EditorPlaybackManager : EditorUIBehavior
             case PlaybackType.PLAYBACK_FROM_CURRENT:
                 break;
             case PlaybackType.PLAYBACK_FROM_SECTION:
+                if (editorManager.CurrentTimelineMarker == null)
+                {
+                    return;
+                }
+
                 editorManager.UpdateEditorPreviewTime(editorManager.CurrentTimelineMarker.RenderTime, true);
                 break;
         }
