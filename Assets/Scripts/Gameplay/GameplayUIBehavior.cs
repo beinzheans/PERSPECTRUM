@@ -107,7 +107,7 @@ public class GameplayUIBehavior : MonoBehaviour
         tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
         gameplayResume_background.color = new Color(0f, 0f, 0f, k_GAMERESUMEBACKGROUNDALPHA);
 
-        SetupStartGameplayUI(GameplayManager.k_TIMEOFFSET);
+        SetupStartGameplayUI();
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(resumeUI_setInactiveTimer);
     }
 
@@ -178,7 +178,7 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplayStart_UICanvasGroup.gameObject.SetActive(true);
         endscreenUI.SetActive(false);
         SetupGameplayUI();
-        SetupStartGameplayUI(GameplayManager.k_STARTTIMEOFFSET);
+        SetupStartGameplayUI();
     }
 
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)
@@ -221,14 +221,8 @@ public class GameplayUIBehavior : MonoBehaviour
     TimerStopwatchAction fadeInTimer;
     TimerStopwatchAction fadeOutTimer;
     TimerIntervalAction setInactiveTimer;
-    private void SetupStartGameplayUI(double aliveTime)
+    private void SetupStartGameplayUI()
     {
-        if (k_GAMEPLAYSTART_FADEINTIME + k_GAMEPLAYSTART_FADEOUTTIME > aliveTime)
-        {
-            Debug.LogWarning($"Tried to show the start UI, but the alive time parameter was too short.");
-            return;
-        }
-
         gameplayStart_UICanvasGroup.alpha = 0f;
 
         fadeInTimer = new TimerStopwatchAction(this, x =>
@@ -241,9 +235,9 @@ public class GameplayUIBehavior : MonoBehaviour
         {
             double t = x / k_GAMEPLAYSTART_FADEOUTTIME;
             gameplayStart_UICanvasGroup.alpha = Mathf.Lerp(1f, 0f, (float)t);
-        }, () => { }, aliveTime - k_GAMEPLAYSTART_FADEOUTTIME, TimerBehavior.TEMPORARY, k_GAMEPLAYSTART_FADEOUTTIME, false);
+        }, () => { }, GameplayManager.k_TIMEOFFSET - k_GAMEPLAYSTART_FADEOUTTIME, TimerBehavior.TEMPORARY, k_GAMEPLAYSTART_FADEOUTTIME, false);
 
-        setInactiveTimer = new TimerIntervalAction(this, x => gameplayStart_UICanvasGroup.gameObject.SetActive(false), () => { }, aliveTime, TimerBehavior.TEMPORARY, 0d);
+        setInactiveTimer = new TimerIntervalAction(this, x => gameplayStart_UICanvasGroup.gameObject.SetActive(false), () => { }, GameplayManager.k_TIMEOFFSET, TimerBehavior.TEMPORARY, 0d);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInTimer);
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutTimer);

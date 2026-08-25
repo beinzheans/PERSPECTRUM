@@ -387,7 +387,10 @@ public class GameplayManager : MonoBehaviour
     {
         EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime + k_TIMEOFFSET;
 
-        stopwatchAction = new TimerStopwatchAction(this, UpdateGameplayTimeByDeltatime, () => { }, k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, TimerBehavior.PERSISTENT, EndTime + k_TIMEOFFSET, true);
+        double offset = k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d;
+
+        CurrentGameplayTime = -offset; // we start our gameplay in negative time, since we want to account for early notes!
+        stopwatchAction = new TimerStopwatchAction(this, UpdateGameplayTimeByDeltatime, () => { }, 0d, TimerBehavior.PERSISTENT, EndTime + k_TIMEOFFSET + offset, true);
         DSPTimerEngine.TimerInstance.AddActionToTimer(stopwatchAction);
 
         InvokeGameplayStartedEvent();
