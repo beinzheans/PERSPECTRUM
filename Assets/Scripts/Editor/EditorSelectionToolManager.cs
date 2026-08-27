@@ -158,8 +158,8 @@ public class EditorSelectionToolManager : EditorUIBehavior
             for (int i = 0; i < selected.Count; i++)
             {
                 selected[i].Move_Rotate(undoMoveMode);
-                selected[i].Move_TimeMirror(undoMoveMode, in averageTime, in timeOffset);
                 selected[i].Move_AxesMirror(undoMoveMode);
+                selected[i].Move_TimeMirror(undoMoveMode, in averageTime, in timeOffset);
             }
         };
 
