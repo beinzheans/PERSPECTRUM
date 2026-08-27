@@ -109,13 +109,27 @@ public class EditorLine : EditorDynamicObject, IConvertable<VisualLine>
         return new EditorLine(FromNormalizedPosition, ToNormalizedPosition, FromTime, ToTime);
     }
 
-    public override void Move_Mirror(MoveSelectedMode axis)
+    public override void Move_AxesMirror(MoveSelectedMode axis)
     {
         FromNormalizedPosition = MathHelper.GetMirroredPosition(FromNormalizedPosition, axis);
         ToNormalizedPosition = MathHelper.GetMirroredPosition(ToNormalizedPosition, axis);
 
         EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
+
+    public override void Move_TimeMirror(MoveSelectedMode moveMode, in double middleTime, in double timeOffset)
+    {
+        double fromTime_cache = FromTime;
+        double toTime_cache = ToTime;
+        FromTime = MathHelper.GetMirroredTime(toTime_cache, middleTime, timeOffset, moveMode);
+        ToTime = MathHelper.GetMirroredTime(fromTime_cache, middleTime, timeOffset, moveMode);
+
+        RenderTime = FromTime;
+
+        Debug.Log($"Mirrored time: {fromTime_cache} -> {toTime_cache} === {FromTime} -> {ToTime}");
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
+    }
+
 
     public override void Move_Rotate(MoveSelectedMode moveMode)
     {

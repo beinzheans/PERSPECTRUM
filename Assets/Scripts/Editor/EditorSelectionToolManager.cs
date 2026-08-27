@@ -125,6 +125,12 @@ public class EditorSelectionToolManager : EditorUIBehavior
         }
 
         List<EditorDynamicObject> selected = editorInstance.CurrentSelectedRenderables;
+
+        if (selected.Count <= 0)
+        {
+            return;
+        }
+
         MoveSelectedMode storedMoveMode = moveMode;
 
         MoveSelectedMode undoMoveMode = GetUndoOfMoveMode(storedMoveMode);
@@ -133,19 +139,27 @@ public class EditorSelectionToolManager : EditorUIBehavior
 
         Action moveAction = () =>
         {
+            GetTimeValuesFromSelectedList(in selected, out double minTime, out double averageTime, out double maxTime);
+            double timeOffset = minTime - MathHelper.GetMirroredTime(maxTime, averageTime, 0d, MoveSelectedMode.Time);
+
             for (int i = 0; i < selected.Count; i++)
             {
-                selected[i].Move_Mirror(storedMoveMode);
+                selected[i].Move_AxesMirror(storedMoveMode);
+                selected[i].Move_TimeMirror(storedMoveMode, in averageTime, in timeOffset);
                 selected[i].Move_Rotate(storedMoveMode);
             }
         };
 
         Action undoMoveAction = () =>
         {
+            GetTimeValuesFromSelectedList(in selected, out double minTime, out double averageTime, out double maxTime);
+            double timeOffset = minTime - MathHelper.GetMirroredTime(maxTime, averageTime, 0d, MoveSelectedMode.Time);
+
             for (int i = 0; i < selected.Count; i++)
             {
                 selected[i].Move_Rotate(undoMoveMode);
-                selected[i].Move_Mirror(undoMoveMode);
+                selected[i].Move_TimeMirror(undoMoveMode, in averageTime, in timeOffset);
+                selected[i].Move_AxesMirror(undoMoveMode);
             }
         };
 
@@ -153,6 +167,39 @@ public class EditorSelectionToolManager : EditorUIBehavior
         editorInstance.ExecuteEditorCommand(mirrorCommand);
     }
 
+    private void GetTimeValuesFromSelectedList(in List<EditorDynamicObject> selected, out double minTime, out double averageTime, out double maxTime)
+    {
+        if (selected.Count <= 0)
+        {
+            Debug.LogWarning($"Attempted to get time values from an empty list.");
+            minTime = averageTime = maxTime = 0d;
+            return;
+        }
+
+        double sum = 0d;
+        double minCache = double.MaxValue;
+        double maxCache = double.MinValue;
+        for (int i = 0; i < selected.Count; i++)
+        {
+            double time = selected[i].RenderTime;
+
+            sum += time;
+
+            if (time < minCache)
+            {
+                minCache = time;
+            }
+
+            if (time > maxCache)
+            {
+                maxCache = time;
+            }
+        }
+
+        minTime = minCache;
+        averageTime = sum / selected.Count;
+        maxTime = maxCache;
+    }
     protected override void UI_OnButtonPress(int index)
     {
         if (index < (int)MoveSelectedMode.Horizontal || index > (int)MoveSelectedMode.Rotate_90_Anticlockwise)
@@ -166,10 +213,13 @@ public class EditorSelectionToolManager : EditorUIBehavior
                 moveMode ^= MoveSelectedMode.Horizontal;
                 SetButtonState(index, moveMode.HasFlag(MoveSelectedMode.Horizontal));
                 break;
-
             case (int)MoveSelectedMode.Vertical:
                 moveMode ^= MoveSelectedMode.Vertical;
                 SetButtonState(index, moveMode.HasFlag(MoveSelectedMode.Vertical));
+                break;
+            case (int)MoveSelectedMode.Time:
+                moveMode ^= MoveSelectedMode.Time;
+                SetButtonState(index, moveMode.HasFlag(MoveSelectedMode.Time));
                 break;
             case (int)MoveSelectedMode.Rotate_90_Clockwise:
                 moveMode ^= MoveSelectedMode.Rotate_90_Clockwise;
@@ -204,6 +254,7 @@ public enum MoveSelectedMode
     None = 0,
     Horizontal = 1,
     Vertical = 2,
-    Rotate_90_Clockwise = 4,
-    Rotate_90_Anticlockwise = 8
+    Time = 4,
+    Rotate_90_Clockwise = 8,
+    Rotate_90_Anticlockwise = 16
 }

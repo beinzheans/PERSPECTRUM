@@ -21,9 +21,15 @@ public class EditorHitbox : EditorDynamicObject, IConvertable<VisualHitbox>
         return new EditorHitbox(NormalizedPosition, NormalizedSize, HitboxType, RenderTime);
     }
 
-    public override void Move_Mirror(MoveSelectedMode axis)
+    public override void Move_AxesMirror(MoveSelectedMode axis)
     {
         NormalizedPosition = MathHelper.GetMirroredPosition(NormalizedPosition, axis);
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
+    }
+
+    public override void Move_TimeMirror(MoveSelectedMode moveMode, in double middleTime, in double timeOffset)
+    {
+        RenderTime = MathHelper.GetMirroredTime(RenderTime, middleTime, timeOffset, moveMode);
         EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 

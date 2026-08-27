@@ -765,6 +765,16 @@ public static class MathHelper
         return new Vector2(mode.HasFlag(MoveSelectedMode.Vertical) ? 1f - pos.x : pos.x, mode.HasFlag(MoveSelectedMode.Horizontal) ? 1f - pos.y : pos.y);
     }
 
+    public static double GetMirroredTime(in double originalTime, in double middleTime, in double timeOffset, MoveSelectedMode mode)
+    {
+        if (!mode.HasFlag(MoveSelectedMode.Time))
+        {
+            return originalTime;
+        }
+
+        return 2d * middleTime - originalTime + timeOffset;
+    }
+
     public static Vector2 GetRotatedPosition(in Vector2 pos, MoveSelectedMode mode)
     {
         if (!(mode.HasFlag(MoveSelectedMode.Rotate_90_Clockwise) ^ mode.HasFlag(MoveSelectedMode.Rotate_90_Anticlockwise)))

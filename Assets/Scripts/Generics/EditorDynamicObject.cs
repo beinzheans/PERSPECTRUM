@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 using UnityEngine;
@@ -53,7 +54,12 @@ public class EditorDynamicObject : EditorObject, IPlaceDeleteable, IEditable
         return new EditorDynamicObject(RenderTime);
     }
 
-    public virtual void Move_Mirror(MoveSelectedMode moveMode)
+    public virtual void Move_AxesMirror(MoveSelectedMode moveMode)
+    {
+        return;
+    }
+
+    public virtual void Move_TimeMirror(MoveSelectedMode moveMode, in double middleTime, in double timeOffset)
     {
         return;
     }
