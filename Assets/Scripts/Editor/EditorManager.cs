@@ -520,12 +520,19 @@ public class EditorManager : MonoBehaviour
         command.Execute();
     }
 
-    // Performance: maybe force it so that we update once? Since right now selecting all will update the editor multiple times
-    // eg. selecting 100 objects at once will update the editor 100 times, when it really isn't necessary. For now it is quite fast still but
-    // if performance gets really horseshit then this is another potential optimization angle
+    private bool requestedUpdateOnce = false;
     public void InvokeEditorPreviewUpdateEvent()
     {
-        OnPreviewUpdated?.Invoke(EditorPreviewTime);
+        requestedUpdateOnce = true;
+    }
+
+    private void LateUpdate()
+    {
+        if (requestedUpdateOnce)
+        {
+            OnPreviewUpdated?.Invoke(EditorPreviewTime);
+            requestedUpdateOnce = false;
+        }
     }
     public void InvokeRenderRenderableEvent(EditorObject r)
     {
