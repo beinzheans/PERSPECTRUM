@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using Steamworks;
 /// <summary>
 /// A class to handle pause logic <br></br>
 /// Note the settings tab is generated once during start-up using <see cref="BasePauseModule"/>. That way, we don't need to make the scene messy.
@@ -31,7 +31,8 @@ public class GamePauseManager : MonoBehaviour
     public const string k_PAUSEMENUDEFAULTDESCRIPTION = "Hover over a setting to see it's description!\n" +
                                                         "There may be more settings if you scroll down.";
     public const string k_PAUSEMENUNODESCRIPTIONPROVIDED = "No description provided.";
-    private void Start()
+
+    private void Start() 
     {
         gameManager = GameManager.GameInstance;
         isInPauseMenu = false;
@@ -52,6 +53,21 @@ public class GamePauseManager : MonoBehaviour
             gameManager.PauseCanvas.gameObject.SetActive(true);
         },
         "Are you sure you want to go back to the main menu?");
+
+        if (!SteamManager.Initialized)
+        {
+            return;
+        }
+
+        Callback<GameOverlayActivated_t>.Create(STEAM_GetGameOverlayActivatedState);
+    }
+
+    private void STEAM_GetGameOverlayActivatedState(GameOverlayActivated_t state)
+    {
+        if (state.m_bActive == 1)
+        {
+            OverridePauseMenuState(true);
+        }
     }
 
     // we don't want to be able to bring the pause menu when waiting for a confirm action!
