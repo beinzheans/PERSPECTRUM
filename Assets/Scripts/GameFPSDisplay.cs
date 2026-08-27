@@ -30,8 +30,8 @@ public class GameFPSDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private void Start()
     {
         displayTimeInterval_internal = updateDisplayTimeInterval;
-        fadeOutTimer = new TimerStopwatchAction(this, x => fpsDisplayCanvasGroup.alpha = Mathf.Lerp(1f, 0f, (float)(x / k_FPSDISPLAYFADETIMER)), () => { }, 0d, TimerBehavior.TEMPORARY, k_FPSDISPLAYFADETIMER, false);
-        fadeInTimer = new TimerStopwatchAction(this, x => fpsDisplayCanvasGroup.alpha = Mathf.Lerp(0f, 1f, (float)(x / k_FPSDISPLAYFADETIMER)), () => { }, 0d, TimerBehavior.TEMPORARY, k_FPSDISPLAYFADETIMER, false);
+        fadeOutTimer = new TimerStopwatchAction(this, x => fpsDisplayCanvasGroup.alpha = Mathf.Lerp(1f, 0f, (float)(x / k_FPSDISPLAYFADETIMER)), () => { }, 0d, TimerBehavior.PERSISTENT, k_FPSDISPLAYFADETIMER, false);
+        fadeInTimer = new TimerStopwatchAction(this, x => fpsDisplayCanvasGroup.alpha = Mathf.Lerp(0f, 1f, (float)(x / k_FPSDISPLAYFADETIMER)), () => { }, 0d, TimerBehavior.PERSISTENT, k_FPSDISPLAYFADETIMER, false);
 
         CheckFPSDisplayState();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
@@ -107,6 +107,7 @@ public class GameFPSDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             return;
         }
 
+        fadeOutTimer.ResetTimer();
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeOutTimer);
     }
 
@@ -118,6 +119,7 @@ public class GameFPSDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             return;
         }
 
+        fadeInTimer.ResetTimer();
         DSPTimerEngine.TimerInstance.AddActionToTimer(fadeInTimer);
     }
 
