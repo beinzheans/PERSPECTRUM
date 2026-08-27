@@ -89,6 +89,7 @@ GameObject:
   - component: {fileID: 5676538933511860025}
   - component: {fileID: 4393783226180199288}
   - component: {fileID: 1198547001550760125}
+  - component: {fileID: 8415381104266088662}
   m_Layer: 0
   m_Name: BaseGameComponents
   m_TagString: Untagged
@@ -186,6 +187,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blackPanelRectTransform: {fileID: 4674901309919853883}
   blockRaycastPanelRectTransform: {fileID: 4667769884027767350}
+--- !u!114 &8415381104266088662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87529997441713300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 739f8590e274efb4491544421a740e91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &211504208204402546
 GameObject:
   m_ObjectHideFlags: 0
