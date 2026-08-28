@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Steamworks;
+using UnityEngine.InputSystem;
 /// <summary>
 /// A class to handle pause logic <br></br>
 /// Note the settings tab is generated once during start-up using <see cref="BasePauseModule"/>. That way, we don't need to make the scene messy.
@@ -32,6 +33,7 @@ public class GamePauseManager : MonoBehaviour
                                                         "There may be more settings if you scroll down.";
     public const string k_PAUSEMENUNODESCRIPTIONPROVIDED = "No description provided.";
 
+    private Callback<GameOverlayActivated_t> STEAM_gameOverlapCallback;
     private void Start() 
     {
         gameManager = GameManager.GameInstance;
@@ -59,14 +61,18 @@ public class GamePauseManager : MonoBehaviour
             return;
         }
 
-        Callback<GameOverlayActivated_t>.Create(STEAM_GetGameOverlayActivatedState);
+        STEAM_gameOverlapCallback = Callback<GameOverlayActivated_t>.Create(STEAM_GetGameOverlayActivatedState);
     }
 
     private void STEAM_GetGameOverlayActivatedState(GameOverlayActivated_t state)
     {
         if (state.m_bActive == 1)
         {
-            OverridePauseMenuState(true);
+            gameManager.RequestOverrideGamePauseState(true);
+        }
+        else
+        {
+            InputSystem.ResetDevice(Keyboard.current); // reset our keyboard device! The steam overlay eats the inputs which messes with the Input system
         }
     }
 
@@ -140,6 +146,8 @@ public class GamePauseManager : MonoBehaviour
     private void OnDestroy()
     {
         RemoveListeners();
+
+        STEAM_gameOverlapCallback?.Dispose();
     }
     private void EscapeMenuInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {

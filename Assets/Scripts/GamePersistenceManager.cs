@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+using Debug = UnityEngine.Debug;
 /// <summary>
 /// A class to handle game persistence logic.
 /// </summary>
@@ -393,6 +395,9 @@ public static class GamePersistenceManager
 
         allRecords = new List<GameplayStatisticRecord>(files.Length);
 
+        Stopwatch watch = new();
+
+        watch.Start();
         for (int i = 0; i < files.Length; i++)
         {
             try
@@ -407,6 +412,10 @@ public static class GamePersistenceManager
 
             }
         }
+
+        watch.Stop();
+
+        Debug.Log($"Loading {files.Length} records took {watch.ElapsedMilliseconds} ms");
     }
 
     public static void LoadSpecificGameplayStatisticRecordFile(string path, out GameplayStatisticRecord specificRecord)
@@ -427,6 +436,9 @@ public static class GamePersistenceManager
 
     public static void GetAllGameplayStatisticRecordFilePaths(out string[] paths)
     {
+        Stopwatch watch = new();
+
+        watch.Start();
         string directory = Path.Combine(Application.persistentDataPath, k_GAMEPLAYRECORDSDIRECTORY);
 
         if (!Directory.Exists(directory))
@@ -435,6 +447,10 @@ public static class GamePersistenceManager
         }
 
         paths = Directory.EnumerateFiles(directory).Where(x => Path.GetExtension(x).TrimStart('.').ToLowerInvariant() == "json").ToArray(); // note we store our gameplay records as json
+
+        watch.Stop();
+
+        Debug.Log($"Getting statistic records took {watch.ElapsedMilliseconds} ms");
     }
 
     /// <summary>
