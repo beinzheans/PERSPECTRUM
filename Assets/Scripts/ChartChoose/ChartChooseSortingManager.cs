@@ -12,6 +12,12 @@ public class ChartChooseSortingManager : EditorUIBehavior
             return;
         }
 
+        if (enumIndex == (int)ChartButtonSortOptions.SCORE_BEST && !GameManager.GameInstance.IsChartRecordsFinishedLoading)
+        {
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Please wait until all records are loaded!", 1d);
+            return;
+        }
+
         for (int i = 0; i < enumIndices.Length; i++)
         {
             SetButtonState(enumIndices[i], enumIndex == enumIndices[i]);

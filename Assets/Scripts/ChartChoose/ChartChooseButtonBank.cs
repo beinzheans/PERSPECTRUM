@@ -29,10 +29,19 @@ public class ChartChooseButtonBank : BaseListBank
         chartChooseManager.OnChartDeleted += ChartChooseManager_OnChartDeleted;
         chartChooseManager.OnSortOptionSelected += ChartChooseManager_OnSortOptionSelected;
         chartChooseManager.OnSortOrderChanged += ChartChooseManager_OnSortOrderChanged;
+
         importedChartsText.text = "0"; // case where no charts present at start
 
         circularScrollingList.Initialize();
         chartChooseManager.InitializeChartButtonsFromFile();
+        SortScrollingList();
+    }
+
+    private void SortScrollingList()
+    {
+        SortChartButtons();
+        circularScrollingList.Refresh();
+        SelectNewContentID(-1);
     }
 
     /// <summary>
@@ -62,9 +71,7 @@ public class ChartChooseButtonBank : BaseListBank
 
         sortOrder = obj;
 
-        SortChartButtons();
-        circularScrollingList.Refresh();
-        SelectNewContentID(-1);
+        SortScrollingList();
     }
 
     private void ChartChooseManager_OnSortOptionSelected(ChartButtonSortOptions obj)
@@ -75,9 +82,8 @@ public class ChartChooseButtonBank : BaseListBank
         }
 
         sortOptions = obj;
-        SortChartButtons();
-        circularScrollingList.Refresh();
-        SelectNewContentID(-1);
+
+        SortScrollingList();
     }
 
     private void OnDestroy()
@@ -155,6 +161,12 @@ public class ChartChooseButtonBank : BaseListBank
                 }).ToList();
                 break;
             case ChartButtonSortOptions.SCORE_BEST:
+
+                if (!GameManager.GameInstance.IsChartRecordsFinishedLoading)
+                {
+                    break;
+                }
+
                 behaviorContents = temp.OrderBy(x =>
                 {
                     bool result = GameManager.GameInstance.ChartMetadataGUIDToGameplayRecordMapping.TryGetValue(x.BaseChartMetadata, out List<GameplayStatisticRecord> gameplayReplays);

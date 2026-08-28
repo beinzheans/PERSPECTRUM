@@ -3,14 +3,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+
+using Debug = UnityEngine.Debug;
 public class GameManager : MonoBehaviour
 {
     public readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
@@ -76,6 +80,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> ChartMetadataGUIDToGameplayRecordMapping { get; private set; }
 
+    public event Action<float> OnChartRecordsLoadProgressUpdated;
+    public event Action OnChartRecordsFinishedLoading;
+    public bool IsChartRecordsFinishedLoading { get; private set; }
     public string k_TUTORIALFILEPATHSTRING { get; private set; }
 
     /// <summary>
@@ -187,12 +194,13 @@ public class GameManager : MonoBehaviour
                (cachedKeyboardModifiers.HasFlag(KeyboardModifiers.ALT) == keyboard.altKey.isPressed);
 
     }
-    private void Start()
+
+    IProgress<float> recordsLoadProgress;
+    private async void Start()
     {
         CreateInputActionModifierCache();
-        string defaultKeybindJson = InputActions.SaveBindingOverridesAsJson();
 
-        DefaultGlobalSettings = new GlobalSettings(0d, CursorMovementTypes.Relative, 1f, false, false, false, 0.25f, 0.5f, 0.5f, defaultKeybindJson, true,
+        DefaultGlobalSettings = new GlobalSettings(0d, CursorMovementTypes.Relative, 1f, false, false, false, 0.25f, 0.5f, 0.5f, "", true,
                                                   new GameSettings(3d, 1.5d, 0.5f, 0.5f, 0.5f, true),
                                                   new EditorSettings(1d, 1d),
                                                   new GraphicSettings(new Vector2Int(Display.main.systemWidth, Display.main.systemHeight), true, AntiAliasingMSAA.Off, 1f, true, 0),
@@ -229,8 +237,11 @@ public class GameManager : MonoBehaviour
         }
 
         SetupGraphicalSettings();
-        GamePersistenceManager.CreateMetadataToRecordsMapping(out Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping);
-        ChartMetadataGUIDToGameplayRecordMapping = mapping;
+        recordsLoadProgress = new Progress<float>(x => OnChartRecordsLoadProgressUpdated?.Invoke(x));
+
+        ChartMetadataGUIDToGameplayRecordMapping = await GamePersistenceManager.CreateMetadataToRecordsMapping(recordsLoadProgress);
+        OnChartRecordsFinishedLoading?.Invoke();
+        IsChartRecordsFinishedLoading = true;
     }
 
     private void SetupGraphicalSettings()

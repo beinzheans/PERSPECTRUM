@@ -11,24 +11,56 @@ public class ChartPlayHistoryManager : MonoBehaviour
     [SerializeField] private RectTransform behaviorParentRectTransform;
     [SerializeField] private ChartGameplayRecordButtonBehavior behaviorPrefab;
     [SerializeField] private TMP_Text playHistoryLabelText;
+    [SerializeField] private TMP_Text playRecordsLoadingText;
     private ChartChooseManager chartChooseManager;
 
     private List<ChartGameplayRecordButtonBehavior> currentActiveRecordButtonBehaviors = new();
+    private BaseChartMetadata currentBaseMetadata;
     private void Start()
     {
         chartChooseManager = ChartChooseManager.ChartChooseInstance;
         ResetPlayHistoryUI();
         chartChooseManager.OnChartButtonClicked += ChartChooseManager_OnChartButtonClicked;
         chartChooseManager.OnChartDeleted += ChartChooseManager_OnChartDeleted;
+
+        if (GameManager.GameInstance.IsChartRecordsFinishedLoading)
+        {
+            playRecordsLoadingText.gameObject.SetActive(false);
+            return;
+        }
+        else
+        {
+            playRecordsLoadingText.gameObject.SetActive(true);
+            GameManager.GameInstance.OnChartRecordsLoadProgressUpdated += GameInstance_OnChartRecordsLoadProgressUpdated;
+            GameManager.GameInstance.OnChartRecordsFinishedLoading += GameInstance_OnChartRecordsFinishedLoading;
+        }
+    }
+
+    private void GameInstance_OnChartRecordsFinishedLoading()
+    {
+        playRecordsLoadingText.gameObject.SetActive(false);
+
+        ResetPlayHistoryUI();
+        UpdateHistoryUIFromBaseMetadata();
+    }
+
+    private void GameInstance_OnChartRecordsLoadProgressUpdated(float obj)
+    {
+        playRecordsLoadingText.text = $"Loading Records...({obj * 100f:F0}%)";
     }
 
     private void OnDestroy()
     {
         chartChooseManager.OnChartButtonClicked -= ChartChooseManager_OnChartButtonClicked;
         chartChooseManager.OnChartDeleted -= ChartChooseManager_OnChartDeleted;
+
+        GameManager.GameInstance.OnChartRecordsLoadProgressUpdated -= GameInstance_OnChartRecordsLoadProgressUpdated;
+        GameManager.GameInstance.OnChartRecordsFinishedLoading -= GameInstance_OnChartRecordsFinishedLoading;
+
     }
     private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents contents)
     {
+        currentBaseMetadata = new();
         ResetPlayHistoryUI();
     }
 
@@ -38,13 +70,25 @@ public class ChartPlayHistoryManager : MonoBehaviour
 
         if (obj == null || id == -1)
         {
-            playHistoryLabelText.text = "History (0)";
+            currentBaseMetadata = new();
+            playHistoryLabelText.text = "History (-)";
             return;
         }
 
-        BaseChartMetadata baseMetadata = obj.BaseChartMetadata;
+        currentBaseMetadata = obj.BaseChartMetadata;
 
-        if (!GameManager.GameInstance.ChartMetadataGUIDToGameplayRecordMapping.TryGetValue(baseMetadata, out List<GameplayStatisticRecord> records))
+        if (!GameManager.GameInstance.IsChartRecordsFinishedLoading)
+        {
+            playHistoryLabelText.text = "History (-)";
+            return;
+        }
+
+        UpdateHistoryUIFromBaseMetadata();
+    }
+
+    private void UpdateHistoryUIFromBaseMetadata()
+    {
+        if (!GameManager.GameInstance.ChartMetadataGUIDToGameplayRecordMapping.TryGetValue(currentBaseMetadata, out List<GameplayStatisticRecord> records))
         {
             playHistoryLabelText.text = "History (0)";
             return;
@@ -74,6 +118,6 @@ public class ChartPlayHistoryManager : MonoBehaviour
     private void ResetPlayHistoryUI()
     {
         RemoveAllPlayHistoryButton();
-        playHistoryLabelText.text = "History (0)";
+        playHistoryLabelText.text = "History (-)";
     }
 }

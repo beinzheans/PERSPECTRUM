@@ -385,44 +385,51 @@ public static class GamePersistenceManager
     /// <summary>
     /// Loads all gameplay records into the game as a list.
     /// </summary>
-    /// <param name="allRecords"></param>
     /// <returns></returns>
-    public static void LoadAllGameplayStatisticRecordFile(out List<GameplayStatisticRecord> allRecords)
+    public static async Task<List<GameplayStatisticRecord>> LoadAllGameplayStatisticRecordFile(IProgress<float> numberOfProcessedRecords)
     {
         string directory = Path.Combine(Application.persistentDataPath, k_GAMEPLAYRECORDSDIRECTORY);
 
         GetAllGameplayStatisticRecordFilePaths(out string[] files);
 
-        allRecords = new List<GameplayStatisticRecord>(files.Length);
+        List<GameplayStatisticRecord> allRecords = new List<GameplayStatisticRecord>(files.Length);
 
         Stopwatch watch = new();
 
         watch.Start();
-        for (int i = 0; i < files.Length; i++)
-        {
-            try
-            {
-                LoadSpecificGameplayStatisticRecordFile(files[i], out GameplayStatisticRecord record);
-                allRecords.Add(record);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Failed to load record at {files[i]}. Exception: \n" +
-                                 $"{e.Message}");
 
+        await Task.Run(async () =>
+        {
+            for (int i = 0; i < files.Length; i++)
+            {
+                try
+                {
+                    GameplayStatisticRecord record = await LoadSpecificGameplayStatisticRecordFile(files[i]);
+                    allRecords.Add(record);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"Failed to load record at {files[i]}. Exception: \n" +
+                                     $"{e.Message}");
+
+                }
+
+                numberOfProcessedRecords?.Report((float)(i + 1) / files.Length);
             }
-        }
+        });
 
         watch.Stop();
 
         Debug.Log($"Loading {files.Length} records took {watch.ElapsedMilliseconds} ms");
+        return allRecords;
     }
 
-    public static void LoadSpecificGameplayStatisticRecordFile(string path, out GameplayStatisticRecord specificRecord)
+    public static async Task<GameplayStatisticRecord> LoadSpecificGameplayStatisticRecordFile(string path)
     {
+        GameplayStatisticRecord specificRecord;
         try
         {
-            string json = File.ReadAllText(path);
+            string json = await File.ReadAllTextAsync(path);
 
             specificRecord = JsonConvert.DeserializeObject<GameplayStatisticRecord>(json, GameManager.GameInstance.JsonSerializerSettings);
         }
@@ -432,6 +439,8 @@ public static class GamePersistenceManager
                              $"{e.Message}");
             specificRecord = new();
         }
+
+        return specificRecord;
     }
 
     public static void GetAllGameplayStatisticRecordFilePaths(out string[] paths)
@@ -457,16 +466,17 @@ public static class GamePersistenceManager
     /// Creates a mapping f: Base Metadata -> set of records. This should be done at the beginning of the game load. <br></br>
     /// Note that this will by default create the mapping in descending order of scores.
     /// </summary>
-    /// <param name="mapping"></param>
-    public static void CreateMetadataToRecordsMapping(out Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping)
+    public static async Task<Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>>> CreateMetadataToRecordsMapping(IProgress<float> numberOfProcessedRecords)
     {
-        mapping = new();
-        LoadAllGameplayStatisticRecordFile(out List<GameplayStatisticRecord> records);
+        Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping = new Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>>();
+        List<GameplayStatisticRecord> records = await LoadAllGameplayStatisticRecordFile(numberOfProcessedRecords);
 
         for (int i = 0; i < records.Count; i++)
         {
             UpdateMetadataToRecordsMapping(records[i], mapping);
         }
+
+        return mapping;
     }
 
     /// <summary>

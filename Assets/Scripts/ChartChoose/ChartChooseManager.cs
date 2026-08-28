@@ -23,6 +23,7 @@ public class ChartChooseManager : MonoBehaviour
     public event Action<ChartSortOrder> OnSortOrderChanged;
 
     public int CurrentSelectChartContentID { get; private set; }
+
     private void Awake()
     {
         ChartChooseInstance = this;

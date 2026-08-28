@@ -58,6 +58,7 @@ public class ChartChooseAudioManager : MonoBehaviour
     {
         if (obj == null || id == -1)
         {
+            currentPlayingChartContents = null;
             AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME, () => { });
             DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
             return;
