@@ -14,6 +14,11 @@ public class SceneLoader : MonoBehaviour
     public const string k_GAMEPLAYINDEX = "GameplayScene";
     public const string k_CALIBRATIONINDEX = "AudioCalibrationScene";
     public const string k_LOADINGSCENEINDEX = "LoadingScreen";
+
+    /// <summary>
+    /// An action for when the scene load request is received. This is invoked just before starting the loading coroutine.
+    /// </summary>
+    public event Action OnSceneLoadRequestReceived;
     /// <summary>
     /// An action for when the next scene is current loading. Accepts a float for the progress from [0, 1].
     /// </summary>
@@ -25,6 +30,13 @@ public class SceneLoader : MonoBehaviour
 
     public event Action<double> OnTransitionToBlack;
     public event Action<double> OnTransitionToNextScene;
+
+    /// <summary>
+    /// An action for when the scene load request is finished. <br></br>
+    /// For normal usage, this is invoked after <see cref="OnTransitionToNextScene"/> and it's timer <see cref="transitionToNewSceneTimer"/> is finished. <br></br>
+    /// Otherwise, this is invoked if loading the scene fails.
+    /// </summary>
+    public event Action OnSceneLoadRequestFinished;
 
     public const double k_LOADINGMINTRANSITIONTIME = 0.5d;
 
@@ -58,8 +70,7 @@ public class SceneLoader : MonoBehaviour
             return;
         }
 
-        GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Disable(); // disallow pausing if loading next scene. sometimes this still makes the pause menu mess up the laoding though..
-
+        OnSceneLoadRequestReceived?.Invoke();
         sceneToLoad = sceneName;
         transitionToBlackTimer = new TimerStopwatchAction(this, x => OnTransitionToBlack?.Invoke(x), () => StartCoroutine(LoadSceneAtIndexAsync(sceneName, callback)), 0d, TimerBehavior.TEMPORARY, k_LOADINGMINTRANSITIONTIME, false); // transition to black before doing anything
         DSPTimerEngine.TimerInstance.AddActionToTimer(transitionToBlackTimer);
@@ -76,7 +87,7 @@ public class SceneLoader : MonoBehaviour
         if (loadOperation == null)
         {
             Debug.LogWarning($"Failed to load scene {sceneName}.");
-            GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Enable();
+            OnSceneLoadRequestFinished?.Invoke();
             yield break;
         }
 
@@ -107,7 +118,7 @@ public class SceneLoader : MonoBehaviour
 
         sceneToLoad = ""; // reset scene to load
 
-        transitionToNewSceneTimer = new TimerStopwatchAction(this, x => OnTransitionToNextScene?.Invoke(x), () => GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Enable(), 0d, TimerBehavior.TEMPORARY, k_LOADINGMINTRANSITIONTIME, false);
+        transitionToNewSceneTimer = new TimerStopwatchAction(this, x => OnTransitionToNextScene?.Invoke(x), () => OnSceneLoadRequestFinished?.Invoke(), 0d, TimerBehavior.TEMPORARY, k_LOADINGMINTRANSITIONTIME, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(transitionToNewSceneTimer);
     }
 
@@ -118,7 +129,7 @@ public class SceneLoader : MonoBehaviour
         if (asyncOperation == null)
         {
             Debug.LogWarning("Failed to load the intermediate loading scene.");
-            GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Enable();
+            OnSceneLoadRequestFinished?.Invoke();
             yield break;
         }
 
@@ -141,7 +152,7 @@ public class SceneLoader : MonoBehaviour
         if (asyncOperation == null)
         {
             Debug.LogWarning($"Failed to unload the intermediate loading scene.");
-            GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.Enable();
+            OnSceneLoadRequestFinished?.Invoke();
             yield break;
         }
 

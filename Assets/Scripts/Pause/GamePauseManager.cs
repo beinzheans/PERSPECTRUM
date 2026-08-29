@@ -34,6 +34,8 @@ public class GamePauseManager : MonoBehaviour
     public const string k_PAUSEMENUNODESCRIPTIONPROVIDED = "No description provided.";
 
     private Callback<GameOverlayActivated_t> STEAM_gameOverlapCallback;
+
+    private bool isBlockPauseMenu;
     private void Start() 
     {
         gameManager = GameManager.GameInstance;
@@ -56,12 +58,24 @@ public class GamePauseManager : MonoBehaviour
         },
         "Are you sure you want to go back to the main menu?");
 
+        SceneLoader.SceneLoaderInstance.OnSceneLoadRequestReceived += SceneLoaderInstance_OnSceneLoadRequestReceived;
+        SceneLoader.SceneLoaderInstance.OnSceneLoadRequestFinished += SceneLoaderInstance_OnSceneLoadRequestFinished;
         if (!SteamManager.Initialized)
         {
             return;
         }
 
         STEAM_gameOverlapCallback = Callback<GameOverlayActivated_t>.Create(STEAM_GetGameOverlayActivatedState);
+    }
+
+    private void SceneLoaderInstance_OnSceneLoadRequestFinished()
+    {
+        isBlockPauseMenu = false;
+    }
+
+    private void SceneLoaderInstance_OnSceneLoadRequestReceived()
+    {
+        isBlockPauseMenu = true;
     }
 
     private void STEAM_GetGameOverlayActivatedState(GameOverlayActivated_t state)
@@ -79,17 +93,21 @@ public class GamePauseManager : MonoBehaviour
     // we don't want to be able to bring the pause menu when waiting for a confirm action!
     private void GameManager_OnConfirmPanelShow()
     {
-        gameManager.InputActions.Gameplay.EscapeMenuInput.performed -= EscapeMenuInput_performed;
+        isBlockPauseMenu = true;
     }
 
-    // resubscribe to action listener
     private void GameManager_OnConfirmPanelHide()
     {
-        gameManager.InputActions.Gameplay.EscapeMenuInput.performed += EscapeMenuInput_performed;
+        isBlockPauseMenu = false;
     }
 
     private void OverridePauseMenuState(bool obj)
     {
+        if (isBlockPauseMenu)
+        {
+            return;
+        }
+
         if (isInPauseMenu == obj)
         {
             return;
@@ -147,10 +165,20 @@ public class GamePauseManager : MonoBehaviour
     {
         RemoveListeners();
 
+        GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.performed -= EscapeMenuInput_performed;
+        SceneLoader.SceneLoaderInstance.OnSceneLoadRequestReceived -= SceneLoaderInstance_OnSceneLoadRequestReceived;
+        SceneLoader.SceneLoaderInstance.OnSceneLoadRequestFinished -= SceneLoaderInstance_OnSceneLoadRequestFinished;
+
         STEAM_gameOverlapCallback?.Dispose();
+        STEAM_gameOverlapCallback = null;
     }
     private void EscapeMenuInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
+        if (isBlockPauseMenu)
+        {
+            return;
+        }
+
         if (!GameManager.GameInstance.IsCorrectKeyboardModifierForInputAction(obj.action))
         {
             return;
