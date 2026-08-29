@@ -38,7 +38,9 @@ public class GameManager : MonoBehaviour
     /// This file name does not supply the extension. This is because we allow .jpg or .png and will need to be created when the chart file is created.
     /// </summary>
     public const string k_BACKGROUNDIMAGEFILENAME = "background";
-    public const string k_FILEEXTENSION = "psr";
+    public const string k_FILEEXTENSION_EDITOR = "psr";
+    public const string k_FILEEXTENSION_GAME = "psrg";
+    public const string k_PUBLISHEDFILEIDNAME = "published_file_id.txt";
     public const string k_PLAYERSETTINGSFILENAME = "settings.json";
     public const string k_TUTORIALCHARTNAME = "tutorial";
 
@@ -207,7 +209,7 @@ public class GameManager : MonoBehaviour
                                                   new GameEvents(false, false));
 
         JsonSerializerSettings.Converters.Add(new Vector2Serializer());
-        k_TUTORIALFILEPATHSTRING = Path.Combine(Application.streamingAssetsPath, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION}");
+        k_TUTORIALFILEPATHSTRING = Path.Combine(Application.streamingAssetsPath, $"{k_TUTORIALCHARTNAME}.{k_FILEEXTENSION_EDITOR}");
 
         CurrentVersion = Application.version;
         if (!MathHelper.IsStringMatchVersioningFormat(CurrentVersion))

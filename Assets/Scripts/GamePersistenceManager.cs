@@ -16,59 +16,6 @@ using Debug = UnityEngine.Debug;
 public static class GamePersistenceManager
 {
     public static readonly byte[] zipEncryptionByteKey = Encoding.UTF8.GetBytes("PleaseDontCrackThisKey");
-
-    /// <summary>
-    /// Saves a chart file to a file destination given the JSON and audio byte array information. This overrides existing paths.
-    /// </summary>
-    /// <param name="fullFilePath"></param>
-    /// <param name="chartJson"></param>
-    /// <param name="audioByte"></param>
-    public static void SaveAsChartFile(string fullFilePath, string chartJson, string metadataJson, byte[] audioByte, byte[] imageByte)
-    {
-        MemoryStream memoryStream = new MemoryStream();
-
-        ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create);
-
-        // below is horrible code. Could probably optimize / refactor this better
-        ZipArchiveEntry chartJsonEntry = archive.CreateEntry(GameManager.k_CHARTFILENAME);
-
-        StreamWriter jsonWriter = new StreamWriter(chartJsonEntry.Open());
-        jsonWriter.Write(chartJson);
-        jsonWriter.Close();
-
-        ZipArchiveEntry metadataJsonEntry = archive.CreateEntry(GameManager.k_METADATAFILENAME);
-
-        StreamWriter metadataWriter = new StreamWriter(metadataJsonEntry.Open());
-        metadataWriter.Write(metadataJson);
-        metadataWriter.Close();
-
-        ZipArchiveEntry audioEntry = archive.CreateEntry(GameManager.k_AUDIOFILENAME);
-
-        Stream audioWriter = audioEntry.Open();
-        audioWriter.Write(audioByte);
-        audioWriter.Close();
-
-        bool isValidImage = IsByteArrayValidImageFile(imageByte, out string extension);
-
-        if (isValidImage)
-        {
-            string imageFilePath = $"{GameManager.k_BACKGROUNDIMAGEFILENAME}.{extension}";
-
-            ZipArchiveEntry imageEntry = archive.CreateEntry(imageFilePath);
-
-            Stream imageWriter = imageEntry.Open();
-            imageWriter.Write(imageByte);
-            imageWriter.Close();
-        }
-
-        archive.Dispose();
-
-        byte[] archiveBytes = memoryStream.ToArray();
-
-        File.WriteAllBytes(fullFilePath, XorProcesser(archiveBytes));
-        memoryStream.Close();
-    }
-
     public static byte[] XorProcesser(byte[] bytes)
     {
         byte[] result = new byte[bytes.Length];
@@ -82,6 +29,96 @@ public static class GamePersistenceManager
     }
 
     /// <summary>
+    /// Saves a chart file to a file destination given the JSON and audio byte array information. This overrides existing paths.
+    /// </summary>
+    /// <param name="fullFilePath"></param>
+    /// <param name="chartJson"></param>
+    /// <param name="audioByte"></param>
+    public static void SaveAsChartFile(string fullFilePath, string chartJson, string metadataJson, byte[] audioByte, byte[] imageByte)
+    {
+        MemoryStream memoryStream = new MemoryStream();
+
+        ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Create);
+
+        CreateEntry(ref archive, GameManager.k_CHARTFILENAME, chartJson);
+        CreateEntry(ref archive, GameManager.k_METADATAFILENAME, metadataJson);
+        CreateEntry(ref archive, GameManager.k_AUDIOFILENAME, audioByte);
+
+        bool isValidImage = IsByteArrayValidImageFile(imageByte, out string extension);
+
+        if (isValidImage)
+        {
+            string imageFilePath = $"{GameManager.k_BACKGROUNDIMAGEFILENAME}.{extension}";
+
+            CreateEntry(ref archive, imageFilePath, imageByte);
+        }
+
+        archive.Dispose();
+
+        byte[] archiveBytes = memoryStream.ToArray();
+
+        File.WriteAllBytes(fullFilePath, XorProcesser(archiveBytes));
+        memoryStream.Close();
+    }
+
+    /// <summary>
+    /// Appends a publisher ID to a chart file.
+    /// </summary>
+    /// <param name="fullFilePath"></param>
+    /// <param name="publishedFileID"></param>
+    public static void AppendPublisherIDToChartFile(string fullFilePath, ulong publishedFileID)
+    {
+        bool result = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_EDITOR, out byte[] bytes);
+
+        if (!result)
+        {
+            Debug.LogWarning($"Invalid archive file!");
+            return;
+        }
+
+        MemoryStream memoryStream = new MemoryStream(bytes);
+        ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Update);
+
+        CreateEntry(ref archive, GameManager.k_PUBLISHEDFILEIDNAME, publishedFileID.ToString());
+
+        archive.Dispose();
+        byte[] newBytes = memoryStream.ToArray();
+
+        File.WriteAllBytes(fullFilePath, newBytes);
+        memoryStream.Close();
+    }
+    
+    /// <summary>
+    /// Creates a new entry with a name inside a zip archive.
+    /// </summary>
+    /// <param name="archive"></param>
+    /// <param name="entryName"></param>
+    /// <param name="entryBytes"></param>
+    private static void CreateEntry(ref ZipArchive archive, string entryName, byte[] entryBytes)
+    {
+        ZipArchiveEntry entry = archive.CreateEntry(entryName);
+
+        Stream stream = entry.Open();
+        stream.Write(entryBytes);
+        stream.Close();
+    }
+
+    /// <summary>
+    /// Creates a new entry with a name inside a zip archive.
+    /// </summary>
+    /// <param name="archive"></param>
+    /// <param name="entryName"></param>
+    /// <param name="entryString"></param>
+    private static void CreateEntry(ref ZipArchive archive, string entryName, string entryString)
+    {
+        ZipArchiveEntry entry = archive.CreateEntry(entryName);
+
+        StreamWriter stream = new StreamWriter(entry.Open());
+        stream.Write(entryString);
+        stream.Close();
+    }
+
+    /// <summary>
     /// Converts a chart file to JSON and audio byte array information if possible. <br></br>
     /// Returns empty chart information if no JSON nor audio byte array is valid.
     /// </summary>
@@ -89,9 +126,50 @@ public static class GamePersistenceManager
     /// <param name="chartJson"></param>
     /// <param name="audioByte"></param>
     /// <returns></returns>
-    public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte, out byte[] imageByte)
+    public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte, out byte[] imageByte, out ulong publisherID)
     {
-        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
+        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_EDITOR, out byte[] archiveBytes);
+
+        if (!isValid)
+        {
+            chartJson = "";
+            metadataJson = "";
+            audioByte = new byte[0];
+            imageByte = new byte[0];
+            publisherID = 0;
+            return;
+        }
+
+        MemoryStream stream = new MemoryStream(archiveBytes);
+        ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read);
+
+        LoadEntry(ref archive, GameManager.k_CHARTFILENAME, out chartJson);
+        LoadEntry(ref archive, GameManager.k_METADATAFILENAME, out metadataJson);
+        LoadEntry(ref archive, GameManager.k_AUDIOFILENAME, out audioByte);
+        LoadEntry(ref archive, GameManager.k_PUBLISHEDFILEIDNAME, out string id);
+
+        ulong.TryParse(id, out publisherID);
+
+        // we only match the name, since it can be .png or .jpg
+        ZipArchiveEntry imageEntry = archive.Entries.FirstOrDefault(x => string.Equals(Path.GetFileNameWithoutExtension(x.Name), GameManager.k_BACKGROUNDIMAGEFILENAME));
+
+        LoadEntry(ref archive, imageEntry, out imageByte);
+
+        archive.Dispose();
+        stream.Close();
+    }
+
+    /// <summary>
+    /// Converts a game file to JSON and audio byte array information if possible. <br></br>
+    /// Returns empty chart information if no JSON nor audio byte array is valid.
+    /// </summary>
+    /// <param name="fullFilePath"></param>
+    /// <param name="chartJson"></param>
+    /// <param name="audioByte"></param>
+    /// <returns></returns>
+    public static void LoadGameFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte, out byte[] imageByte)
+    {
+        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_GAME, out byte[] archiveBytes);
 
         if (!isValid)
         {
@@ -105,76 +183,86 @@ public static class GamePersistenceManager
         MemoryStream stream = new MemoryStream(archiveBytes);
         ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
-        // below is actually very shit code. OH well.
-        // I guess I can fix it in the future since reading bytes from an archive file is the same. But let's do that later when I actually get the shit working
-        ZipArchiveEntry jsonEntry = archive.GetEntry(GameManager.k_CHARTFILENAME);
-
-        if (jsonEntry == null)
-        {
-            chartJson = "";
-        }
-        else
-        {
-            StreamReader jsonReader = new StreamReader(jsonEntry.Open());
-
-            chartJson = jsonReader.ReadToEnd();
-            jsonReader.Close();
-        }
-
-        ZipArchiveEntry metadataEntry = archive.GetEntry(GameManager.k_METADATAFILENAME);
-
-        if (metadataEntry == null)
-        {
-            metadataJson = "";
-        }
-        else
-        {
-            StreamReader metadataReader = new StreamReader(metadataEntry.Open());
-
-            metadataJson = metadataReader.ReadToEnd();
-            metadataReader.Close();
-        }
-
-        ZipArchiveEntry audioEntry = archive.GetEntry(GameManager.k_AUDIOFILENAME);
-
-        if (audioEntry == null)
-        {
-            audioByte = new byte[0];
-        }
-        else
-        {
-            Stream audioReader = audioEntry.Open();
-            MemoryStream memoryStream = new MemoryStream();
-
-            audioReader.CopyTo(memoryStream);
-            audioByte = memoryStream.ToArray();
-
-            memoryStream.Close();
-            audioReader.Close();
-        }
+        LoadEntry(ref archive, GameManager.k_CHARTFILENAME, out chartJson);
+        LoadEntry(ref archive, GameManager.k_METADATAFILENAME, out metadataJson);
+        LoadEntry(ref archive, GameManager.k_AUDIOFILENAME, out audioByte);
 
         // we only match the name, since it can be .png or .jpg
         ZipArchiveEntry imageEntry = archive.Entries.FirstOrDefault(x => string.Equals(Path.GetFileNameWithoutExtension(x.Name), GameManager.k_BACKGROUNDIMAGEFILENAME));
 
-        if (imageEntry == null)
-        {
-            imageByte = new byte[0];
-        }
-        else
-        {
-            Stream imageReader = imageEntry.Open();
-            MemoryStream memoryStream = new MemoryStream();
-
-            imageReader.CopyTo(memoryStream);
-            imageByte = memoryStream.ToArray();
-
-            memoryStream.Close();
-            imageReader.Close();
-        }
+        LoadEntry(ref archive, imageEntry, out imageByte);
 
         archive.Dispose();
         stream.Close();
+    }
 
+    /// <summary>
+    /// Loads an entry with a name inside an zip archive.
+    /// </summary>
+    /// <param name="archive"></param>
+    /// <param name="entryName"></param>
+    /// <param name="bytes"></param>
+    private static void LoadEntry(ref ZipArchive archive, string entryName, out byte[] bytes)
+    {
+        ZipArchiveEntry entry = archive.GetEntry(entryName);
+
+        LoadEntry(ref archive, entry, out bytes);
+    }
+
+    /// <summary>
+    /// Loads an entry with a name inside an zip archive.
+    /// </summary>
+    /// <param name="archive"></param>
+    /// <param name="entryName"></param>
+    /// <param name="bytes"></param>
+    private static void LoadEntry(ref ZipArchive archive, string entryName, out string stringContent)
+    {
+        ZipArchiveEntry entry = archive.GetEntry(entryName);
+
+        LoadEntry(ref archive, entry, out stringContent);
+    }
+
+    /// <summary>
+    /// Loads a given entry inside an zip archive.
+    /// </summary>
+    /// <param name="archive"></param>
+    /// <param name="entryName"></param>
+    /// <param name="bytes"></param>
+    private static void LoadEntry(ref ZipArchive archive, ZipArchiveEntry entry, out byte[] bytes)
+    {
+        if (entry == null)
+        {
+            bytes = new byte[0];
+            return;
+        }
+
+        Stream reader = entry.Open();
+        MemoryStream memoryStream = new MemoryStream();
+
+        reader.CopyTo(memoryStream);
+        bytes = memoryStream.ToArray();
+
+        memoryStream.Close();
+        reader.Close();
+    }
+
+    /// <summary>
+    /// Loads a given entry inside an zip archive.
+    /// </summary>
+    /// <param name="archive"></param>
+    /// <param name="entryName"></param>
+    /// <param name="bytes"></param>
+    private static void LoadEntry(ref ZipArchive archive, ZipArchiveEntry entry, out string stringContent)
+    {
+        if (entry == null)
+        {
+            stringContent = "";
+            return;
+        }
+
+        StreamReader stream = new StreamReader(entry.Open());
+        stringContent = stream.ReadToEnd();
+        stream.Close();
     }
 
     private const string k_TEMPORARYCACHE_AUDIOFILENAME = "temporary_cache.mp3";
@@ -252,7 +340,7 @@ public static class GamePersistenceManager
             return false;
         }
 
-        if (Path.GetExtension(editorChartPath).TrimStart('.') != GameManager.k_FILEEXTENSION)
+        if (Path.GetExtension(editorChartPath).TrimStart('.') != GameManager.k_FILEEXTENSION_EDITOR)
         {
             internalChartPath = "";
             return false;
@@ -260,13 +348,13 @@ public static class GamePersistenceManager
 
         string fileName = Path.GetFileNameWithoutExtension(editorChartPath);
 
-        string gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}.{GameManager.k_FILEEXTENSION}");
+        string gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}.{GameManager.k_FILEEXTENSION_EDITOR}");
 
         int copyIndex = 0;
         while (File.Exists(gamePath))
         {
             copyIndex++;
-            gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}_{copyIndex}.{GameManager.k_FILEEXTENSION}");
+            gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}_{copyIndex}.{GameManager.k_FILEEXTENSION_EDITOR}");
         }
 
         // gamePath does not conflict anymore. we do this because it's possible different charts share the same name.
@@ -285,7 +373,7 @@ public static class GamePersistenceManager
             Directory.CreateDirectory(path);
         }
 
-        editorChartPaths = Directory.EnumerateFiles(path).Where(x => Path.GetExtension(x).TrimStart('.').ToLowerInvariant() == GameManager.k_FILEEXTENSION).OrderBy(x => x).ToArray(); // only get files with our extension and sort in ascending order
+        editorChartPaths = Directory.EnumerateFiles(path).Where(x => Path.GetExtension(x).TrimStart('.').ToLowerInvariant() == GameManager.k_FILEEXTENSION_EDITOR).OrderBy(x => x).ToArray(); // only get files with our extension and sort in ascending order
     }
 
     public static void GetMetadataOfEditorChartFromJson(string metadataJson, out EditorChartMetadata metadata)
@@ -295,7 +383,7 @@ public static class GamePersistenceManager
 
     public static void GetMetadataJsonOfEditorChartPath(string fullFilePath, out string metadataJson)
     {
-        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, out byte[] archiveBytes);
+        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_EDITOR, out byte[] archiveBytes);
 
         if (!isValid)
         {

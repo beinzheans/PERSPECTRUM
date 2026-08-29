@@ -416,7 +416,7 @@ public class GameplayManager : MonoBehaviour
     public async Task RequestGameplayStartedEvent(string path)
     {
         CurrentPath = path;
-        GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
+        GamePersistenceManager.LoadGameFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
 
         if (string.IsNullOrWhiteSpace(chartJson) || string.IsNullOrWhiteSpace(metadataJson))
         {

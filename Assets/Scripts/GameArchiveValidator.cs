@@ -52,12 +52,13 @@ public static class GameArchiveValidator
     }
 
     /// <summary>
-    /// Gets a byte array from a file extension <see cref="GameManager.k_FILEEXTENSION"/>. Returns true if it is valid, otherwise returns false. <br></br>
+    /// Gets a byte array from a file extension. Returns true if it is valid, otherwise returns false. <br></br>
+    /// The file extension to match should NOT include a period / full stop at the beginning!
     /// </summary>
     /// <param name="fullFilePath"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static bool GetArchiveFileBytes(string fullFilePath, out byte[] result)
+    public static bool GetArchiveFileBytes(string fullFilePath, string extensionMatch, out byte[] result)
     {
         if (!File.Exists(fullFilePath))
         {
@@ -65,7 +66,7 @@ public static class GameArchiveValidator
             return false;
         }
 
-        if (Path.GetExtension(fullFilePath).TrimStart('.').ToLowerInvariant() != GameManager.k_FILEEXTENSION)
+        if (Path.GetExtension(fullFilePath).TrimStart('.').ToLowerInvariant() != extensionMatch)
         {
             result = new byte[0];
             return false;

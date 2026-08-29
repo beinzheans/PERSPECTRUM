@@ -4,6 +4,7 @@ using SFB;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
@@ -40,6 +41,9 @@ public class EditorManager : MonoBehaviour
     public event Action<EditorDynamicObject> OnEditorEditEditable;
 
     public event Action<TimelineMarker> OnTimelineMarkerActive;
+
+    private string currentEditorChartLoadedPath = "";
+    private ulong currentEditorChartPublisherID = 0;
     public EditorChart CurrentEditorChart { get; private set; }
     public double EditorPreviewTime { get; private set; }
     public float EditorPlaceDeleteSize { get; private set; }
@@ -151,6 +155,7 @@ public class EditorManager : MonoBehaviour
         EditorPlaceDeleteSize = 0.1f;
         numberOfBeatSubdivisions = 4;
         CurrentTimelineMarker = null;
+        currentEditorChartLoadedPath = "";
         inputAction.Editor.ScrollEditorTime.performed += ScrollEditorTime_performed;
         inputAction.Editor.ScrollEditorTime_BigScroll.performed += ScrollEditorTime_BigScroll_performed;
         inputAction.Editor.ScrollEditorBeatSubdivision.performed += ScrollEditorBeatSubdivision_performed;
@@ -632,14 +637,19 @@ public class EditorManager : MonoBehaviour
 
     public void SaveEditorChart()
     {
-        string path = StandaloneFileBrowser.SaveFilePanel("Save To File", "", "New_Chart", GameManager.k_FILEEXTENSION);
+        string path = StandaloneFileBrowser.SaveFilePanel("Save To File", "", "New_Chart", GameManager.k_FILEEXTENSION_EDITOR);
 
         if (string.IsNullOrEmpty(path))
         {
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid File");
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid file destination", 1d);
             return;
         }
 
+        SaveEditorChartToJson(path);
+    }
+
+    private void SaveEditorChartToJson(string path)
+    {
         string chartJson = "";
         BaseChartMetadata baseMetadata = (BaseChartMetadata)(OnRequestBaseChartMetadata?.Invoke());
 
@@ -668,6 +678,34 @@ public class EditorManager : MonoBehaviour
 
         GamePersistenceManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray, currentEditorBackgroundByteArray);
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
+        currentEditorChartLoadedPath = path;
+    }
+
+    /// <summary>
+    /// Exports the current editor chart in memory as a game file. <br></br>
+    /// Note this will automatically save the current editor chart in memory to ensure consistency.
+    /// </summary>
+    public void ExportEditorChartToGameChart()
+    {
+        string path = StandaloneFileBrowser.SaveFilePanel("Export as", "", "New_Exported_Chart", GameManager.k_FILEEXTENSION_GAME);
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid file destination", 1d);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(currentEditorChartLoadedPath))
+        {
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Save the chart as a file first!", 1d);
+            return;
+        }
+
+        SaveEditorChartToJson(currentEditorChartLoadedPath);
+
+        ulong testID = 0123456789;
+
+        GamePersistenceManager.AppendPublisherIDToChartFile(currentEditorChartLoadedPath, testID);
     }
 
     private EditorChartMetadata CreateChartMetadataFromBaseMetadata(in BaseChartMetadata baseMetadata)
@@ -708,7 +746,7 @@ public class EditorManager : MonoBehaviour
 
     public void LoadEditorChart()
     {
-        string[] paths = StandaloneFileBrowser.OpenFilePanel("Load From File", "", GameManager.k_FILEEXTENSION, false);
+        string[] paths = StandaloneFileBrowser.OpenFilePanel("Load From File", "", GameManager.k_FILEEXTENSION_EDITOR, false);
 
         if (paths.Length <= 0)
         {
@@ -716,7 +754,8 @@ public class EditorManager : MonoBehaviour
             return;
         }
 
-        GamePersistenceManager.LoadChartFile(paths[0], out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
+        string path = paths[0];
+        GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes, out ulong publisherID);
 
         JObject chartJObject = JObject.Parse(chartJson);
         JObject metadataJObject = JObject.Parse(metadataJson);
@@ -725,13 +764,13 @@ public class EditorManager : MonoBehaviour
 
         if (!validResult)
         {
-            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
+            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
                                                                                                                                                "Do you want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(invalidConfirmAction);
         }
         else if (compareResult == 1)
         {
-            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
+            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
                                                                                                                                                     "Do you want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(outdatedGameConfirmAction);
         }
@@ -743,7 +782,7 @@ public class EditorManager : MonoBehaviour
 
             if (!result)
             {
-                ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has a version mismatch and the game failed to resolve it.\n" +
+                ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has a version mismatch and the game failed to resolve it.\n" +
                                                                                                                                                    "Do you want to continue?");
 
                 GameManager.GameInstance.InvokeConfirmActionNeeded(convertConfirmAction);
@@ -751,16 +790,16 @@ public class EditorManager : MonoBehaviour
             else
             {
                 Debug.Log($"Resolved version mismatch automatically");
-                ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes);
+                ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes);
             }
         }
         else
         {
-            ConvertToEditorChart(chartJson, metadataJson, audioBytes, imageBytes);
+            ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes);
         }
     }
 
-    private async void ConvertToEditorChart(string chartJson, string metadataJson, byte[] audioBytes, byte[] imageBytes)
+    private async void ConvertToEditorChart(string filePath, string chartJson, string metadataJson, byte[] audioBytes, byte[] imageBytes)
     {
         try
         {
@@ -809,10 +848,12 @@ public class EditorManager : MonoBehaviour
                 await Awaitable.MainThreadAsync();
                 InvokeBackgroundTextureLoadedEvent(null, imageBytes);
             }
+
+            currentEditorChartLoadedPath = filePath;
         }
         catch (Exception e)
         {
-            Debug.LogWarning($"Failed to parse file! Exception: \n" +
+            Debug.LogWarning($"Failed to parse file at {filePath}! Exception: \n" +
                              $"{e}");
             return;
         }

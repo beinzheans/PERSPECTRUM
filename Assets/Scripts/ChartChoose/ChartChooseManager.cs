@@ -74,7 +74,7 @@ public class ChartChooseManager : MonoBehaviour
 
     public void UI_ImportButtonClicked()
     {
-        string[] paths = StandaloneFileBrowser.OpenFilePanel("Import Chart", "", GameManager.k_FILEEXTENSION, false);
+        string[] paths = StandaloneFileBrowser.OpenFilePanel("Import Chart", "", GameManager.k_FILEEXTENSION_EDITOR, false);
 
         if (paths.Length <= 0)
         {
