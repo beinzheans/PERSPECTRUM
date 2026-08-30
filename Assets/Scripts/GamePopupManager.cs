@@ -154,7 +154,8 @@ public class GamePopupManager : MonoBehaviour
 }
 
 /// <summary>
-/// A class to represent an action to be done only when confirmed.
+/// A class to represent an action to be done only when confirmed. <br></br>
+/// This class has been extended to allow for custom button labels custom options.
 /// </summary>
 public class ConfirmAction
 {
@@ -162,11 +163,16 @@ public class ConfirmAction
     public Action actionToExecute_Deny;
     public string MessageToDisplay;
 
-    public ConfirmAction(Action actionToExecute, Action actionToDeny, string messageToDisplay)
+    public string confirmButtonText;
+    public string denyButtonText;
+
+    public ConfirmAction(Action actionToExecute, Action actionToDeny, string messageToDisplay, string confirmButtonText = "Confirm", string denyButtonText = "Cancel")
     {
         actionToExecute_Confirm = actionToExecute;
         actionToExecute_Deny = actionToDeny;
         MessageToDisplay = messageToDisplay;
+        this.confirmButtonText = confirmButtonText;
+        this.denyButtonText = denyButtonText;
     }
 
     public void ExecuteConfirmAction()

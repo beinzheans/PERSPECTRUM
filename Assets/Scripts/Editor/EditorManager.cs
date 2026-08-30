@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SFB;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -41,10 +42,8 @@ public class EditorManager : MonoBehaviour
     public event Action<EditorDynamicObject> OnEditorEditEditable;
 
     public event Action<TimelineMarker> OnTimelineMarkerActive;
-
-    private string currentEditorChartLoadedPath = "";
-    private ulong currentEditorChartPublisherID = 0;
     public EditorChart CurrentEditorChart { get; private set; }
+    private ulong STEAM_currentPublisherItemID;
     public double EditorPreviewTime { get; private set; }
     public float EditorPlaceDeleteSize { get; private set; }
     public double CurrentBPM { get; private set; }
@@ -102,7 +101,9 @@ public class EditorManager : MonoBehaviour
     private byte[] currentEditorBackgroundByteArray = new byte[0];
     public event Action<Texture2D> OnBackgroundTextureLoaded;
 
-
+    /// <summary>
+    /// Requests a new <see cref="BaseChartMetadata"/>.
+    /// </summary>
     public event Func<BaseChartMetadata> OnRequestBaseChartMetadata;
     public event Action<EditorChartMetadata> OnChartMetadataLoaded;
 
@@ -155,7 +156,6 @@ public class EditorManager : MonoBehaviour
         EditorPlaceDeleteSize = 0.1f;
         numberOfBeatSubdivisions = 4;
         CurrentTimelineMarker = null;
-        currentEditorChartLoadedPath = "";
         inputAction.Editor.ScrollEditorTime.performed += ScrollEditorTime_performed;
         inputAction.Editor.ScrollEditorTime_BigScroll.performed += ScrollEditorTime_BigScroll_performed;
         inputAction.Editor.ScrollEditorBeatSubdivision.performed += ScrollEditorBeatSubdivision_performed;
@@ -632,20 +632,22 @@ public class EditorManager : MonoBehaviour
 
     public void InvokeOnEditorMetadataLoaded(EditorChartMetadata metadata)
     {
+        STEAM_currentPublisherItemID = metadata == null ? 0 : metadata.STEAM_PublisherFileID;
         OnChartMetadataLoaded?.Invoke(metadata);
     }
 
-    public void SaveEditorChart()
+    public string SaveEditorChart()
     {
-        string path = StandaloneFileBrowser.SaveFilePanel("Save To File", "", "New_Chart", GameManager.k_FILEEXTENSION_EDITOR);
+        string path = StandaloneFileBrowser.SaveFilePanel("Save To File", "", "New_Chart", GameManager.k_FILEEXTENSION);
 
         if (string.IsNullOrEmpty(path))
         {
             GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid file destination", 1d);
-            return;
+            return "";
         }
 
         SaveEditorChartToJson(path);
+        return path;
     }
 
     private void SaveEditorChartToJson(string path)
@@ -678,46 +680,18 @@ public class EditorManager : MonoBehaviour
 
         GamePersistenceManager.SaveAsChartFile(path, chartJson, metadataJson, currentEditorAudioClipByteArray, currentEditorBackgroundByteArray);
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Saved", 1d);
-        currentEditorChartLoadedPath = path;
-    }
-
-    /// <summary>
-    /// Exports the current editor chart in memory as a game file. <br></br>
-    /// Note this will automatically save the current editor chart in memory to ensure consistency.
-    /// </summary>
-    public void ExportEditorChartToGameChart()
-    {
-        string path = StandaloneFileBrowser.SaveFilePanel("Export as", "", "New_Exported_Chart", GameManager.k_FILEEXTENSION_GAME);
-
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid file destination", 1d);
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(currentEditorChartLoadedPath))
-        {
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Save the chart as a file first!", 1d);
-            return;
-        }
-
-        SaveEditorChartToJson(currentEditorChartLoadedPath);
-
-        ulong testID = 0123456789;
-
-        GamePersistenceManager.AppendPublisherIDToChartFile(currentEditorChartLoadedPath, testID);
     }
 
     private EditorChartMetadata CreateChartMetadataFromBaseMetadata(in BaseChartMetadata baseMetadata)
     {
         double previewStartTime = GetSongPreviewStartTime();
 
-        return new EditorChartMetadata(baseMetadata, previewStartTime);
+        return new EditorChartMetadata(baseMetadata, previewStartTime, STEAM_currentPublisherItemID);
     }
 
     /// <summary>
     /// Gets the song's preview start time. <br></br>
-    /// If multiple markers are marked as the start time, we choose the earliest one. If none are marked, we default to 0d as the start time.
+    /// If multiple markers are marked as the start time, we choose the earliest one. If none are marked, we default to 0 as the start time.
     /// </summary>
     /// <returns></returns>
     private double GetSongPreviewStartTime()
@@ -746,7 +720,7 @@ public class EditorManager : MonoBehaviour
 
     public void LoadEditorChart()
     {
-        string[] paths = StandaloneFileBrowser.OpenFilePanel("Load From File", "", GameManager.k_FILEEXTENSION_EDITOR, false);
+        string[] paths = StandaloneFileBrowser.OpenFilePanel("Load From File", "", GameManager.k_FILEEXTENSION, false);
 
         if (paths.Length <= 0)
         {
@@ -755,7 +729,7 @@ public class EditorManager : MonoBehaviour
         }
 
         string path = paths[0];
-        GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes, out ulong publisherID);
+        GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
 
         JObject chartJObject = JObject.Parse(chartJson);
         JObject metadataJObject = JObject.Parse(metadataJson);
@@ -764,13 +738,13 @@ public class EditorManager : MonoBehaviour
 
         if (!validResult)
         {
-            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
+            ConfirmAction invalidConfirmAction = new ConfirmAction(() => ConvertJSONToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has completely invalid metadata. Importing may cause errors.\n" +
                                                                                                                                                "Do you want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(invalidConfirmAction);
         }
         else if (compareResult == 1)
         {
-            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
+            ConfirmAction outdatedGameConfirmAction = new ConfirmAction(() => ConvertJSONToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart is made with a later version of the game. Importing may cause errors.\n" +
                                                                                                                                                     "Do you want to continue?");
             GameManager.GameInstance.InvokeConfirmActionNeeded(outdatedGameConfirmAction);
         }
@@ -782,7 +756,7 @@ public class EditorManager : MonoBehaviour
 
             if (!result)
             {
-                ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has a version mismatch and the game failed to resolve it.\n" +
+                ConfirmAction convertConfirmAction = new ConfirmAction(() => ConvertJSONToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes), () => { }, "The selected chart has a version mismatch and the game failed to resolve it.\n" +
                                                                                                                                                    "Do you want to continue?");
 
                 GameManager.GameInstance.InvokeConfirmActionNeeded(convertConfirmAction);
@@ -790,16 +764,16 @@ public class EditorManager : MonoBehaviour
             else
             {
                 Debug.Log($"Resolved version mismatch automatically");
-                ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes);
+                ConvertJSONToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes);
             }
         }
         else
         {
-            ConvertToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes);
+            ConvertJSONToEditorChart(path, chartJson, metadataJson, audioBytes, imageBytes);
         }
     }
 
-    private async void ConvertToEditorChart(string filePath, string chartJson, string metadataJson, byte[] audioBytes, byte[] imageBytes)
+    private async void ConvertJSONToEditorChart(string filePath, string chartJson, string metadataJson, byte[] audioBytes, byte[] imageBytes)
     {
         try
         {
@@ -848,8 +822,6 @@ public class EditorManager : MonoBehaviour
                 await Awaitable.MainThreadAsync();
                 InvokeBackgroundTextureLoadedEvent(null, imageBytes);
             }
-
-            currentEditorChartLoadedPath = filePath;
         }
         catch (Exception e)
         {
@@ -857,6 +829,50 @@ public class EditorManager : MonoBehaviour
                              $"{e}");
             return;
         }
+    }
+
+    /// <summary>
+    /// Exports the current Editor chart to the Steam workshop.
+    /// </summary>
+    public void STEAM_ExportEditorChart()
+    {
+        if (!SteamManager.Initialized)
+        {
+            return;
+        }
+
+        ulong previousPublisherID = STEAM_currentPublisherItemID;
+        if (previousPublisherID != 0)
+        {
+            ConfirmAction action = new ConfirmAction(() => SaveAndAddFileToSteam(previousPublisherID), () => 
+            {
+                // below is just test function to get a ulong. In actuality we should use SteamManager.
+                byte[] ulongBytes = new byte[8];
+                System.Random random = new System.Random();
+
+                random.NextBytes(ulongBytes);
+
+                ulong testID = BitConverter.ToUInt64(ulongBytes);
+
+                STEAM_currentPublisherItemID = testID;
+
+                SaveAndAddFileToSteam(previousPublisherID);
+
+            }, "The chart to export is already published to Steam Workshop, and can be updated.\n" +
+               "Are you sure you want to update the item? Otherwise, the item will be published separately, and marked as derivative work.");
+
+            GameManager.GameInstance.InvokeConfirmActionNeeded(action);
+        }
+        else
+        {
+            SaveAndAddFileToSteam(previousPublisherID);
+        }
+    }
+
+    private void SaveAndAddFileToSteam(ulong previousPublisherID)
+    {
+        string path = SaveEditorChart(); // prompt the user to save the chart as a file with the publisher ID. We will record the path used for the Steam workshop upload.
+        SteamManager.SteamInstance.AddFileToStagingArea(path, previousPublisherID);
     }
 }
 
@@ -933,11 +949,14 @@ public class EditorChartMetadata : IEquatable<EditorChartMetadata>
     [JsonProperty(GameManager.k_CHARTSTARTPREVIEWTIMEKEY)]
     public double PreviewStartTime { get; private set; }
 
-    public double PreviewBPM { get; private set; }
-    public EditorChartMetadata(BaseChartMetadata baseChartMetadata, double previewStartTime)
+    [DefaultValue(0)]
+    [JsonProperty(GameManager.k_CHARTPUBLISHERFILEIDKEY)]
+    public ulong STEAM_PublisherFileID { get; private set; }
+    public EditorChartMetadata(BaseChartMetadata baseChartMetadata, double previewStartTime, ulong STEAM_PublisherFileID)
     {
         BaseMetadata = baseChartMetadata;
         PreviewStartTime = previewStartTime;
+        this.STEAM_PublisherFileID = STEAM_PublisherFileID;
     }
 
     public override bool Equals(object obj)

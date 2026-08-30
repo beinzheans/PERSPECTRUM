@@ -70,7 +70,7 @@ public class ChartChooseAudioManager : MonoBehaviour
         }
 
         currentPlayingChartContents = obj;
-        GamePersistenceManager.LoadGameFile(obj.AssociatedFullFilePath, out _, out string metadataJson, out byte[] audioBytes, out _); // here we could add a preview for the BG!
+        GamePersistenceManager.LoadChartFile(obj.AssociatedFullFilePath, out _, out string metadataJson, out byte[] audioBytes, out _); // here we could add a preview for the BG!
 
         (bool result, AudioClip clip) = await GamePersistenceManager.GetAudioClipFromByteArray(audioBytes, true);
 

@@ -13,6 +13,9 @@ using UnityEngine;
 #if !DISABLESTEAMWORKS
 using System.Collections;
 using Steamworks;
+using System;
+using System.Threading.Tasks;
+using System.IO;
 #endif
 
 //
@@ -26,7 +29,7 @@ public class SteamManager : MonoBehaviour
     protected static bool s_EverInitialized = false;
 
     protected static SteamManager s_instance;
-    protected static SteamManager Instance
+    public static SteamManager SteamInstance
     {
         get
         {
@@ -46,7 +49,7 @@ public class SteamManager : MonoBehaviour
     {
         get
         {
-            return Instance.m_bInitialized;
+            return SteamInstance.m_bInitialized;
         }
     }
 
@@ -194,6 +197,114 @@ public class SteamManager : MonoBehaviour
         // Run Steam client callbacks
         SteamAPI.RunCallbacks();
     }
+
+    public event Func<Task<ulong>> OnRequestPublishToSteamWorkshop;
+
+    public async Task<ulong> InvokePublishWorkshopEvent()
+    {
+        ulong? result = await OnRequestPublishToSteamWorkshop.Invoke();
+
+        return result == null ? 0 : (ulong)result;
+    }
+
+    /// <summary>
+    /// The folder used when staging a Steam Workshop upload. This should a subdirectory inside <see cref="Application.temporaryCachePath"/>. <br></br>
+    /// </summary>
+    public const string k_STEAM_WORKSHOP_STAGINGFOLDER = "Workshop_Staging_Folder";
+
+    /// <summary>
+    /// This event fires when the file has been placed into the Staging area and ready to upload.
+    /// </summary>
+    public event Action<string, ulong> OnRequestUploadFiles;
+
+    /// <summary>
+    /// Adds a file with extension <see cref="GameManager.k_FILEEXTENSION"/> into the staging area for the Steam Workshop. <br></br>
+    /// Returns false if the file to add is invalid, or if adding fails.
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    public bool AddFileToStagingArea(string filePath, ulong previousPublisherID)
+    {
+        if (!File.Exists(filePath))
+        {
+            Debug.LogWarning($"Attempted to add a non-existent file to the staging area!");
+            return false;
+        }
+
+        if (Path.GetExtension(filePath).TrimStart('.').ToLowerInvariant() != GameManager.k_FILEEXTENSION)
+        {
+            Debug.LogWarning($"Attempted to add an invalid file to the staging area!");
+            return false;
+        }
+
+        string stagingFolder = Path.Combine(Application.temporaryCachePath, k_STEAM_WORKSHOP_STAGINGFOLDER);
+
+        if (!Directory.Exists(stagingFolder))
+        {
+            Directory.CreateDirectory(stagingFolder);
+        }
+
+        try
+        {
+            string originalfileNameWithExtension = Path.GetFileName(filePath);
+            string destinationFilePath = Path.Combine(stagingFolder, originalfileNameWithExtension);
+            File.Copy(filePath, destinationFilePath, true);
+
+            OnRequestUploadFiles?.Invoke(destinationFilePath, previousPublisherID);
+            Debug.Log($"Added {destinationFilePath}");
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Failed to add file to the staging area! Exception: \n" +
+                             $"{e.Message}");
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Returns true if all of the files inside the staging area has been deleted. <br></br>
+    /// Returns false if the staging area is invalid, or if no files are in the staging area, or if at least one file has failed to be deleted.
+    /// </summary>
+    /// <returns></returns>
+    public bool RemoveAllFilesInStagingArea()
+    {
+        string stagingFolder = Path.Combine(Application.temporaryCachePath, k_STEAM_WORKSHOP_STAGINGFOLDER);
+        
+        if (!Directory.Exists(stagingFolder))
+        {
+            Debug.LogWarning($"Staging area does not exist, it has not been created, and thus nothing to remove.");
+            return false;
+        }
+
+        string[] files = Directory.GetFiles(stagingFolder);
+        if (files.Length <= 0)
+        {
+            Debug.Log($"Nothing to remove in staging area.");
+            return false;
+        }
+
+        bool oneHasFailed = false;
+
+        for (int i = files.Length - 1; i >= 0; i--)
+        {
+            try
+            {
+                File.Delete(files[i]);
+            }
+            catch (Exception e)
+            {
+                oneHasFailed = true;
+                Debug.LogWarning($"Failed to delete file at {files[i]}. Exception: \n" +
+                                 $"{e.Message}");
+            }
+        }
+
+        return !oneHasFailed;
+    }
+
+
 #else
 	public static bool Initialized {
 		get {

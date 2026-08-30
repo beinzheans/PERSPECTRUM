@@ -1,5 +1,8 @@
 using UnityEngine;
 using Steamworks;
+using System.Threading.Tasks;
+using System.IO;
+using System;
 
 /// <summary>
 /// A class to handle Steam workshop logic. Specificaly: <br></br>
@@ -9,8 +12,6 @@ using Steamworks;
 /// </summary>
 public class SteamWorkshopManager : MonoBehaviour
 {
-    private CallResult<CreateItemResult_t> CreateItemCallback;
-
     private void Start()
     {
         if (!SteamManager.Initialized)
@@ -18,29 +19,137 @@ public class SteamWorkshopManager : MonoBehaviour
             return;
         }
 
-        CreateItemCallback = CallResult<CreateItemResult_t>.Create(OnItemCreated);
+        SteamManager.SteamInstance.OnRequestPublishToSteamWorkshop += SteamInstance_OnRequestPublishToSteamWorkshop;
+        SteamManager.SteamInstance.OnRequestUploadFiles += SteamInstance_OnRequestUploadFiles;
     }
 
-    private void OnItemCreated(CreateItemResult_t call, bool bIOFailure)
+    private const string k_PREVIEWIMAGENAME = "preview";
+    private async void SteamInstance_OnRequestUploadFiles(string file, ulong previousPublisherID)
     {
-        if (bIOFailure)
+        GamePersistenceManager.LoadChartFile(file, out _, out string metadataJson, out _, out byte[] imageByte);
+
+        GamePersistenceManager.GetMetadataOfEditorChartFromJson(metadataJson, out EditorChartMetadata metadata);
+
+        UGCUpdateHandle_t handle = SteamUGC.StartItemUpdate(AppId_t.Invalid, PublishedFileId_t.Invalid);
+
+        string title = $"{metadata.BaseMetadata.ChartName} [{metadata.BaseMetadata.ChartDifficulty}]";
+
+        SteamUGC.SetItemTitle(handle, title);
+        SteamUGC.SetItemMetadata(handle, metadata.BaseMetadata.GUID);
+        string description = $"Charted by {metadata.BaseMetadata.ChartMapper}\n" +
+                             $"Song: {metadata.BaseMetadata.SongName} [by {metadata.BaseMetadata.SongArtist}]";
+        if (previousPublisherID != 0) // this indicates it is a derivative work! We must credit the original in the derivate work.
         {
-            Debug.LogWarning("bIOFailure when attempting to create item");
-            return;
+            string originalAuthor = await GetAuthorOfItemByPublisherFileID(previousPublisherID);
+            description += $"\nA derivative work of {originalAuthor}";
         }
 
-        if (call.m_eResult != EResult.k_EResultOK)
+        SteamUGC.SetItemDescription(handle, description);
+
+        if (GamePersistenceManager.IsByteArrayValidImageFile(imageByte, out string extension))
         {
-            Debug.LogWarning($"Create item result is not OK. Result: {call.m_eResult}");
-            return;
+            string imageFilePath = Path.Combine(Application.temporaryCachePath, SteamManager.k_STEAM_WORKSHOP_STAGINGFOLDER, $"{k_PREVIEWIMAGENAME}.{extension}");
+
+            try
+            {
+                File.WriteAllBytes(imageFilePath, imageByte);
+
+                SteamUGC.SetItemPreview(handle, imageFilePath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Failed to copy image bytes onto the Staging area. No preview image is assigned! Exception: \n" +
+                                 $"{e.Message}");
+            }
+        }
+        SteamUGC.SetItemContent(handle, Path.Combine(Application.temporaryCachePath, SteamManager.k_STEAM_WORKSHOP_STAGINGFOLDER));
+        SteamUGC.SetItemVisibility(handle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPublic);
+
+        SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, null);
+
+        SubmitItemUpdateResult_t result = await SteamHelper.CreateAwaitableFromSteamAPICall<SubmitItemUpdateResult_t>(call);
+
+
+        if (result.m_bUserNeedsToAcceptWorkshopLegalAgreement)
+        {
+            Debug.LogWarning("User hasn't accepted legal agreement!");
         }
 
-        if (call.m_bUserNeedsToAcceptWorkshopLegalAgreement)
+        if (result.m_eResult != EResult.k_EResultOK)
         {
-            Debug.Log($"Open Workshop User agreement");
-            return;
+            Debug.LogWarning($"Failed to submit item update! Status: {result.m_eResult}");
+        }
+        else
+        {
+            Debug.Log($"Item Update Result is OK");
         }
 
-        
+        SteamManager.SteamInstance.RemoveAllFilesInStagingArea(); // we remove everything in staging area after the submit result!
+    }
+
+    private const string k_FAILEDFETCHNAME = "[unknown]";
+    private async Task<string> GetAuthorOfItemByPublisherFileID(ulong publisherFileID)
+    {
+        UGCQueryHandle_t queryHandle = SteamUGC.CreateQueryUGCDetailsRequest(new PublishedFileId_t[] { new PublishedFileId_t(publisherFileID) }, 1);
+        SteamAPICall_t queryCall = SteamUGC.SendQueryUGCRequest(queryHandle);
+        SteamUGCQueryCompleted_t queryResult = await SteamHelper.CreateAwaitableFromSteamAPICall<SteamUGCQueryCompleted_t>(queryCall);
+
+        SteamUGC.ReleaseQueryUGCRequest(queryHandle);
+        if (queryResult.m_eResult != EResult.k_EResultOK)
+        {
+            Debug.LogWarning($"Failed to query item with ID {publisherFileID}! Result: {queryResult.m_eResult}");
+            return k_FAILEDFETCHNAME;
+        }
+
+        bool isQueryResultSuccess = SteamUGC.GetQueryUGCResult(queryResult.m_handle, 0, out SteamUGCDetails_t details);
+        SteamUGC.ReleaseQueryUGCRequest(queryResult.m_handle);
+
+        if (!isQueryResultSuccess)
+        {
+            Debug.LogWarning($"Failed to fetch UGC details from query result.");
+            return k_FAILEDFETCHNAME;
+        }
+
+        CSteamID id = new CSteamID(details.m_ulSteamIDOwner);
+        bool isCached = SteamFriends.RequestUserInformation(id, true);
+        if (!isCached)
+        {
+            try
+            {
+                await SteamHelper.CreateAwaitableFromCallback<PersonaStateChange_t>(x => x.m_ulSteamID == publisherFileID);
+            }
+            catch
+            {
+                return k_FAILEDFETCHNAME;
+            }
+        }
+
+        return SteamFriends.GetFriendPersonaName(id);
+    }
+
+    private async Task<ulong> SteamInstance_OnRequestPublishToSteamWorkshop()
+    {
+        SteamAPICall_t handle = SteamUGC.CreateItem(AppId_t.Invalid, EWorkshopFileType.k_EWorkshopFileTypeCommunity);
+        CreateItemResult_t result = await SteamHelper.CreateAwaitableFromSteamAPICall<CreateItemResult_t>(handle);
+
+        if (result.m_eResult != EResult.k_EResultOK)
+        {
+            Debug.LogWarning($"Failed to create item! Result: {result.m_eResult}");
+            return 0;
+        }
+
+        if (result.m_bUserNeedsToAcceptWorkshopLegalAgreement)
+        {
+            Debug.LogWarning($"User hasn't accepted legal agreement!");
+            return 0;
+        }
+
+        return result.m_nPublishedFileId.m_PublishedFileId;
+    }
+
+    private void OnDestroy()
+    {
+        SteamManager.SteamInstance.OnRequestPublishToSteamWorkshop -= SteamInstance_OnRequestPublishToSteamWorkshop;
+        SteamManager.SteamInstance.OnRequestUploadFiles -= SteamInstance_OnRequestUploadFiles;
     }
 }

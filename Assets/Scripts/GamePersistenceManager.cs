@@ -60,33 +60,6 @@ public static class GamePersistenceManager
         File.WriteAllBytes(fullFilePath, XorProcesser(archiveBytes));
         memoryStream.Close();
     }
-
-    /// <summary>
-    /// Appends a publisher ID to a chart file.
-    /// </summary>
-    /// <param name="fullFilePath"></param>
-    /// <param name="publishedFileID"></param>
-    public static void AppendPublisherIDToChartFile(string fullFilePath, ulong publishedFileID)
-    {
-        bool result = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_EDITOR, out byte[] bytes);
-
-        if (!result)
-        {
-            Debug.LogWarning($"Invalid archive file!");
-            return;
-        }
-
-        MemoryStream memoryStream = new MemoryStream(bytes);
-        ZipArchive archive = new ZipArchive(memoryStream, ZipArchiveMode.Update);
-
-        CreateEntry(ref archive, GameManager.k_PUBLISHEDFILEIDNAME, publishedFileID.ToString());
-
-        archive.Dispose();
-        byte[] newBytes = memoryStream.ToArray();
-
-        File.WriteAllBytes(fullFilePath, newBytes);
-        memoryStream.Close();
-    }
     
     /// <summary>
     /// Creates a new entry with a name inside a zip archive.
@@ -126,50 +99,9 @@ public static class GamePersistenceManager
     /// <param name="chartJson"></param>
     /// <param name="audioByte"></param>
     /// <returns></returns>
-    public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte, out byte[] imageByte, out ulong publisherID)
+    public static void LoadChartFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte, out byte[] imageByte)
     {
-        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_EDITOR, out byte[] archiveBytes);
-
-        if (!isValid)
-        {
-            chartJson = "";
-            metadataJson = "";
-            audioByte = new byte[0];
-            imageByte = new byte[0];
-            publisherID = 0;
-            return;
-        }
-
-        MemoryStream stream = new MemoryStream(archiveBytes);
-        ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Read);
-
-        LoadEntry(ref archive, GameManager.k_CHARTFILENAME, out chartJson);
-        LoadEntry(ref archive, GameManager.k_METADATAFILENAME, out metadataJson);
-        LoadEntry(ref archive, GameManager.k_AUDIOFILENAME, out audioByte);
-        LoadEntry(ref archive, GameManager.k_PUBLISHEDFILEIDNAME, out string id);
-
-        ulong.TryParse(id, out publisherID);
-
-        // we only match the name, since it can be .png or .jpg
-        ZipArchiveEntry imageEntry = archive.Entries.FirstOrDefault(x => string.Equals(Path.GetFileNameWithoutExtension(x.Name), GameManager.k_BACKGROUNDIMAGEFILENAME));
-
-        LoadEntry(ref archive, imageEntry, out imageByte);
-
-        archive.Dispose();
-        stream.Close();
-    }
-
-    /// <summary>
-    /// Converts a game file to JSON and audio byte array information if possible. <br></br>
-    /// Returns empty chart information if no JSON nor audio byte array is valid.
-    /// </summary>
-    /// <param name="fullFilePath"></param>
-    /// <param name="chartJson"></param>
-    /// <param name="audioByte"></param>
-    /// <returns></returns>
-    public static void LoadGameFile(string fullFilePath, out string chartJson, out string metadataJson, out byte[] audioByte, out byte[] imageByte)
-    {
-        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_GAME, out byte[] archiveBytes);
+        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION, out byte[] archiveBytes);
 
         if (!isValid)
         {
@@ -340,7 +272,7 @@ public static class GamePersistenceManager
             return false;
         }
 
-        if (Path.GetExtension(editorChartPath).TrimStart('.') != GameManager.k_FILEEXTENSION_EDITOR)
+        if (Path.GetExtension(editorChartPath).TrimStart('.') != GameManager.k_FILEEXTENSION)
         {
             internalChartPath = "";
             return false;
@@ -348,13 +280,13 @@ public static class GamePersistenceManager
 
         string fileName = Path.GetFileNameWithoutExtension(editorChartPath);
 
-        string gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}.{GameManager.k_FILEEXTENSION_EDITOR}");
+        string gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}.{GameManager.k_FILEEXTENSION}");
 
         int copyIndex = 0;
         while (File.Exists(gamePath))
         {
             copyIndex++;
-            gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}_{copyIndex}.{GameManager.k_FILEEXTENSION_EDITOR}");
+            gamePath = Path.Combine(Application.persistentDataPath, k_GameChartStorageFolderName, $"{fileName}_{copyIndex}.{GameManager.k_FILEEXTENSION}");
         }
 
         // gamePath does not conflict anymore. we do this because it's possible different charts share the same name.
@@ -373,7 +305,7 @@ public static class GamePersistenceManager
             Directory.CreateDirectory(path);
         }
 
-        editorChartPaths = Directory.EnumerateFiles(path).Where(x => Path.GetExtension(x).TrimStart('.').ToLowerInvariant() == GameManager.k_FILEEXTENSION_EDITOR).OrderBy(x => x).ToArray(); // only get files with our extension and sort in ascending order
+        editorChartPaths = Directory.EnumerateFiles(path).Where(x => Path.GetExtension(x).TrimStart('.').ToLowerInvariant() == GameManager.k_FILEEXTENSION).OrderBy(x => x).ToArray(); // only get files with our extension and sort in ascending order
     }
 
     public static void GetMetadataOfEditorChartFromJson(string metadataJson, out EditorChartMetadata metadata)
@@ -383,7 +315,7 @@ public static class GamePersistenceManager
 
     public static void GetMetadataJsonOfEditorChartPath(string fullFilePath, out string metadataJson)
     {
-        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION_EDITOR, out byte[] archiveBytes);
+        bool isValid = GameArchiveValidator.GetArchiveFileBytes(fullFilePath, GameManager.k_FILEEXTENSION, out byte[] archiveBytes);
 
         if (!isValid)
         {

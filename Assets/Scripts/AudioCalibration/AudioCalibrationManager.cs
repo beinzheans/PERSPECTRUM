@@ -25,7 +25,7 @@ public class AudioCalibrationManager : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
 
-        string chartFilePath = Path.Combine(Application.streamingAssetsPath, $"{k_CALIBRATIONCHARTNAME}.{GameManager.k_FILEEXTENSION_EDITOR}");
+        string chartFilePath = Path.Combine(Application.streamingAssetsPath, $"{k_CALIBRATIONCHARTNAME}.{GameManager.k_FILEEXTENSION}");
 
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
