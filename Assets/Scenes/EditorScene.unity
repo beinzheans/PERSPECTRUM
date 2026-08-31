@@ -2474,7 +2474,7 @@ GameObject:
   - component: {fileID: 217694357}
   - component: {fileID: 217694356}
   m_Layer: 5
-  m_Name: ExitEditor
+  m_Name: PublishChart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3116,6 +3116,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 267285399}
   m_CullTransparentMesh: 1
+--- !u!114 &282669530 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 254025506919659165, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+  m_PrefabInstance: {fileID: 2008639182}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &293298255
 GameObject:
   m_ObjectHideFlags: 0
@@ -5009,7 +5020,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Exit Editor
+  m_text: Publish Chart
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 52d4408d581d95646ae4ae6fdac061e2, type: 2}
   m_sharedMaterial: {fileID: -1286301799560842084, guid: 52d4408d581d95646ae4ae6fdac061e2, type: 2}
@@ -5269,6 +5280,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: -8, y: -5, z: -8, w: -5}
   m_Softness: {x: 0, y: 0}
+--- !u!114 &464060914 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1449343545658619758, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+  m_PrefabInstance: {fileID: 2008639182}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &471277511
 GameObject:
   m_ObjectHideFlags: 0
@@ -20908,6 +20930,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseGameComponents
       objectReference: {fileID: 0}
+    - target: {fileID: 796377743062540942, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: m_Name
+      value: ConfirmText
+      objectReference: {fileID: 0}
+    - target: {fileID: 2677960440749185393, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: m_Name
+      value: CancelText
+      objectReference: {fileID: 0}
+    - target: {fileID: 4990681556669747597, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: denyButton_label
+      value: 
+      objectReference: {fileID: 464060914}
+    - target: {fileID: 4990681556669747597, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
+      propertyPath: confirmButton_label
+      value: 
+      objectReference: {fileID: 282669530}
     - target: {fileID: 5066035480902132430, guid: ed5ebeba7149c914c9546b49ed0c3e88, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

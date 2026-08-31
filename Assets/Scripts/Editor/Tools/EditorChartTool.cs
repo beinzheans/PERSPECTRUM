@@ -7,7 +7,7 @@ public class EditorChartTool : EditorUIBehavior
 {
     protected override async void UI_OnButtonPress(int index)
     {
-        if (index < (int)ChartOptions.LOAD_AUDIO_FILE || index > (int)ChartOptions.EXITEDITOR)
+        if (index < (int)ChartOptions.LOAD_AUDIO_FILE || index > (int)ChartOptions.PUBLISH_EDITOR_CHART)
         {
             return;
         }
@@ -54,10 +54,10 @@ public class EditorChartTool : EditorUIBehavior
 
                 GameManager.GameInstance.InvokeConfirmActionNeeded(loadAction);
                 break;
-            case ChartOptions.EXITEDITOR:
-                ConfirmAction exitAction = new(() => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask), () => { }, "Are you sure you want to exit?\n" +
-                                                                                                                                               "All unsaved progress will be lost.");
-                GameManager.GameInstance.InvokeConfirmActionNeeded(exitAction);
+            case ChartOptions.PUBLISH_EDITOR_CHART:
+                ConfirmAction confirmAction = new ConfirmAction(() => EditorManager.EditorInstance.STEAM_ExportEditorChart(), () => { }, "Are you sure you want to publish the current chart to Steam Workshop?");
+
+                GameManager.GameInstance.InvokeConfirmActionNeeded(confirmAction);
                 break;
         }
     }
@@ -70,5 +70,5 @@ public enum ChartOptions
     LOAD_AUDIO_FILE = 0,
     SAVE_EDITOR_CHART = 1,
     LOAD_EDITOR_CHART = 2,
-    EXITEDITOR = 3
+    PUBLISH_EDITOR_CHART = 3
 }

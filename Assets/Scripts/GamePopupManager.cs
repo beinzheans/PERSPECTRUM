@@ -21,6 +21,9 @@ public class GamePopupManager : MonoBehaviour
     [SerializeField] private Button confirmButton;
     [SerializeField] private Button denyButton;
 
+    [SerializeField] private TMP_Text confirmButton_label;
+    [SerializeField] private TMP_Text denyButton_label;
+
     [Header("Info Popup")]
 
     [SerializeField] private Animator infoPopupPanelAnimation;
@@ -115,6 +118,8 @@ public class GamePopupManager : MonoBehaviour
         ConfirmAction obj = confirmActionQueue.Peek();
 
         popupDescriptionText.text = obj.MessageToDisplay;
+        confirmButton_label.text = obj.confirmButtonText;
+        denyButton_label.text = obj.denyButtonText;
 
         ShowPanel();
     }

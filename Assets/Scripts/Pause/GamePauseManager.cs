@@ -172,6 +172,7 @@ public class GamePauseManager : MonoBehaviour
         STEAM_gameOverlapCallback?.Dispose();
         STEAM_gameOverlapCallback = null;
     }
+
     private void EscapeMenuInput_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         if (isBlockPauseMenu)

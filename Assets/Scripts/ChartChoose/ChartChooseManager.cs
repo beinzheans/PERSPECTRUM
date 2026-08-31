@@ -1,7 +1,9 @@
 using Newtonsoft.Json.Linq;
 using SFB;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,19 +31,86 @@ public class ChartChooseManager : MonoBehaviour
         ChartChooseInstance = this;
     }
 
+    private void Start()
+    {
+        SteamManager.SteamInstance.OnChartInstalledInSteamStorage += SteamInstance_OnChartInstalledInSteamStorage;
+    }
+
+    private void SteamInstance_OnChartInstalledInSteamStorage(string folderPath_STEAM)
+    {
+        List<string> validSteamFiles = AddChartFilesFromSteamFolders(folderPath_STEAM);
+
+        for (int i = 0; i < validSteamFiles.Count; i++)
+        {
+            AddChartButton(validSteamFiles[i]);
+        }
+    }
+
     private void OnDestroy()
     {
         ChartChooseInstance = null;
     }
 
+    private void OnDisable()
+    {
+        SteamManager.SteamInstance.OnChartInstalledInSteamStorage -= SteamInstance_OnChartInstalledInSteamStorage;
+    }
+
     public void InitializeChartButtonsFromFile()
     {
-        GamePersistenceManager.ReadEditorChartsInGameStorage(out string[] allPaths);
+        GamePersistenceManager.ReadEditorChartsInGameStorage(out string[] allLocalPaths);
+        string[] allSteamFolderPaths = SteamManager.SteamInstance.RequestChartsInLocalSteamStorage();
 
-        for (int i = 0; i < allPaths.Length; i++)
+        List<string> validSteamFiles = AddChartFilesFromSteamFolders(allSteamFolderPaths);
+        List<string> allFiles = new List<string>(allLocalPaths.Length + validSteamFiles.Count);
+
+        allFiles.AddRange(allLocalPaths);
+        allFiles.AddRange(validSteamFiles);
+
+        for (int i = 0; i < allFiles.Count; i++)
         {
-            AddChartButton(allPaths[i]);
+            AddChartButton(allFiles[i]);
         }
+    }
+
+    private List<string> AddChartFilesFromSteamFolders(string[] allSteamFolders)
+    {
+        List<string> result = new List<string>(allSteamFolders.Length);
+        for (int i = 0; i < allSteamFolders.Length; i++)
+        {
+            result.AddRange(AddChartFilesFromSteamFolders(allSteamFolders[i]));
+        }
+
+        return result;
+    }
+    private List<string> AddChartFilesFromSteamFolders(string allSteamFolders)
+    {
+        List<string> result = new List<string>();
+        string path = allSteamFolders;
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return result;
+        }
+
+        if (!Directory.Exists(path))
+        {
+            return result;
+        }
+
+        string[] files = Directory.GetFiles(path);
+
+        for (int j = 0; j < files.Length; j++)
+        {
+            if (Path.GetExtension(files[j]).TrimStart('.').ToLowerInvariant() != GameManager.k_FILEEXTENSION)
+            {
+                continue;
+            }
+
+            result.Add(files[j]);
+        }
+
+        return result;
     }
 
     private void AddChartButton(string path)

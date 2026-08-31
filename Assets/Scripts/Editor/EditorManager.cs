@@ -834,7 +834,7 @@ public class EditorManager : MonoBehaviour
     /// <summary>
     /// Exports the current Editor chart to the Steam workshop.
     /// </summary>
-    public void STEAM_ExportEditorChart()
+    public async void STEAM_ExportEditorChart()
     {
         if (!SteamManager.Initialized)
         {
@@ -842,37 +842,30 @@ public class EditorManager : MonoBehaviour
         }
 
         ulong previousPublisherID = STEAM_currentPublisherItemID;
+        
         if (previousPublisherID != 0)
         {
-            ConfirmAction action = new ConfirmAction(() => SaveAndAddFileToSteam(previousPublisherID), () => 
+            ConfirmAction action = new ConfirmAction(() => SaveAndAddFileToSteam(STEAM_currentPublisherItemID, previousPublisherID), async () => 
             {
-                // below is just test function to get a ulong. In actuality we should use SteamManager.
-                byte[] ulongBytes = new byte[8];
-                System.Random random = new System.Random();
-
-                random.NextBytes(ulongBytes);
-
-                ulong testID = BitConverter.ToUInt64(ulongBytes);
-
-                STEAM_currentPublisherItemID = testID;
-
-                SaveAndAddFileToSteam(previousPublisherID);
-
-            }, "The chart to export is already published to Steam Workshop, and can be updated.\n" +
-               "Are you sure you want to update the item? Otherwise, the item will be published separately, and marked as derivative work.");
+                STEAM_currentPublisherItemID = await SteamManager.SteamInstance.InvokePublishWorkshopEvent();
+                SaveAndAddFileToSteam(STEAM_currentPublisherItemID, previousPublisherID);
+            }, "The chart to export is already published to Steam Workshop, and can be updated if you own it.\n" +
+               "Are you sure you want to update the item? Otherwise, the item will be published separately, and marked as derivative work.", "Update Existing", "Publish New");
 
             GameManager.GameInstance.InvokeConfirmActionNeeded(action);
         }
         else
         {
-            SaveAndAddFileToSteam(previousPublisherID);
+            STEAM_currentPublisherItemID = await SteamManager.SteamInstance.InvokePublishWorkshopEvent();
+            SaveAndAddFileToSteam(STEAM_currentPublisherItemID, previousPublisherID);
         }
     }
 
-    private void SaveAndAddFileToSteam(ulong previousPublisherID)
+    private void SaveAndAddFileToSteam(ulong publisherFileID, ulong previousPublisherFileID)
     {
         string path = SaveEditorChart(); // prompt the user to save the chart as a file with the publisher ID. We will record the path used for the Steam workshop upload.
-        SteamManager.SteamInstance.AddFileToStagingArea(path, previousPublisherID);
+        Debug.Log($"Adding {path} to staging area with file ID: {publisherFileID}");
+        SteamManager.SteamInstance.AddFileToStagingArea(path, publisherFileID, previousPublisherFileID);
     }
 }
 

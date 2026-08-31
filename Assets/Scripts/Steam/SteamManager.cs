@@ -16,6 +16,7 @@ using Steamworks;
 using System;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Generic;
 #endif
 
 //
@@ -215,7 +216,7 @@ public class SteamManager : MonoBehaviour
     /// <summary>
     /// This event fires when the file has been placed into the Staging area and ready to upload.
     /// </summary>
-    public event Action<string, ulong> OnRequestUploadFiles;
+    public event Action<string, ulong, ulong> OnRequestUploadFiles;
 
     /// <summary>
     /// Adds a file with extension <see cref="GameManager.k_FILEEXTENSION"/> into the staging area for the Steam Workshop. <br></br>
@@ -223,7 +224,7 @@ public class SteamManager : MonoBehaviour
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    public bool AddFileToStagingArea(string filePath, ulong previousPublisherID)
+    public bool AddFileToStagingArea(string filePath, ulong publisherFileID, ulong previousPublisherFileID)
     {
         if (!File.Exists(filePath))
         {
@@ -249,9 +250,9 @@ public class SteamManager : MonoBehaviour
             string originalfileNameWithExtension = Path.GetFileName(filePath);
             string destinationFilePath = Path.Combine(stagingFolder, originalfileNameWithExtension);
             File.Copy(filePath, destinationFilePath, true);
-
-            OnRequestUploadFiles?.Invoke(destinationFilePath, previousPublisherID);
             Debug.Log($"Added {destinationFilePath}");
+
+            OnRequestUploadFiles?.Invoke(destinationFilePath, publisherFileID, previousPublisherFileID);
             return true;
         }
         catch (Exception e)
@@ -304,7 +305,32 @@ public class SteamManager : MonoBehaviour
         return !oneHasFailed;
     }
 
+    /// <summary>
+    /// This event fires when we have installed a chart in Steam's local storage. <br></br>
+    /// Note since Steam report folder paths, you should search through the result for the files you want. <br></br>
+    /// Passes the folder path that Steam reports. If somehow the subscribed item is not installed locally, empty string is passed.
+    /// </summary>
+    public event Action<string> OnChartInstalledInSteamStorage;
 
+    public void InvokeChartInstalledInSteamStorage(string folderPath_STEAM)
+    {
+        OnChartInstalledInSteamStorage?.Invoke(folderPath_STEAM);
+    }
+
+    public event Func<string[]> OnRequestChartsInLocalSteamStorage;
+
+    /// <summary>
+    /// Gets all charts that are installed in Steam's local storage. This should be done at start-up. <br></br>
+    /// Note since Steam report folder paths, you should search through the result for the files you want. <br></br>
+    /// Returns an array with the length <see cref="SteamUGC.GetNumDownloadedItems"/> that contains the folder paths. <br></br>
+    /// If the subscribed item is not installed locally, empty string is returned.
+    /// </summary>
+    /// <returns></returns>
+    public string[] RequestChartsInLocalSteamStorage()
+    {
+        string[] allChartsInstalled = OnRequestChartsInLocalSteamStorage?.Invoke();
+        return allChartsInstalled;
+    }
 #else
 	public static bool Initialized {
 		get {

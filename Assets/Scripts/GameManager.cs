@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     {
         TypeNameHandling = TypeNameHandling.Auto,
         DefaultValueHandling = DefaultValueHandling.Populate,
-        MissingMemberHandling = MissingMemberHandling.Error
+        MissingMemberHandling = MissingMemberHandling.Ignore
     };
 
 
