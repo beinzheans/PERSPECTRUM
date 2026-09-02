@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System;
 using System.Collections.Generic;
+using TMPro;
 
 /// <summary>
 /// A class to handle Steam workshop logic. Specifically: <br></br>
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 /// </summary>
 public class SteamWorkshopManager : MonoBehaviour
 {
+    private Callback<DownloadItemResult_t> OnDownloadItemCallback;
     private Callback<ItemInstalled_t> OnItemInstalledCallback;
     private const string k_STEAM_WORKSHOP_FIXEDURL = @"steam://url/CommunityFilePage/";
     private void Start()
@@ -24,6 +26,8 @@ public class SteamWorkshopManager : MonoBehaviour
         SteamManager.SteamInstance.OnRequestPublishToSteamWorkshop += SteamInstance_OnRequestPublishToSteamWorkshop;
         SteamManager.SteamInstance.OnRequestUploadFiles += SteamInstance_OnRequestUploadFiles;
         SteamManager.SteamInstance.OnRequestChartsInLocalSteamStorage += SteamInstance_OnRequestChartsInLocalSteamStorage;
+
+        OnDownloadItemCallback = Callback<DownloadItemResult_t>.Create(OnItemDownloaded);
         OnItemInstalledCallback = Callback<ItemInstalled_t>.Create(OnItemInstalled);
     }
 
@@ -37,11 +41,11 @@ public class SteamWorkshopManager : MonoBehaviour
 
         for (int i = 0; i < numberOfSubscribedItems; i++)
         {
-            bool isInstalled = SteamUGC.GetItemInstallInfo(subscribedIDs[i], out _, out string path, k_STEAM_FOLDERCHARLIMIT, out _);
+            bool isValid = IsSteamItemValid(subscribedIDs[i], out string path);
 
-            if (!isInstalled)
+            if (!isValid)
             {
-                Debug.LogWarning($"Subscribed item is not installed! Attempting to request download...");
+                Debug.LogWarning($"Subscribed item is not installed, needs update, or is actively downloading! Sending download request...");
                 SteamUGC.DownloadItem(subscribedIDs[i], true); // we will tell Steam to download it first, which moves it to the Callback case.
                 result[i] = "";
                 continue;
@@ -52,6 +56,65 @@ public class SteamWorkshopManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Gets if a Steam item is valid by <see cref="PublishedFileId_t"/>. <br></br>
+    /// Returns true if it is valid (ie., the <paramref name="path"/> exists locally), otherwise returns false (ie., requires installation, update or is actively updating). <br></br>
+    /// Note it is possible for Steam to think the item is valid despite the <paramref name="path"/> not existing locally. This case is handled by returning false.
+    /// </summary>
+    /// <param name="publisherFileID_t"></param>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private bool IsSteamItemValid(PublishedFileId_t publisherFileID_t, out string path)
+    {
+        uint itemState = SteamUGC.GetItemState(publisherFileID_t);
+
+        bool isInstalled = (itemState & (uint)EItemState.k_EItemStateInstalled) != 0;
+        bool isNeedUpdate = (itemState & (uint)EItemState.k_EItemStateNeedsUpdate) != 0;
+        bool isDownloading = (itemState & (uint)EItemState.k_EItemStateDownloading) != 0;
+        if (!isInstalled || isNeedUpdate || isDownloading)
+        {
+            path = "";
+            return false;
+        }
+
+        SteamUGC.GetItemInstallInfo(publisherFileID_t, out _, out path, k_STEAM_FOLDERCHARLIMIT, out _);
+
+        bool isValidPathInFile = Directory.Exists(path) && Directory.GetFiles(path).Length > 0;
+
+        if (!isValidPathInFile)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void OnItemDownloaded(DownloadItemResult_t downloadResult)
+    {
+        if (downloadResult.m_unAppID != SteamUtils.GetAppID())
+        {
+            Debug.Log("Ignoring download event due to incorrect AppID");
+            return;
+        }
+
+        if (downloadResult.m_eResult != EResult.k_EResultOK)
+        {
+            Debug.Log($"Download event is not OK! Status: {downloadResult.m_eResult}");
+            return;
+        }
+
+        bool isValid = IsSteamItemValid(downloadResult.m_nPublishedFileId, out string path);
+
+        if (!isValid)
+        {
+            Debug.LogWarning($"Item is not downloaded in a valid way, and thus it is not safe to access it locally!");
+            return;
+        }
+
+        Debug.Log($"Item {downloadResult.m_nPublishedFileId} downloaded and installed! Invoking event to listeners...");
+        SteamManager.SteamInstance.InvokeChartInstalledInSteamStorage(path);
     }
 
     private const uint k_STEAM_FOLDERCHARLIMIT = 1024;
@@ -68,10 +131,11 @@ public class SteamWorkshopManager : MonoBehaviour
         if (!isInstalled)
         {
             Debug.LogWarning($"Item is not installed, and thus it is not safe to access it locally!\n" +
-                             $"This is a contradiction, since this Item has been invoked by Steam's ItemInstall_t callback!");
+                             $"This is a contradiction, since this Item has been invoked by Steam's ItemInstalled_t callback!");
             return;
         }
 
+        Debug.Log($"Item {item.m_nPublishedFileId} installed! Invoking event to listeners...");
         SteamManager.SteamInstance.InvokeChartInstalledInSteamStorage(folderPath);
     }
 
@@ -202,8 +266,10 @@ public class SteamWorkshopManager : MonoBehaviour
             {
                 await SteamHelper.CreateAwaitableFromCallback<PersonaStateChange_t>(x => x.m_ulSteamID == details.m_ulSteamIDOwner);
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogWarning($"PersonaStateChange_t callback returned exception! Exception: \n" +
+                                 $"{e.Message}");
                 return k_FAILEDFETCHNAME;
             }
         }
@@ -239,6 +305,7 @@ public class SteamWorkshopManager : MonoBehaviour
         SteamManager.SteamInstance.OnRequestUploadFiles -= SteamInstance_OnRequestUploadFiles;
         SteamManager.SteamInstance.OnRequestChartsInLocalSteamStorage -= SteamInstance_OnRequestChartsInLocalSteamStorage;
 
+        OnDownloadItemCallback?.Dispose();
         OnItemInstalledCallback?.Dispose();
     }
 }

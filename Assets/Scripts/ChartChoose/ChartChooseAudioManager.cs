@@ -88,6 +88,14 @@ public class ChartChooseAudioManager : MonoBehaviour
 
         if (!result)
         {
+            AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME, () =>
+            {
+                music_AudioSource.Stop();
+                music_AudioSource.clip = null;
+            });
+
+            DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
+
             return;
         }
 

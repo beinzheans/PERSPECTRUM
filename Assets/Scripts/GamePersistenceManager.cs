@@ -506,6 +506,12 @@ public static class GamePersistenceManager
     /// <param name="mapping"></param>
     public static void UpdateMetadataToRecordsMapping(GameplayStatisticRecord record, Dictionary<BaseChartMetadata, List<GameplayStatisticRecord>> mapping)
     {
+        if (mapping == null)
+        {
+            Debug.LogWarning($"Record mapping has not been loaded yet, ignoring request to update the mapping!");
+            return;
+        }
+
         BaseChartMetadata metadata = record.BaseChartMetadata;
 
         if (!mapping.TryGetValue(metadata, out List<GameplayStatisticRecord> recordsList))

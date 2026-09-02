@@ -237,8 +237,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 247.75485, y: -34.613144}
-  m_SizeDelta: {x: 125, y: 30}
+  m_AnchoredPosition: {x: 210.25485, y: -34.613144}
+  m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4397146141593352275
 CanvasRenderer:
@@ -643,7 +643,7 @@ GameObject:
   - component: {fileID: 4668585669653708331}
   - component: {fileID: 254025506919659165}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ConfirmLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -985,7 +985,7 @@ GameObject:
   - component: {fileID: 3239098813305913099}
   - component: {fileID: 1449343545658619758}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: CancelLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1489,8 +1489,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 422.75485, y: -34.613144}
-  m_SizeDelta: {x: 125, y: 30}
+  m_AnchoredPosition: {x: 460.25485, y: -34.613144}
+  m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6625944912463599020
 CanvasRenderer:
@@ -2822,6 +2822,8 @@ MonoBehaviour:
   popupDescriptionText: {fileID: 2072788243567589246}
   confirmButton: {fileID: 4222134266736571444}
   denyButton: {fileID: 3179020121078035460}
+  confirmButton_label: {fileID: 254025506919659165}
+  denyButton_label: {fileID: 1449343545658619758}
   infoPopupPanelAnimation: {fileID: 5560382613901804833}
   infoMessageText: {fileID: 3226624343498569430}
   fadeOutTime: 1

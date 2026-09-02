@@ -18,6 +18,9 @@ public class ChartChooseManager : MonoBehaviour
     public event Action<ChartButtonBehaviorContents, int> OnChartButtonClicked;
     public event Action<ChartButtonBehaviorContents> OnChartButtonNeededAdd;
 
+    /// <summary>
+    /// Returns the current selected chart button and it's associated content ID as a tuple.
+    /// </summary>
     public event Func<(ChartButtonBehaviorContents, int)> OnRequestCurrentSelectedChartButton;
     public event Action<ChartButtonBehaviorContents> OnChartDeleted;
 

@@ -18,7 +18,6 @@ public class DSPTimerEngine : MonoBehaviour
 
     private Queue<TimerAction> audioActionsToRemove = new();
     private Queue<TimerAction> audioActionsToRegister = new();
-    private Queue<TimerAction> audioActionsToReset = new();
     private void Awake()
     {
         if (DSPTimerEngine.TimerInstance == null)
@@ -257,8 +256,6 @@ public abstract class TimerAction : IEquatable<TimerAction>
     {
         if (TimerCaller == null) // don't update if the caller becomes null
         {
-            Debug.Log($"Removed timer from null caller");
-
             DSPTimerEngine.TimerInstance.RemoveActionFromTimer(this);
             return;
         }
