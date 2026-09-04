@@ -5,6 +5,8 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using TMPro;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 /// <summary>
 /// A class to handle Steam workshop logic. Specifically: <br></br>
@@ -13,9 +15,15 @@ using TMPro;
 /// </summary>
 public class SteamWorkshopManager : MonoBehaviour
 {
+    private Callback<RemoteStoragePublishedFileSubscribed_t> OnItemSubscribedCallback;
+    private Callback<RemoteStoragePublishedFileUnsubscribed_t> OnItemUnsubscribedCallback;
+
     private Callback<DownloadItemResult_t> OnDownloadItemCallback;
-    private Callback<ItemInstalled_t> OnItemInstalledCallback;
+    private Callback<DeleteItemResult_t> OnDeleteItemCallback;
+
     private const string k_STEAM_WORKSHOP_FIXEDURL = @"steam://url/CommunityFilePage/";
+    private const string k_STEAM_USER_FIXEDURL = @"https://steamcommunity.com/profiles/";
+    private const string k_STEAM_WORKSHOPITEM_FIXEDURL = @"https://steamcommunity.com/sharedfiles/filedetails/?id=";
     private void Start()
     {
         if (!SteamManager.Initialized)
@@ -27,8 +35,11 @@ public class SteamWorkshopManager : MonoBehaviour
         SteamManager.SteamInstance.OnRequestUploadFiles += SteamInstance_OnRequestUploadFiles;
         SteamManager.SteamInstance.OnRequestChartsInLocalSteamStorage += SteamInstance_OnRequestChartsInLocalSteamStorage;
 
+        OnItemSubscribedCallback = Callback<RemoteStoragePublishedFileSubscribed_t>.Create(OnItemSubscribed);
+        OnItemUnsubscribedCallback = Callback<RemoteStoragePublishedFileUnsubscribed_t>.Create(OnItemUnsubscribed);
+
         OnDownloadItemCallback = Callback<DownloadItemResult_t>.Create(OnItemDownloaded);
-        OnItemInstalledCallback = Callback<ItemInstalled_t>.Create(OnItemInstalled);
+        OnDeleteItemCallback = Callback<DeleteItemResult_t>.Create(OnItemDeleted);
     }
 
 
@@ -81,9 +92,14 @@ public class SteamWorkshopManager : MonoBehaviour
 
         SteamUGC.GetItemInstallInfo(publisherFileID_t, out _, out path, k_STEAM_FOLDERCHARLIMIT, out _);
 
-        bool isValidPathInFile = Directory.Exists(path) && Directory.GetFiles(path).Length > 0;
+        if (!Directory.Exists(path))
+        {
+            return false;
+        }
 
-        if (!isValidPathInFile)
+        bool hasValidFile = Directory.EnumerateFiles(path).Any(x => Path.GetExtension(x).TrimStart('.').ToLowerInvariant() == GameManager.k_FILEEXTENSION);
+
+        if (!hasValidFile)
         {
             return false;
         }
@@ -91,6 +107,43 @@ public class SteamWorkshopManager : MonoBehaviour
         return true;
     }
 
+    private void OnItemSubscribed(RemoteStoragePublishedFileSubscribed_t subscribedItem)
+    {
+        if (subscribedItem.m_nAppID != SteamUtils.GetAppID())
+        {
+            Debug.Log("Ignoring subscribe event due to incorrect AppID");
+            return;
+        }
+
+        bool isValid = IsSteamItemValid(subscribedItem.m_nPublishedFileId, out string path);
+
+        if (isValid)
+        {
+            Debug.LogWarning($"Contradiction! The Workshop item was just subscribed yet it was found to be valid! We ignore this request.");
+            return;
+        }
+
+        SteamUGC.DownloadItem(subscribedItem.m_nPublishedFileId, true);
+    }
+
+    private void OnItemUnsubscribed(RemoteStoragePublishedFileUnsubscribed_t unsubscribedItem)
+    {
+        if (unsubscribedItem.m_nAppID != SteamUtils.GetAppID())
+        {
+            Debug.Log("Ignoring download event due to incorrect AppID");
+            return;
+        }
+
+        bool isValid = IsSteamItemValid(unsubscribedItem.m_nPublishedFileId, out _);
+
+        if (!isValid)
+        {
+            Debug.LogWarning($"Contradiction! The Workshop item was just unsubscribed yet it was found to be NOT valid! We ignore this request.");
+            return;
+        }
+
+        SteamUGC.DeleteItem(unsubscribedItem.m_nPublishedFileId);
+    }
     private void OnItemDownloaded(DownloadItemResult_t downloadResult)
     {
         if (downloadResult.m_unAppID != SteamUtils.GetAppID())
@@ -109,7 +162,7 @@ public class SteamWorkshopManager : MonoBehaviour
 
         if (!isValid)
         {
-            Debug.LogWarning($"Item is not downloaded in a valid way, and thus it is not safe to access it locally!");
+            Debug.LogWarning($"Item is downloaded but the path is still not valid, and thus it is not safe to access it locally!");
             return;
         }
 
@@ -117,27 +170,22 @@ public class SteamWorkshopManager : MonoBehaviour
         SteamManager.SteamInstance.InvokeChartInstalledInSteamStorage(path);
     }
 
-    private const uint k_STEAM_FOLDERCHARLIMIT = 1024;
-    private void OnItemInstalled(ItemInstalled_t item)
+    private void OnItemDeleted(DeleteItemResult_t deleteResult)
     {
-        if (item.m_unAppID != SteamUtils.GetAppID())
+        if (deleteResult.m_eResult != EResult.k_EResultOK)
         {
-            Debug.Log("Ignoring install event due to incorrect AppID");
+            Debug.LogWarning($"Delete event is not OK! Status: {deleteResult.m_eResult}");
             return;
         }
 
-        bool isInstalled = SteamUGC.GetItemInstallInfo(item.m_nPublishedFileId, out _, out string folderPath, k_STEAM_FOLDERCHARLIMIT, out _);
+        bool isValid = IsSteamItemValid(deleteResult.m_nPublishedFileId, out string path);
 
-        if (!isInstalled)
+        if (isValid)
         {
-            Debug.LogWarning($"Item is not installed, and thus it is not safe to access it locally!\n" +
-                             $"This is a contradiction, since this Item has been invoked by Steam's ItemInstalled_t callback!");
-            return;
+            Debug.LogWarning($"Item was deleted but it is still valid!");
         }
-
-        Debug.Log($"Item {item.m_nPublishedFileId} installed! Invoking event to listeners...");
-        SteamManager.SteamInstance.InvokeChartInstalledInSteamStorage(folderPath);
     }
+    private const uint k_STEAM_FOLDERCHARLIMIT = 1024;
 
     private async Task<(bool, SteamUGCDetails_t)> GetSteamUGCQueryDetails(ulong publisherFileID)
     {
@@ -188,8 +236,18 @@ public class SteamWorkshopManager : MonoBehaviour
 
         if (previousPublisherFileID != 0) // this means that this is derivative work!
         {
-            string originalAuthor = await GetAuthorOfItemByPublisherFileID(publisherFileID);
-            description += $"\nA derivative work of {originalAuthor}";
+            string itemLink = $"{k_STEAM_WORKSHOPITEM_FIXEDURL}{previousPublisherFileID}";
+
+            (bool authorResult, CSteamID id, string originalAuthor) = await GetAuthorOfItemByPublisherFileID(previousPublisherFileID);
+            if (!authorResult)
+            {
+                description += $"\nA [url={itemLink}]derivative work[/url]. Can not identify who created it!";
+            }
+            else
+            {
+                string userLink = $"{k_STEAM_USER_FIXEDURL}{id.m_SteamID}";
+                description += $"\nA [url={itemLink}]derivative work[/url] of [url={userLink}]{originalAuthor}[/url] (name when the item was updated)";
+            }
         }
 
         SteamUGC.SetItemDescription(handle, description);
@@ -248,19 +306,19 @@ public class SteamWorkshopManager : MonoBehaviour
     }
 
     private const string k_FAILEDFETCHNAME = "[unknown]";
-    private async Task<string> GetAuthorOfItemByPublisherFileID(ulong publisherFileID)
+    private async Task<(bool, CSteamID, string)> GetAuthorOfItemByPublisherFileID(ulong publisherFileID)
     {
         (bool hasFetchedQueryDetails, SteamUGCDetails_t details) = await GetSteamUGCQueryDetails(publisherFileID);
 
         if (!hasFetchedQueryDetails)
         {
             Debug.LogWarning($"Failed to fetch UGC details from query result.");
-            return k_FAILEDFETCHNAME;
+            return (false, new CSteamID(), k_FAILEDFETCHNAME);
         }
 
         CSteamID id = new CSteamID(details.m_ulSteamIDOwner);
-        bool isCached = SteamFriends.RequestUserInformation(id, true);
-        if (!isCached)
+        bool needsQuery = SteamFriends.RequestUserInformation(id, true);
+        if (needsQuery)
         {
             try
             {
@@ -270,11 +328,11 @@ public class SteamWorkshopManager : MonoBehaviour
             {
                 Debug.LogWarning($"PersonaStateChange_t callback returned exception! Exception: \n" +
                                  $"{e.Message}");
-                return k_FAILEDFETCHNAME;
+                return (false, id, k_FAILEDFETCHNAME);
             }
         }
 
-        return SteamFriends.GetFriendPersonaName(id);
+        return (true, id, SteamFriends.GetFriendPersonaName(id));
     }
 
     private async Task<ulong> SteamInstance_OnRequestPublishToSteamWorkshop()
@@ -306,6 +364,6 @@ public class SteamWorkshopManager : MonoBehaviour
         SteamManager.SteamInstance.OnRequestChartsInLocalSteamStorage -= SteamInstance_OnRequestChartsInLocalSteamStorage;
 
         OnDownloadItemCallback?.Dispose();
-        OnItemInstalledCallback?.Dispose();
+        OnItemSubscribedCallback?.Dispose();
     }
 }
