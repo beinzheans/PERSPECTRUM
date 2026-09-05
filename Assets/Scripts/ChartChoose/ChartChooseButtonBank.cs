@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ChartChooseButtonBank : BaseListBank
 {
@@ -98,10 +99,21 @@ public class ChartChooseButtonBank : BaseListBank
         return ((ChartButtonBehaviorContents)GetListContent(currentSelectedContentID), currentSelectedContentID);
     }
 
-    private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents obj)
+    private void ChartChooseManager_OnChartDeleted(string path)
     {
-        if (!behaviorContents.Remove(obj))
+        bool hasRemoved = false;
+        for (int i = 0; i < behaviorContents.Count; i++)
         {
+            if (string.Equals(behaviorContents[i].AssociatedFullFilePath, path))
+            {
+                behaviorContents.RemoveAt(i);
+                hasRemoved = true;
+            }
+        }
+
+        if (!hasRemoved)
+        {
+            Debug.LogWarning($"Failed to find a button content that contains {path}!");
             return;
         }
 

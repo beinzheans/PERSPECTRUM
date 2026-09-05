@@ -55,7 +55,8 @@ public class EditorChartTool : EditorUIBehavior
                 GameManager.GameInstance.InvokeConfirmActionNeeded(loadAction);
                 break;
             case ChartOptions.PUBLISH_EDITOR_CHART:
-                ConfirmAction confirmAction = new ConfirmAction(() => EditorManager.EditorInstance.STEAM_ExportEditorChart(), () => { }, "Are you sure you want to publish the current chart to Steam Workshop?");
+                ConfirmAction confirmAction = new ConfirmAction(() => EditorManager.EditorInstance.STEAM_ExportEditorChart(), () => { }, "Are you sure you want to publish the current chart to Steam Workshop?\n" +
+                                                                                                                                         "By submitting this item, you agree to the workshop terms of service.");
 
                 GameManager.GameInstance.InvokeConfirmActionNeeded(confirmAction);
                 break;

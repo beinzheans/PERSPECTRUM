@@ -19,11 +19,10 @@ public class SteamWorkshopManager : MonoBehaviour
     private Callback<RemoteStoragePublishedFileUnsubscribed_t> OnItemUnsubscribedCallback;
 
     private Callback<DownloadItemResult_t> OnDownloadItemCallback;
-    private Callback<DeleteItemResult_t> OnDeleteItemCallback;
 
-    private const string k_STEAM_WORKSHOP_FIXEDURL = @"steam://url/CommunityFilePage/";
-    private const string k_STEAM_USER_FIXEDURL = @"https://steamcommunity.com/profiles/";
-    private const string k_STEAM_WORKSHOPITEM_FIXEDURL = @"https://steamcommunity.com/sharedfiles/filedetails/?id=";
+    public const string k_STEAM_WORKSHOP_FIXEDURL = @"https://steamcommunity.com/app/480/workshop";
+    public const string k_STEAM_USER_FIXEDURL = @"https://steamcommunity.com/profiles/";
+    public const string k_STEAM_WORKSHOPITEM_FIXEDURL = @"https://steamcommunity.com/sharedfiles/filedetails/?id=";
     private void Start()
     {
         if (!SteamManager.Initialized)
@@ -39,7 +38,6 @@ public class SteamWorkshopManager : MonoBehaviour
         OnItemUnsubscribedCallback = Callback<RemoteStoragePublishedFileUnsubscribed_t>.Create(OnItemUnsubscribed);
 
         OnDownloadItemCallback = Callback<DownloadItemResult_t>.Create(OnItemDownloaded);
-        OnDeleteItemCallback = Callback<DeleteItemResult_t>.Create(OnItemDeleted);
     }
 
 
@@ -56,13 +54,12 @@ public class SteamWorkshopManager : MonoBehaviour
 
             if (!isValid)
             {
-                Debug.LogWarning($"Subscribed item is not installed, needs update, or is actively downloading! Sending download request...");
+                Debug.LogWarning($"Subscribed item {subscribedIDs[i]} is not installed, needs update, or is actively downloading! Sending download request...");
                 SteamUGC.DownloadItem(subscribedIDs[i], true); // we will tell Steam to download it first, which moves it to the Callback case.
                 result[i] = "";
                 continue;
             }
 
-            Debug.Log($"Found file at FOLDER path {path} in local Steam storage");
             result[i] = path;
         }
 
@@ -134,15 +131,15 @@ public class SteamWorkshopManager : MonoBehaviour
             return;
         }
 
-        bool isValid = IsSteamItemValid(unsubscribedItem.m_nPublishedFileId, out _);
+        bool isValid = IsSteamItemValid(unsubscribedItem.m_nPublishedFileId, out string path);
 
         if (!isValid)
         {
-            Debug.LogWarning($"Contradiction! The Workshop item was just unsubscribed yet it was found to be NOT valid! We ignore this request.");
+            Debug.LogWarning($"Contradiction! The Workshop item was just unsubscribed yet it was found to be NOT valid, not invoking unsubscribed event.");
             return;
         }
 
-        SteamUGC.DeleteItem(unsubscribedItem.m_nPublishedFileId);
+        SteamManager.SteamInstance.InvokeWorkshopItemUnsubscribed(path);
     }
     private void OnItemDownloaded(DownloadItemResult_t downloadResult)
     {
@@ -170,21 +167,6 @@ public class SteamWorkshopManager : MonoBehaviour
         SteamManager.SteamInstance.InvokeChartInstalledInSteamStorage(path);
     }
 
-    private void OnItemDeleted(DeleteItemResult_t deleteResult)
-    {
-        if (deleteResult.m_eResult != EResult.k_EResultOK)
-        {
-            Debug.LogWarning($"Delete event is not OK! Status: {deleteResult.m_eResult}");
-            return;
-        }
-
-        bool isValid = IsSteamItemValid(deleteResult.m_nPublishedFileId, out string path);
-
-        if (isValid)
-        {
-            Debug.LogWarning($"Item was deleted but it is still valid!");
-        }
-    }
     private const uint k_STEAM_FOLDERCHARLIMIT = 1024;
 
     private async Task<(bool, SteamUGCDetails_t)> GetSteamUGCQueryDetails(ulong publisherFileID)
@@ -234,7 +216,7 @@ public class SteamWorkshopManager : MonoBehaviour
                              $"Song: {metadata.BaseMetadata.SongName} [by {metadata.BaseMetadata.SongArtist}]";
 
 
-        if (previousPublisherFileID != 0) // this means that this is derivative work!
+        if (previousPublisherFileID != 0 && previousPublisherFileID != publisherFileID) // this means that this is derivative work!
         {
             string itemLink = $"{k_STEAM_WORKSHOPITEM_FIXEDURL}{previousPublisherFileID}";
 
@@ -298,7 +280,7 @@ public class SteamWorkshopManager : MonoBehaviour
 
         if (result.m_bUserNeedsToAcceptWorkshopLegalAgreement)
         {
-            string url = $"{k_STEAM_WORKSHOP_FIXEDURL}{result.m_nPublishedFileId}";
+            string url = $"{k_STEAM_WORKSHOPITEM_FIXEDURL}{result.m_nPublishedFileId.m_PublishedFileId}";
             SteamFriends.ActivateGameOverlayToWebPage(url);
             Debug.LogWarning("User hasn't accepted legal agreement!");
         }
@@ -349,7 +331,7 @@ public class SteamWorkshopManager : MonoBehaviour
         if (result.m_bUserNeedsToAcceptWorkshopLegalAgreement)
         {
             Debug.LogWarning($"User hasn't accepted legal agreement!");
-            string url = $"{k_STEAM_WORKSHOP_FIXEDURL}{result.m_nPublishedFileId}";
+            string url = $"{k_STEAM_WORKSHOP_FIXEDURL}{result.m_nPublishedFileId.m_PublishedFileId}";
             SteamFriends.ActivateGameOverlayToWebPage(url);
         }
 
@@ -365,5 +347,6 @@ public class SteamWorkshopManager : MonoBehaviour
 
         OnDownloadItemCallback?.Dispose();
         OnItemSubscribedCallback?.Dispose();
+        OnItemUnsubscribedCallback?.Dispose();
     }
 }

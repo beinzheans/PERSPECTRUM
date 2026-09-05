@@ -864,8 +864,18 @@ public class EditorManager : MonoBehaviour
     private void SaveAndAddFileToSteam(ulong publisherFileID, ulong previousPublisherFileID)
     {
         string path = SaveEditorChart(); // prompt the user to save the chart as a file with the publisher ID. We will record the path used for the Steam workshop upload.
-        Debug.Log($"Adding {path} to staging area with file ID: {publisherFileID}");
-        SteamManager.SteamInstance.AddFileToStagingArea(path, publisherFileID, previousPublisherFileID);
+
+        bool addResult = SteamManager.SteamInstance.AddFileToStagingArea(path, publisherFileID, previousPublisherFileID);
+
+        if (addResult)
+        {
+            Debug.Log($"Adding {path} to staging area with file ID: {publisherFileID}");
+            STEAM_currentPublisherItemID = publisherFileID;
+        }
+        else
+        {
+            STEAM_currentPublisherItemID = previousPublisherFileID;
+        }
     }
 }
 

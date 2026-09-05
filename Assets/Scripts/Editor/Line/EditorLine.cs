@@ -130,7 +130,6 @@ public class EditorLine : EditorDynamicObject, IConvertable<VisualLine>
         FromNormalizedPosition = ToNormalizedPosition; // we must swap the from-to position vector too!
         ToNormalizedPosition = fromNormalizedPosition_cache;
 
-        Debug.Log($"Mirrored time: {fromTime_cache} -> {toTime_cache} === {FromTime} -> {ToTime}");
         EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 

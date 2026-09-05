@@ -1,3 +1,6 @@
+using Steamworks;
+using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +23,7 @@ public class ChartDetailsManager : MonoBehaviour
         ChartChooseManager.ChartChooseInstance.OnChartDeleted += ChartChooseInstance_OnChartDeleted;
     }
 
-    private void ChartChooseInstance_OnChartDeleted(ChartButtonBehaviorContents obj)
+    private void ChartChooseInstance_OnChartDeleted(string path)
     {
         HideSelectedUI();
     }
@@ -45,7 +48,30 @@ public class ChartDetailsManager : MonoBehaviour
         songCreditText.SetText($"{obj.BaseChartMetadata.SongName} by {obj.BaseChartMetadata.SongArtist}", k_DETAILSCALE, k_DETAILSCALETIME);
         chartDifficultyText.SetText($"Difficulty {obj.BaseChartMetadata.ChartDifficulty}", k_DETAILSCALE, k_DETAILSCALETIME);
         PlayChartButton.onClick.AddListener(() => ChartChooseManager.ChartChooseInstance.RequestPlayChart());
-        DeleteChartButton.onClick.AddListener(() => ChartChooseManager.ChartChooseInstance.RequestRemoveChart());
+        DeleteChartButton.onClick.AddListener(() =>
+        {
+            try
+            {
+                GamePersistenceManager.GetMetadataJsonOfEditorChartPath(obj.AssociatedFullFilePath, out string metadataJson);
+                GamePersistenceManager.GetMetadataOfEditorChartFromJson(metadataJson, out EditorChartMetadata metadata);
+
+                if (metadata.STEAM_PublisherFileID != 0)
+                {
+                    SteamUGC.UnsubscribeItem(new PublishedFileId_t(metadata.STEAM_PublisherFileID));
+                    GameManager.GameInstance.InvokeInformationDisplayNeeded("Unsubscibed from Steam Workshop", 1d);
+                }
+                else
+                {
+                    ChartChooseManager.ChartChooseInstance.RequestRemoveChart();
+                    GameManager.GameInstance.InvokeInformationDisplayNeeded("Deleted from loaded storage", 1d);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Getting metadata from file failed, thus can not determine if the chart is a Workshop item! Exception:\n" +
+                                 $"{e.Message}");
+            }
+        });
     }
 
     private void OnDestroy()

@@ -58,7 +58,7 @@ public class ChartPlayHistoryManager : MonoBehaviour
         GameManager.GameInstance.OnChartRecordsFinishedLoading -= GameInstance_OnChartRecordsFinishedLoading;
 
     }
-    private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents contents)
+    private void ChartChooseManager_OnChartDeleted(string path)
     {
         currentBaseMetadata = new();
         ResetPlayHistoryUI();

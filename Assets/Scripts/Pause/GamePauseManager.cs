@@ -50,8 +50,8 @@ public class GamePauseManager : MonoBehaviour
         gameManager.OnConfirmPanelHide += GameManager_OnConfirmPanelHide;
         returnMainMenuConfirmAction = new(() =>
         {
-            SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
             gameManager.RequestOverrideGamePauseState(false);
+            SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_TITLESCREENINDEX, () => Task.CompletedTask);
         }, () =>
         {
             gameManager.PauseCanvas.gameObject.SetActive(true);

@@ -33,7 +33,7 @@ public class ChartChooseAudioManager : MonoBehaviour
         music_AudioSource.Pause();
     }
 
-    private void ChartChooseManager_OnChartDeleted(ChartButtonBehaviorContents contents)
+    private void ChartChooseManager_OnChartDeleted(string path)
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(playAction);
         AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME, () => music_AudioSource.Stop());

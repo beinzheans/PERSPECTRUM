@@ -317,6 +317,17 @@ public class SteamManager : MonoBehaviour
         OnChartInstalledInSteamStorage?.Invoke(folderPath_STEAM);
     }
 
+    /// <summary>
+    /// This event fires when we have unsubscribed from a Steam Workshop item. <br></br>
+    /// Passes the folder path that the unsubscribed item is in.
+    /// </summary>
+    public event Action<string> OnSteamWorkshopUnsubscribed;
+
+    public void InvokeWorkshopItemUnsubscribed(string folderPath_STEAM)
+    {
+        OnSteamWorkshopUnsubscribed?.Invoke(folderPath_STEAM);
+    }
+
     public event Func<string[]> OnRequestChartsInLocalSteamStorage;
 
     /// <summary>

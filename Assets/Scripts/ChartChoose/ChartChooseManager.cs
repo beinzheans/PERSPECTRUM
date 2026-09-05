@@ -1,11 +1,13 @@
 using Newtonsoft.Json.Linq;
 using SFB;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Profiling.Memory.Experimental;
 using UnityEngine.UI;
 
 public class ChartChooseManager : MonoBehaviour
@@ -22,7 +24,7 @@ public class ChartChooseManager : MonoBehaviour
     /// Returns the current selected chart button and it's associated content ID as a tuple.
     /// </summary>
     public event Func<(ChartButtonBehaviorContents, int)> OnRequestCurrentSelectedChartButton;
-    public event Action<ChartButtonBehaviorContents> OnChartDeleted;
+    public event Action<string> OnChartDeleted;
 
     public event Action<ChartButtonSortOptions> OnSortOptionSelected;
     public event Action<ChartSortOrder> OnSortOrderChanged;
@@ -37,11 +39,22 @@ public class ChartChooseManager : MonoBehaviour
     private void Start()
     {
         SteamManager.SteamInstance.OnChartInstalledInSteamStorage += SteamInstance_OnChartInstalledInSteamStorage;
+        SteamManager.SteamInstance.OnSteamWorkshopUnsubscribed += SteamInstance_OnChartDeletedInSteamStorage;
+    }
+
+    private void SteamInstance_OnChartDeletedInSteamStorage(string STEAM_folderPath)
+    {
+        List<string> validSteamFiles = GetChartFilesFromSteamFolders(STEAM_folderPath);
+
+        for (int i = 0; i < validSteamFiles.Count; i++)
+        {
+            RemoveChartWithPath(validSteamFiles[i]);
+        }
     }
 
     private void SteamInstance_OnChartInstalledInSteamStorage(string folderPath_STEAM)
     {
-        List<string> validSteamFiles = AddChartFilesFromSteamFolders(folderPath_STEAM);
+        List<string> validSteamFiles = GetChartFilesFromSteamFolders(folderPath_STEAM);
 
         for (int i = 0; i < validSteamFiles.Count; i++)
         {
@@ -57,6 +70,7 @@ public class ChartChooseManager : MonoBehaviour
     private void OnDisable()
     {
         SteamManager.SteamInstance.OnChartInstalledInSteamStorage -= SteamInstance_OnChartInstalledInSteamStorage;
+        SteamManager.SteamInstance.OnSteamWorkshopUnsubscribed -= SteamInstance_OnChartDeletedInSteamStorage;
     }
 
     public void InitializeChartButtonsFromFile()
@@ -64,7 +78,7 @@ public class ChartChooseManager : MonoBehaviour
         GamePersistenceManager.ReadEditorChartsInGameStorage(out string[] allLocalPaths);
         string[] allSteamFolderPaths = SteamManager.SteamInstance.RequestChartsInLocalSteamStorage();
 
-        List<string> validSteamFiles = AddChartFilesFromSteamFolders(allSteamFolderPaths);
+        List<string> validSteamFiles = GetChartFilesFromSteamFolders(allSteamFolderPaths);
         List<string> allFiles = new List<string>(allLocalPaths.Length + validSteamFiles.Count);
 
         allFiles.AddRange(allLocalPaths);
@@ -76,17 +90,17 @@ public class ChartChooseManager : MonoBehaviour
         }
     }
 
-    private List<string> AddChartFilesFromSteamFolders(string[] allSteamFolders)
+    private List<string> GetChartFilesFromSteamFolders(string[] allSteamFolders)
     {
         List<string> result = new List<string>(allSteamFolders.Length);
         for (int i = 0; i < allSteamFolders.Length; i++)
         {
-            result.AddRange(AddChartFilesFromSteamFolders(allSteamFolders[i]));
+            result.AddRange(GetChartFilesFromSteamFolders(allSteamFolders[i]));
         }
 
         return result;
     }
-    private List<string> AddChartFilesFromSteamFolders(string allSteamFolders)
+    private List<string> GetChartFilesFromSteamFolders(string allSteamFolders)
     {
         List<string> result = new List<string>();
         string path = allSteamFolders;
@@ -146,6 +160,12 @@ public class ChartChooseManager : MonoBehaviour
 
     public void UI_ImportButtonClicked()
     {
+        ConfirmAction confirmAction = new ConfirmAction(ImportChartFromLocalStorage, ImportChartFromSteamWorkshop, "Do you want to import from local storage or from Steam workshop?", "Local Storage", "Steam Workshop");
+        GameManager.GameInstance.InvokeConfirmActionNeeded(confirmAction);
+    }
+
+    private void ImportChartFromLocalStorage()
+    {
         string[] paths = StandaloneFileBrowser.OpenFilePanel("Import Chart", "", GameManager.k_FILEEXTENSION, false);
 
         if (paths.Length <= 0)
@@ -160,6 +180,12 @@ public class ChartChooseManager : MonoBehaviour
         }
 
         AddChartButton(internalChartPath);
+    }
+
+    private void ImportChartFromSteamWorkshop()
+    {
+        string link = SteamWorkshopManager.k_STEAM_WORKSHOP_FIXEDURL;
+        SteamFriends.ActivateGameOverlayToWebPage(link);
     }
 
     public void UI_ReturnMainMenuButton()
@@ -186,9 +212,25 @@ public class ChartChooseManager : MonoBehaviour
             return;
         }
 
-        OnChartDeleted?.Invoke(contentsToDelete);
-        Debug.Log($"Deleted {contentsToDelete.AssociatedFullFilePath}");
-        File.Delete(contentsToDelete.AssociatedFullFilePath);
+        RemoveChartWithPath(contentsToDelete.AssociatedFullFilePath);
+    }
+
+    private void RemoveChartWithPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning($"The path does not exist, ignoring delete request!");
+            return;
+        }
+
+        OnChartDeleted?.Invoke(path);
+        File.Delete(path);
+        Debug.Log($"Deleted {path}");
     }
 
     public void RequestPlayChart()

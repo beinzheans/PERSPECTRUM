@@ -126,15 +126,15 @@ public class GamePopupManager : MonoBehaviour
     public void UI_OnConfirmButtonPressed()
     {
         ConfirmAction action = confirmActionQueue.Dequeue();
-        action.ExecuteConfirmAction();
         CheckForNextConfirmAction();
+        action.ExecuteConfirmAction();
     }
 
     public void UI_OnDenyButtonPressed()
     {
         ConfirmAction action = confirmActionQueue.Dequeue();
-        action.ExecuteDenyAction();
         CheckForNextConfirmAction();
+        action.ExecuteDenyAction();
     }
     private void HidePanel()
     {

@@ -114,7 +114,7 @@ public class AudioEngine : MonoBehaviour
 
         if (seekSamples > source.clip.samples)
         { // invalid seek time, don't play anything
-            GameManager.GameInstance.InvokeInformationDisplayNeeded("Preview Longer than Audio");
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Seek time Longer than Audio");
             return;
         }
 
