@@ -3,6 +3,7 @@ using Steamworks;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using System;
+using UnityEditor;
 /// <summary>
 /// A class to help with Steam related functions.
 /// </summary>
@@ -46,7 +47,7 @@ public static class SteamHelper
     /// Creates an awaitable Task to fetch the result of a <see cref="Callback{T}"/> that matches the <paramref name="matchPredicate"/> without having to create many methods. <br></br>
     /// Since it is possible for this <see cref="Callback{T}"/> to fail the predicate, an optional timeout parameter is provided. <br></br>
     /// Timeouts will throw an exception for you to catch and handle such cases. <br></br>
-    /// You should use <see cref="Callback{T}"/> normally if the <see cref="Callback{T}"/> is just one-shot event that isn't necessary to keep checking every frame.
+    /// You should use <see cref="Callback{T}"/> normally if the <see cref="Callback{T}"/> is just one-shot event that will always be listened to.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="matchPredicate"></param>

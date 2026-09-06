@@ -308,7 +308,7 @@ public class GameManager : MonoBehaviour
         OnConfirmActionNeeded?.Invoke(action);
     }
 
-    public void InvokeInformationDisplayNeeded(string infoMessage, double time = 0.25d)
+    public void InvokeInformationDisplayNeeded(string infoMessage, double time = 0.5d)
     {
         OnInformationDisplayNeeded?.Invoke(infoMessage, time);
     }

@@ -781,7 +781,6 @@ public class EditorManager : MonoBehaviour
             currentSelectedRenderables = new();
             executeCommandStack = new(k_MAXIMUMCOMMANDPOOL);
             undoCommandStack = new(k_MAXIMUMCOMMANDPOOL);
-            UpdateEditorPreviewTime(0d, false);
             if (string.IsNullOrWhiteSpace(chartJson) || loadedChart == null)
             {
                 CurrentEditorChart = new(new(), new(), new(), new());
@@ -822,6 +821,8 @@ public class EditorManager : MonoBehaviour
                 await Awaitable.MainThreadAsync();
                 InvokeBackgroundTextureLoadedEvent(null, imageBytes);
             }
+
+            UpdateEditorPreviewTime(0d, false);
         }
         catch (Exception e)
         {

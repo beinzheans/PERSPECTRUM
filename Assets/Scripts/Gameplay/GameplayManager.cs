@@ -332,6 +332,7 @@ public class GameplayManager : MonoBehaviour
             Debug.LogWarning($"No gameplay chart assigned");
             return;
         }
+
         MaxHitboxCount = CurrentGameplayChart.GameplayObjects.Count(x =>
         {
             if (x is not VisualHitbox hitbox)
@@ -341,6 +342,13 @@ public class GameplayManager : MonoBehaviour
 
             return hitbox.HitboxType != HitboxType.BOMB;
         });
+
+        if (MaxHitboxCount <= 0)
+        {
+            Debug.Log($"Chart has no hitboxes. Gameplay will not start.");
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Chart has no notes, and gameplay will not start!", 1d);
+            return;
+        }
 
         if (IsInReplayMode)
         {
@@ -355,13 +363,6 @@ public class GameplayManager : MonoBehaviour
         }
 
         CurrentAccuracy = 1d;
-
-        if (MaxHitboxCount <= 0)
-        {
-            scorePerNote = 0d;
-            CurrentScore = k_MAXIMUMSCORE;
-            return;
-        }
 
         scorePerNote = k_MAXIMUMSCORE / MaxHitboxCount;
 

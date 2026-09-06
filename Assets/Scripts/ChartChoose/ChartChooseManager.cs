@@ -3,13 +3,14 @@ using SFB;
 using Steamworks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Profiling.Memory.Experimental;
 using UnityEngine.UI;
-
+using Debug = UnityEngine.Debug;
 public class ChartChooseManager : MonoBehaviour
 {
     public static ChartChooseManager ChartChooseInstance;
@@ -76,9 +77,10 @@ public class ChartChooseManager : MonoBehaviour
     public void InitializeChartButtonsFromFile()
     {
         GamePersistenceManager.ReadEditorChartsInGameStorage(out string[] allLocalPaths);
-        string[] allSteamFolderPaths = SteamManager.SteamInstance.RequestChartsInLocalSteamStorage();
 
+        string[] allSteamFolderPaths = SteamManager.SteamInstance.RequestChartsInLocalSteamStorage();
         List<string> validSteamFiles = GetChartFilesFromSteamFolders(allSteamFolderPaths);
+
         List<string> allFiles = new List<string>(allLocalPaths.Length + validSteamFiles.Count);
 
         allFiles.AddRange(allLocalPaths);

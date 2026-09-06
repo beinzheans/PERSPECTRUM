@@ -264,16 +264,19 @@ public class SteamWorkshopManager : MonoBehaviour
         SteamUGC.SetItemVisibility(handle, ERemoteStoragePublishedFileVisibility.k_ERemoteStoragePublishedFileVisibilityPublic);
 
         Debug.Log($"Submitting item update request");
+        GameManager.GameInstance.InvokeInformationDisplayNeeded("Publishing item. Please wait.", 5d);
         SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, null);
         
         SubmitItemUpdateResult_t result = await SteamHelper.CreateAwaitableFromSteamAPICall<SubmitItemUpdateResult_t>(call);
 
         if (result.m_eResult != EResult.k_EResultOK)
         {
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Publish failed, check logs.", 1d);
             Debug.LogWarning($"Failed to submit item update! Status: {result.m_eResult}");
         }
         else
         {
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Published to Steam!", 1d);
             Debug.Log($"Item Update Result is OK");
         }
 

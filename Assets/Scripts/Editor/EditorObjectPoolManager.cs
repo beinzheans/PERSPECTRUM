@@ -122,6 +122,14 @@ public abstract class EditorObjectPoolManager<TRenderable, TBehavior> : MonoBeha
     }
     protected void AssignAllRenderableList(List<TRenderable> renderables)
     {
+        // ensures that our object pool is synced with what we assigned to our list.
+        // the "complement" = allRenderables \ renderables, which defines what renderables should be unrendered.
+        List<TRenderable> complement = allRenderables.Except(renderables).ToList();
+        for (int i = 0; i < complement.Count; i++)
+        {
+            UnrenderRenderable_ReturnBehaviorToPool(complement[i]);
+        }
+
         this.allRenderables = new List<TRenderable>(renderables);
     }
     private void EditorManager_OnPreviewUpdated(double time)
