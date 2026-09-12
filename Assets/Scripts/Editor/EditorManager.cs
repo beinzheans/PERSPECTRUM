@@ -1,11 +1,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SFB;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Mathematics;
@@ -843,10 +841,10 @@ public class EditorManager : MonoBehaviour
         }
 
         ulong previousPublisherID = STEAM_currentPublisherItemID;
-        
+
         if (previousPublisherID != 0)
         {
-            ConfirmAction action = new ConfirmAction(() => SaveAndAddFileToSteam(STEAM_currentPublisherItemID, previousPublisherID), async () => 
+            ConfirmAction action = new ConfirmAction(() => SaveAndAddFileToSteam(STEAM_currentPublisherItemID, previousPublisherID), async () =>
             {
                 STEAM_currentPublisherItemID = await SteamManager.SteamInstance.InvokePublishWorkshopEvent();
                 SaveAndAddFileToSteam(STEAM_currentPublisherItemID, previousPublisherID);

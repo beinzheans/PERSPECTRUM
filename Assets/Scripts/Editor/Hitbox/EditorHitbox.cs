@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem.Processors;
 
 [Serializable]
 public class EditorHitbox : EditorDynamicObject, IConvertable<VisualHitbox>

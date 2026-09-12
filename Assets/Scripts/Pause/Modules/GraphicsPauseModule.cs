@@ -95,6 +95,12 @@ public class GraphicsPauseModule : BasePauseModule
 
         for (int i = 0; i < resolutions.Length; i++)
         {
+            if ((float)resolutions[i].width / resolutions[i].height < 1f)
+            {
+                Debug.Log($"Removed resolution {resolutions[i].width} x {resolutions[i].height} from options, the game supports 1:1 aspect ratio at minimum.");
+                continue;
+            }
+
             Vector2Int resolution = new Vector2Int(resolutions[i].width, resolutions[i].height);
 
             if (result.Contains(resolution))

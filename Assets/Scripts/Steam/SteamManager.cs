@@ -11,12 +11,10 @@
 
 using UnityEngine;
 #if !DISABLESTEAMWORKS
-using System.Collections;
 using Steamworks;
 using System;
 using System.Threading.Tasks;
 using System.IO;
-using System.Collections.Generic;
 #endif
 
 //
@@ -272,7 +270,7 @@ public class SteamManager : MonoBehaviour
     public bool RemoveAllFilesInStagingArea()
     {
         string stagingFolder = Path.Combine(Application.temporaryCachePath, k_STEAM_WORKSHOP_STAGINGFOLDER);
-        
+
         if (!Directory.Exists(stagingFolder))
         {
             Debug.LogWarning($"Staging area does not exist, it has not been created, and thus nothing to remove.");

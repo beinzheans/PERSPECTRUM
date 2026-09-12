@@ -3,11 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
@@ -237,7 +235,8 @@ public class GameManager : MonoBehaviour
             URP_asset = asset;
         }
 
-        SetupGraphicalSettings();
+        InvokeGameSettingsChanged();
+
         recordsLoadProgress = new Progress<float>(x => OnChartRecordsLoadProgressUpdated?.Invoke(x));
 
         ChartMetadataGUIDToGameplayRecordMapping = await GamePersistenceManager.CreateMetadataToRecordsMapping(recordsLoadProgress);
@@ -385,6 +384,14 @@ public class GameManager : MonoBehaviour
         yield return null; // wait for the current frame to be done (set resolution is done at the end of current frame)
         yield return new WaitForEndOfFrame(); // wait for the canvas / gui to be updated
         OnGameSettingsChanged?.Invoke(); // finally invoke the event for the listeners do to their own logic
+
+        if ((float)Screen.width / Screen.height < 1f)
+        {
+            Debug.LogWarning($"Screen has unsupported aspect ratio!");
+            ConfirmAction action = new ConfirmAction(() => RequestOverrideGamePauseState(true), () => { }, "The screen is too narrow, UI elements will render incorrectly.\n" +
+                                                                                                           "Do you want open the Settings and change the resolution?", denyButtonText: "I know what I'm doing!");
+            InvokeConfirmActionNeeded(action);
+        }
 
     }
     public void AddGameplayRecordToMapping(GameplayStatisticRecord record)

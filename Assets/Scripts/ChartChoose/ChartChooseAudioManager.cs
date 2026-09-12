@@ -1,6 +1,5 @@
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 public class ChartChooseAudioManager : MonoBehaviour
 {
@@ -99,7 +98,7 @@ public class ChartChooseAudioManager : MonoBehaviour
             return;
         }
 
-        
+
         playAction = new TimerIntervalAction(this, x =>
         {
             AudioEngine.AudioInstance.FadeOutAudioSource(music_AudioSource, k_MUSICFADETIME,

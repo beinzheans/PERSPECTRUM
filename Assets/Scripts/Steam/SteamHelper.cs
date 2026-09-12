@@ -1,9 +1,6 @@
-using UnityEngine;
 using Steamworks;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
 using System;
-using UnityEditor;
+using System.Threading.Tasks;
 /// <summary>
 /// A class to help with Steam related functions.
 /// </summary>

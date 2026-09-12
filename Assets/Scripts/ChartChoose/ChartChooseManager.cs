@@ -3,12 +3,9 @@ using SFB;
 using Steamworks;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Profiling.Memory.Experimental;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 public class ChartChooseManager : MonoBehaviour

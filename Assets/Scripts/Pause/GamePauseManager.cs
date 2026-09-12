@@ -1,9 +1,9 @@
+using Steamworks;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using Steamworks;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 /// <summary>
 /// A class to handle pause logic <br></br>
 /// Note the settings tab is generated once during start-up using <see cref="BasePauseModule"/>. That way, we don't need to make the scene messy.
@@ -36,7 +36,7 @@ public class GamePauseManager : MonoBehaviour
     private Callback<GameOverlayActivated_t> STEAM_gameOverlapCallback;
 
     private bool isBlockPauseMenu;
-    private void Start() 
+    private void Start()
     {
         gameManager = GameManager.GameInstance;
         isInPauseMenu = false;
@@ -237,5 +237,5 @@ public class GamePauseManager : MonoBehaviour
         ContinueGameButton.onClick.RemoveAllListeners();
     }
 
-    
+
 }

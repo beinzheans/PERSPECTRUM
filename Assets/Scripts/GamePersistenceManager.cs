@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -61,7 +60,7 @@ public static class GamePersistenceManager
         File.WriteAllBytes(fullFilePath, XorProcesser(archiveBytes));
         memoryStream.Close();
     }
-    
+
     /// <summary>
     /// Creates a new entry with a name inside a zip archive.
     /// </summary>

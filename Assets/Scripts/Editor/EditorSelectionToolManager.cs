@@ -83,7 +83,7 @@ public class EditorSelectionToolManager : EditorUIBehavior
         initialNormalizedMousePosition = editorInstance.EditorMousePosition;
 
         initialSelectedObjectPositions = editorInstance.CurrentSelectedRenderables.Select(x => { x.GetPosition(out Vector2 position); return position; }).ToList();
-}
+    }
 
     private void Update()
     {

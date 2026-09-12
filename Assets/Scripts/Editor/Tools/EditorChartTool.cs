@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
 using SFB;
 using System.IO;
-using System.Threading.Tasks;
 using UnityEngine;
 public class EditorChartTool : EditorUIBehavior
 {

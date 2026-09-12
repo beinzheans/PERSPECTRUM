@@ -27,7 +27,7 @@ public class GlobalPauseModule : BasePauseModule
             {
                 SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CALIBRATIONINDEX, () => System.Threading.Tasks.Task.CompletedTask);
                 GameManager.GameInstance.RequestOverrideGamePauseState(false);
-            }, () => 
+            }, () =>
             {
                 GameManager.GameInstance.PauseCanvas.gameObject.SetActive(true);
             }, "Are you sure you want to enter the calibration screen? This will bring you out of the current session.");
@@ -35,7 +35,7 @@ public class GlobalPauseModule : BasePauseModule
             GameManager.GameInstance.PauseCanvas.gameObject.SetActive(false);
             GameManager.GameInstance.InvokeConfirmActionNeeded(action);
         });
-        
+
         pauseMenuGroups[k_PREDICTIVEHITSOUNDGROUPINDEX].SetGroupAction_Toggle((x) =>
         {
             GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, x);

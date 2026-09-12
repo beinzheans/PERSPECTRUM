@@ -104,7 +104,7 @@ public class GameplayBackgroundManager : MonoBehaviour
             Color colorB_pulse = Color.Lerp(gradientBColor_Default, gradientBColor_Pulse, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
 
             Color colorA = Color.Lerp(colorA_pulse, gradientAColor_Default, (float)progress);
-            Color colorB = Color.Lerp(colorB_pulse,gradientBColor_Default, (float)progress);
+            Color colorB = Color.Lerp(colorB_pulse, gradientBColor_Default, (float)progress);
             gradientMaterial.SetColor(k_SHADER_GRADIENTCOLORAKEY, colorA);
             gradientMaterial.SetColor(k_SHADER_GRADIENTCOLORBKEY, colorB);
         }

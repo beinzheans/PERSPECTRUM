@@ -23,7 +23,7 @@ public class ChartButtonBehavior : ListBox
     private void Start()
     {
         ChartChooseManager.ChartChooseInstance.OnChartButtonClicked += ChartChooseInstance_OnChartButtonClicked;
-
+        startTextButton.SetActive(false);
         previousContentID = ContentID;
     }
 

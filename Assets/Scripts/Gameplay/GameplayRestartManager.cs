@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class GameplayRestartManager : MonoBehaviour
@@ -19,7 +18,7 @@ public class GameplayRestartManager : MonoBehaviour
     private TimerIntervalAction stopBlockingTimer;
     private void GameplayManager_OnGameplayResumed()
     {
-        stopBlockingTimer = new TimerIntervalAction(this, x => shouldBlockRestart = false, () => { }, GameplayManager.k_TIMEOFFSET, TimerBehavior.TEMPORARY,0);
+        stopBlockingTimer = new TimerIntervalAction(this, x => shouldBlockRestart = false, () => { }, GameplayManager.k_TIMEOFFSET, TimerBehavior.TEMPORARY, 0);
         DSPTimerEngine.TimerInstance.AddActionToTimer(stopBlockingTimer);
     }
 

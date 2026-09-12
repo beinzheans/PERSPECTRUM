@@ -1,12 +1,9 @@
-using UnityEngine;
 using Steamworks;
-using System.Threading.Tasks;
-using System.IO;
 using System;
-using System.Collections.Generic;
-using TMPro;
+using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using UnityEngine;
 
 /// <summary>
 /// A class to handle Steam workshop logic. Specifically: <br></br>
@@ -266,7 +263,7 @@ public class SteamWorkshopManager : MonoBehaviour
         Debug.Log($"Submitting item update request");
         GameManager.GameInstance.InvokeInformationDisplayNeeded("Publishing item. Please wait.", 5d);
         SteamAPICall_t call = SteamUGC.SubmitItemUpdate(handle, null);
-        
+
         SubmitItemUpdateResult_t result = await SteamHelper.CreateAwaitableFromSteamAPICall<SubmitItemUpdateResult_t>(call);
 
         if (result.m_eResult != EResult.k_EResultOK)
