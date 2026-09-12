@@ -68,8 +68,8 @@ MonoBehaviour:
   m_text: Name0, Name1, Name2, Name3, Name4, Name5, Name6, Name7, Name8, Name9, Name10,
     ... OK I have enough
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 52d4408d581d95646ae4ae6fdac061e2, type: 2}
-  m_sharedMaterial: {fileID: -1286301799560842084, guid: 52d4408d581d95646ae4ae6fdac061e2, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3704b62ab6f61f647b1dba982f88bf39, type: 2}
+  m_sharedMaterial: {fileID: -3948835651955190600, guid: 3704b62ab6f61f647b1dba982f88bf39, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

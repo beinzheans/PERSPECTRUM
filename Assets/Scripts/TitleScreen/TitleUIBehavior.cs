@@ -5,7 +5,6 @@ using UnityEngine;
 public class TitleUIBehavior : MonoBehaviour
 {
     [SerializeField] private TMP_Text gameVersionText;
-    [SerializeField] private Canvas CreditsCanvas;
 
     private void Start()
     {
@@ -60,15 +59,5 @@ public class TitleUIBehavior : MonoBehaviour
     public void UI_OnSettingsButtonPressed()
     {
         GameManager.GameInstance.RequestOverrideGamePauseState(true);
-    }
-
-    public void UI_OnCreditsButtonPressed()
-    {
-        CreditsCanvas.gameObject.SetActive(true);
-    }
-
-    public void UI_OnCreditsExitButtonPressed()
-    {
-        CreditsCanvas.gameObject.SetActive(false);
     }
 }
