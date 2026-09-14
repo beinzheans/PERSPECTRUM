@@ -79,16 +79,16 @@ public class GameplayBackgroundManager : MonoBehaviour
 
             darkPanelImage.color = new Color(0f, 0f, 0f, Mathf.Clamp01(darkenAmount + pulseAmount));
 
-            pulseAction = new TimerStopwatchAction(this, (x) => PulseBackground(x), () => { }, 0d, TimerBehavior.TEMPORARY, GetPulseLength(), false);
+            pulseAction = new TimerStopwatchAction(this, (x) => PulseBackground(obj), () => { }, 0d, TimerBehavior.TEMPORARY, GetPulseLength(), false);
             DSPTimerEngine.TimerInstance.AddActionToTimer(pulseAction);
         }
 
         metronomeLoopIndex = (metronomeLoopIndex + 1) % k_CAMERABACKGROUNDPULSEBEAT;
     }
 
-    private void PulseBackground(double timeElapsed)
+    private void PulseBackground(double previousPulseTime)
     {
-        double progress = timeElapsed / GetPulseLength();
+        double progress = (gameplayManager.CurrentGameplayTime - previousPulseTime) / GetPulseLength();
 
         float darkenAmount = GetDarkenAmountBasedOnSettings();
         if (isUsingCustomBackground)

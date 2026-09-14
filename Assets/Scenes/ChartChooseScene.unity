@@ -3510,6 +3510,7 @@ GameObject:
   - component: {fileID: 1069841127}
   - component: {fileID: 1069841128}
   - component: {fileID: 1069841129}
+  - component: {fileID: 1069841130}
   m_Layer: 0
   m_Name: ChartChooseManager
   m_TagString: Untagged
@@ -3625,6 +3626,18 @@ MonoBehaviour:
   highFrequencySample: 300
   peakDecayFactor: 0.5
   visualizerImage: {fileID: 958868202}
+--- !u!114 &1069841130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1069841122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1990e73456c80d478f70897b6b93675, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1088366055
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,7 +27,7 @@ public class TitleUIBehavior : MonoBehaviour
 
     public void UI_OnTutorialButtonPressed()
     {
-        GameManager.GameInstance.RequestPlayChartEvent(GameManager.GameInstance.k_TUTORIALFILEPATHSTRING);
+        GameManager.GameInstance.RequestPlayChartEvent(GameManager.GameInstance.k_TUTORIALFILEPATHSTRING, ChartChooseModifications.k_DEFAULTGAMEPLAYMODIFICATIONS);
     }
 
     public void UI_OnCalibrationButtonPressed()

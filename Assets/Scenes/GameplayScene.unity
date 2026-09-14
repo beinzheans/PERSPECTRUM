@@ -1888,6 +1888,7 @@ GameObject:
   - component: {fileID: 373450063}
   - component: {fileID: 373450065}
   - component: {fileID: 373450064}
+  - component: {fileID: 373450066}
   m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
@@ -1952,6 +1953,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 373450062}
   m_CullTransparentMesh: 1
+--- !u!114 &373450066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373450062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d46d15c49235eb94ab24e126db048733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIParticleSystem: {fileID: 0}
 --- !u!1 &382809172
 GameObject:
   m_ObjectHideFlags: 0
@@ -10194,6 +10208,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameplayRectTransform: {fileID: 471277512}
+  cursorColors:
+  - {r: 0.58431375, g: 0.58431375, b: 0.58431375, a: 1}
+  - {r: 0.8980392, g: 0.2509804, b: 0.32941177, a: 1}
+  - {r: 0.41960785, g: 0.7176471, b: 0.9529412, a: 1}
   gameplayCamera: {fileID: 330585545}
   IsMetronomeDisabled: 0
 --- !u!4 &1167072928
@@ -10274,6 +10292,12 @@ MonoBehaviour:
   - {fileID: 1787726451}
   - {fileID: 382809177}
   - {fileID: 1337567574}
+  dynamicUIColorElements:
+  - {fileID: 1641882402}
+  - {fileID: 1523304659}
+  - {fileID: 2102243151}
+  - {fileID: 1290621356}
+  - {fileID: 373450066}
   gameplayStart_UICanvasGroup: {fileID: 1003308888}
   gameplayStart_colorText: {fileID: 1095937900}
   gameplayStart_restartText: {fileID: 1788930020}
@@ -10446,13 +10470,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86e3ca2e61312f7478ef67767322b05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorColors:
-  - {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-  - {r: 0.9433962, g: 0.076395266, b: 0.057849795, a: 1}
-  - {r: 0, g: 0.9600265, b: 1, a: 1}
   cursorRawImage: {fileID: 1641882400}
   cursorTrailParticleSystemRectTransform: {fileID: 1256400925}
-  cursorTrailParticleSystem: {fileID: 1127574040}
 --- !u!114 &1167072944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10977,6 +10996,7 @@ GameObject:
   - component: {fileID: 1290621353}
   - component: {fileID: 1290621355}
   - component: {fileID: 1290621354}
+  - component: {fileID: 1290621356}
   m_Layer: 5
   m_Name: SeparationLine (1)
   m_TagString: Untagged
@@ -11041,6 +11061,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1290621352}
   m_CullTransparentMesh: 1
+--- !u!114 &1290621356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290621352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d46d15c49235eb94ab24e126db048733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIParticleSystem: {fileID: 0}
 --- !u!1 &1322042382
 GameObject:
   m_ObjectHideFlags: 0
@@ -12276,6 +12309,7 @@ GameObject:
   - component: {fileID: 1523304656}
   - component: {fileID: 1523304658}
   - component: {fileID: 1523304657}
+  - component: {fileID: 1523304659}
   m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
@@ -12340,6 +12374,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1523304655}
   m_CullTransparentMesh: 1
+--- !u!114 &1523304659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1523304655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d46d15c49235eb94ab24e126db048733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIParticleSystem: {fileID: 0}
 --- !u!1 &1528550523
 GameObject:
   m_ObjectHideFlags: 0
@@ -12776,6 +12823,7 @@ GameObject:
   - component: {fileID: 1641882399}
   - component: {fileID: 1641882401}
   - component: {fileID: 1641882400}
+  - component: {fileID: 1641882402}
   m_Layer: 5
   m_Name: PreviewCursor
   m_TagString: Untagged
@@ -12837,6 +12885,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1641882398}
   m_CullTransparentMesh: 1
+--- !u!114 &1641882402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1641882398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d46d15c49235eb94ab24e126db048733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIParticleSystem: {fileID: 1127574040}
 --- !u!1 &1653319670
 GameObject:
   m_ObjectHideFlags: 0
@@ -13140,7 +13201,7 @@ GameObject:
   - component: {fileID: 1787726450}
   - component: {fileID: 1787726451}
   m_Layer: 5
-  m_Name: Gameplay_RunningStatisticsUI_Progress
+  m_Name: Gameplay_RunningStatisticsUI_Stats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14197,6 +14258,7 @@ GameObject:
   - component: {fileID: 2102243148}
   - component: {fileID: 2102243150}
   - component: {fileID: 2102243149}
+  - component: {fileID: 2102243151}
   m_Layer: 5
   m_Name: SeparationLine
   m_TagString: Untagged
@@ -14261,6 +14323,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2102243147}
   m_CullTransparentMesh: 1
+--- !u!114 &2102243151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2102243147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d46d15c49235eb94ab24e126db048733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIParticleSystem: {fileID: 0}
 --- !u!1 &2110554617
 GameObject:
   m_ObjectHideFlags: 0

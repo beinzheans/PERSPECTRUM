@@ -6,6 +6,7 @@ public class UIElasticColor : UIElastic
 {
     public Graphic Graphic { get; private set; }
     private Color initialColor;
+    [SerializeField] private ParticleSystem UIParticleSystem;
     protected override void Awake()
     {
         base.Awake();
@@ -23,7 +24,25 @@ public class UIElasticColor : UIElastic
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(pulseTimer);
 
-        pulseTimer = new TimerStopwatchAction(this, x => Graphic.color = Color.Lerp(newColor, initialColor, (float)(x / pulseTime)), () => { }, 0d, TimerBehavior.TEMPORARY, pulseTime, false);
+        pulseTimer = new TimerStopwatchAction(this, x => SetGraphicColor(Color.Lerp(newColor, initialColor, (float)(x / pulseTime)), false), () => { }, 0d, TimerBehavior.TEMPORARY, pulseTime, false);
         DSPTimerEngine.TimerInstance.AddActionToTimer(pulseTimer);
+    }
+
+    public void SetGraphicColor(Color newColor, bool overrideInitialColor = true)
+    {
+        if (overrideInitialColor)
+        {
+            initialColor = newColor;
+        }
+
+        Graphic.color = newColor;
+
+        if (UIParticleSystem == null)
+        {
+            return;
+        }
+
+        ParticleSystem.MainModule mainModule = UIParticleSystem.main;
+        mainModule.startColor = newColor;
     }
 }

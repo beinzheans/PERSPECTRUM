@@ -172,6 +172,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     {
         double pulseProgress = (time - previousPulseTime) / pulseInterval;
 
+        Debug.Log($"Pulse progress: {pulseProgress}");
         pulsePropertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, (float)pulseProgress);
         playareaBorderMeshRenderer_front.SetPropertyBlock(pulsePropertyBlock);
         playareaBorderMeshRenderer_earlyHitPlane.SetPropertyBlock(pulsePropertyBlock);

@@ -326,25 +326,25 @@ public class GameManager : MonoBehaviour
     /// Request to play the chart at the designated <paramref name="path"/>. This will automatically load the scene and invoke <see cref="GameplayManager.RequestGameplayStartedEvent(string)"/>.
     /// </summary>
     /// <param name="path"></param>
-    public void RequestPlayChartEvent(string path)
+    public void RequestPlayChartEvent(string path, GameplayModifications gameplayModifications)
     {
         if (!GlobalSettings.GameEvents.HasPlayedTutorial)
         {
             if (path != k_TUTORIALFILEPATHSTRING)
             {
-                ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path)), () => { }, "It is recommended to play the tutorial chart first.\n" +
-                                                                                                                                                                                                                         "Do you still want to continue?");
+                ConfirmAction loadConfirmAction = new ConfirmAction(() => SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path, gameplayModifications)), () => { }, "It is recommended to play the tutorial chart first.\n" +
+                                                                                                                                                                                                                                             "Do you still want to continue?");
                 InvokeConfirmActionNeeded(loadConfirmAction);
                 return;
             }
         }
 
-        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path));
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path, gameplayModifications));
     }
 
-    public void RequestReplayChartEvent(string path, GameplayStatisticRecord gameplayRecord)
+    public void RequestReplayChartEvent(string path, GameplayStatisticRecord gameplayRecord, GameplayModifications gameplayModifications)
     {
-        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord));
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord, gameplayModifications));
     }
 
     /// <summary>

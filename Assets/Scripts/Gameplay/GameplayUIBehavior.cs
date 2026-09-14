@@ -36,6 +36,7 @@ public class GameplayUIBehavior : MonoBehaviour
     [SerializeField] private UIElastic gameplay_missIcon;
 
     [SerializeField] private UIDynamic[] dynamicUIElements = new UIDynamic[0];
+    [SerializeField] private UIElasticColor[] dynamicUIColorElements = new UIElasticColor[0];
 
     [Header("Gameplay Start UI")]
     [SerializeField] private CanvasGroup gameplayStart_UICanvasGroup;
@@ -65,6 +66,7 @@ public class GameplayUIBehavior : MonoBehaviour
     void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
+        gameplayManager.OnMouseActiveTypeChanged += GameplayManager_OnMouseActiveTypeChanged;
 
         gameplayManager.OnGameplayWaitingForResume += GameplayManager_OnGameplayWaitingForResume;
         gameplayManager.OnGameplayResumeTick += GameplayManager_OnGameplayResumeTick;
@@ -75,6 +77,33 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplayManager.OnHitboxMiss += GameplayManager_OnHitboxMiss;
         gameplayManager.OnHitboxMismatchedHit += GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnHitboxBombHit += GameplayManager_OnHitboxBombHit;
+
+        GameplayManager_OnMouseActiveTypeChanged(gameplayManager.MouseActiveType);
+    }
+
+    private void GameplayManager_OnMouseActiveTypeChanged(MouseActiveType obj)
+    {
+        Color newColor;
+        switch (obj)
+        {
+            case MouseActiveType.NONE:
+                newColor = gameplayManager.GameplayColors[GameplayManager.k_CURSORNONECOLORINDEX];
+                break;
+            case MouseActiveType.A:
+                newColor = gameplayManager.GameplayColors[GameplayManager.k_CURSORACOLORINDEX];
+                break;
+            case MouseActiveType.B:
+                newColor = gameplayManager.GameplayColors[GameplayManager.k_CURSORBCOLORINDEX];
+                break;
+            default:
+                newColor = gameplayManager.GameplayColors[GameplayManager.k_CURSORNONECOLORINDEX];
+                break;
+        }
+
+        for (int i = 0; i < dynamicUIColorElements.Length; i++)
+        {
+            dynamicUIColorElements[i].SetGraphicColor(newColor);
+        }
     }
 
     private int tick = GameplayResumeManager.k_NUMBEROFLEADINTICKS;
@@ -144,6 +173,8 @@ public class GameplayUIBehavior : MonoBehaviour
 
     private void OnDestroy()
     {
+        gameplayManager.OnMouseActiveTypeChanged -= GameplayManager_OnMouseActiveTypeChanged;
+
         gameplayManager.OnGameplayWaitingForResume -= GameplayManager_OnGameplayWaitingForResume;
         gameplayManager.OnGameplayResumeTick -= GameplayManager_OnGameplayResumeTick;
         gameplayManager.OnGameplayResumed -= GameplayManager_OnGameplayResumed;

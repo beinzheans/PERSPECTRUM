@@ -7,6 +7,11 @@ using Debug = UnityEngine.Debug;
 public class GameplayManager : MonoBehaviour
 {
     [SerializeField] private RectTransform gameplayRectTransform;
+    public const int k_CURSORNONECOLORINDEX = 0;
+    public const int k_CURSORACOLORINDEX = 1;
+    public const int k_CURSORBCOLORINDEX = 2;
+    [SerializeField] private Color[] cursorColors;
+    public Color[] GameplayColors { get => cursorColors; }
     public RectTransform GameplayRectTransform { get => gameplayRectTransform; }
 
     [SerializeField] private Camera gameplayCamera;
@@ -155,6 +160,7 @@ public class GameplayManager : MonoBehaviour
     public Quaternion CurrentPlayAreaRotation { get; private set; }
     public Vector3[] LocalBorderCorners { get; private set; } = new Vector3[4]; // 0 is bottom-left corner, increment clockwise
 
+    public GameplayModifications CurrentGameplayModifications { get; private set; }
     private void Start()
     {
         CreateGameplayReferencePoints();
@@ -313,7 +319,8 @@ public class GameplayManager : MonoBehaviour
     public const double k_STARTTIMEOFFSET = 3d;
     private void UpdateGameplayTimeByDeltatime(double dt)
     {
-        CurrentGameplayTime += dt;
+        double scaledDt = dt * CurrentGameplayModifications.GameplaySpeed;
+        CurrentGameplayTime += scaledDt;
 
         if (CurrentGameplayTime >= EndTime)
         {
@@ -321,7 +328,7 @@ public class GameplayManager : MonoBehaviour
             return;
         }
 
-        gameplayCamera.transform.Translate((float)(dt * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed) * Vector3.forward);
+        gameplayCamera.transform.Translate((float)(scaledDt * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed) * Vector3.forward);
         OnGameplayTimeUpdated?.Invoke(CurrentGameplayTime);
     }
 
@@ -388,10 +395,10 @@ public class GameplayManager : MonoBehaviour
     {
         EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime + k_TIMEOFFSET;
 
-        double offset = k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d;
+        double offset = k_STARTTIMEOFFSET * CurrentGameplayModifications.GameplaySpeed + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d;
 
-        CurrentGameplayTime = -offset; // we start our gameplay in negative time, since we want to account for early notes!
-        stopwatchAction = new TimerStopwatchAction(this, UpdateGameplayTimeByDeltatime, () => { }, 0d, TimerBehavior.PERSISTENT, EndTime + k_TIMEOFFSET + offset, true);
+        CurrentGameplayTime = -offset + CurrentGameplayModifications.GameplayStartTime; // we start our gameplay in negative time, since we want to account for early notes!
+        stopwatchAction = new TimerStopwatchAction(this, UpdateGameplayTimeByDeltatime, () => { }, 0d, TimerBehavior.PERSISTENT, (EndTime + k_TIMEOFFSET + offset) / CurrentGameplayModifications.GameplaySpeed, true);
         DSPTimerEngine.TimerInstance.AddActionToTimer(stopwatchAction);
 
         InvokeGameplayStartedEvent();
@@ -414,9 +421,10 @@ public class GameplayManager : MonoBehaviour
     /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
     /// </summary>
     /// <param name="path"></param>
-    public async Task RequestGameplayStartedEvent(string path)
+    public async Task RequestGameplayStartedEvent(string path, GameplayModifications gameplayModifications)
     {
         CurrentPath = path;
+        CurrentGameplayModifications = gameplayModifications;
         GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
 
         if (string.IsNullOrWhiteSpace(chartJson) || string.IsNullOrWhiteSpace(metadataJson))
@@ -489,12 +497,12 @@ public class GameplayManager : MonoBehaviour
     /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
     /// </summary>
     /// <param name="path"></param>
-    public async Task InvokeGameplayReplayStartedEvent(string path, GameplayStatisticRecord record)
+    public async Task InvokeGameplayReplayStartedEvent(string path, GameplayStatisticRecord record, GameplayModifications gameplayModifications)
     {
         IsInReplayMode = true;
         CurrentGameplayRecord = record;
 
-        await RequestGameplayStartedEvent(path);
+        await RequestGameplayStartedEvent(path, gameplayModifications);
     }
 
     public void InvokeGameplayObjectRendered(GameplayObject obj)
@@ -662,4 +670,27 @@ public enum GameplayResultRank
     C = 5,
     D = 6,
     F = 7
+}
+
+/// <summary>
+/// A struct to define all the relevant gameplay modifications that we will make to gameplay.
+/// </summary>
+/// 
+// replays should also indicate that the gameplay was modified. Replays will also need to remember the gameplay modifications at that specific play as well!
+
+[Serializable]
+public struct GameplayModifications
+{
+    public GameplayModifications(double gameplaySpeed, double gameplayStartTime)
+    {
+        GameplaySpeed = gameplaySpeed;
+        GameplayStartTime = gameplayStartTime;
+    }
+
+    public double GameplaySpeed { get; private set; }
+
+    /// <summary>
+    /// When the gameplay will start. This is useful for practicing. Note this may lead to the replay NOT being saved if the note count does not sum to total notes.
+    /// </summary>
+    public double GameplayStartTime { get; private set; }
 }

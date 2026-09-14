@@ -109,7 +109,12 @@ public class GameplayMetronomeManager : MonoBehaviour
             return;
         }
 
-        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, initialMarker.RenderTime + GameplayManager.k_STARTTIMEOFFSET + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, TimerBehavior.PERSISTENT, 60d / initialMarker.BPM, 0);
+        currentBPM = initialMarker.BPM * gameplayManager.CurrentGameplayModifications.GameplaySpeed;
+        double offset = (initialMarker.RenderTime + GameplayManager.k_STARTTIMEOFFSET) / gameplayManager.CurrentGameplayModifications.GameplaySpeed;
+        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, 
+                                                 offset + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 
+                                                 TimerBehavior.PERSISTENT, 
+                                                 60d / currentBPM, 0);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(metronomeTimer);
     }
@@ -157,7 +162,7 @@ public class GameplayMetronomeManager : MonoBehaviour
             return;
         }
 
-        currentBPM = currentMarkerInGameplay.BPM;
+        currentBPM = currentMarkerInGameplay.BPM * gameplayManager.CurrentGameplayModifications.GameplaySpeed;
         UpdateMetronomeTimer();
         gameplayManager.InvokeGameplayMarkerUpdate(currentMarkerInGameplay);
     }

@@ -48,13 +48,13 @@ public class GameplayAudioController : MonoBehaviour
 
     private void GameplayManager_OnGameplayResumed()
     {
-        if (gameplayManager.CurrentGameplayTime < 0d)
+        if (gameplayManager.CurrentGameplayTime < gameplayManager.CurrentGameplayModifications.GameplayStartTime)
         {
-            AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET - gameplayManager.CurrentGameplayTime, GameManager.GameInstance.GlobalSettings.SongVolume, 0d, 1f, 0f);
+            AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET - gameplayManager.CurrentGameplayTime, GameManager.GameInstance.GlobalSettings.SongVolume, gameplayManager.CurrentGameplayModifications.GameplayStartTime, gameplayManager.CurrentGameplayModifications.GameplaySpeed, 0f);
         }
         else
         {
-            AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, gameplayManager.CurrentGameplayTime, 1f, 0f);
+            AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_TIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, gameplayManager.CurrentGameplayTime, gameplayManager.CurrentGameplayModifications.GameplaySpeed, 0f);
         }
     }
 
@@ -82,11 +82,11 @@ public class GameplayAudioController : MonoBehaviour
 
         if (obj.HitboxType == HitboxType.A)
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, hitboxOffset - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_AClip, hitboxOffset / gameplayManager.CurrentGameplayModifications.GameplaySpeed - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
         else
         {
-            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, hitboxOffset - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
+            AudioEngine.AudioInstance.PlayAudioClip(matchHitsound_BClip, hitboxOffset / gameplayManager.CurrentGameplayModifications.GameplaySpeed - GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, GameManager.GameInstance.GlobalSettings.HitsoundVolume, 1d, panning);
         }
     }
 
@@ -150,6 +150,6 @@ public class GameplayAudioController : MonoBehaviour
 
     private void GameplayManager_OnGameplayStarted()
     {
-        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_STARTTIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, 0d, 1d, 0f);
+        AudioEngine.AudioInstance.PlayAudioSource(musicAudioSource, GameplayManager.k_STARTTIMEOFFSET, GameManager.GameInstance.GlobalSettings.SongVolume, gameplayManager.CurrentGameplayModifications.GameplayStartTime, gameplayManager.CurrentGameplayModifications.GameplaySpeed, 0f);
     }
 }

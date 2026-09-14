@@ -25,8 +25,8 @@ public class GlobalPauseModule : BasePauseModule
         {
             ConfirmAction action = new ConfirmAction(() =>
             {
-                SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CALIBRATIONINDEX, () => System.Threading.Tasks.Task.CompletedTask);
                 GameManager.GameInstance.RequestOverrideGamePauseState(false);
+                SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_CALIBRATIONINDEX, () => System.Threading.Tasks.Task.CompletedTask);
             }, () =>
             {
                 GameManager.GameInstance.PauseCanvas.gameObject.SetActive(true);
