@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 
@@ -116,7 +117,8 @@ public class GameplayStatisticRecorder : MonoBehaviour
                                                                      gameplayManager.CurrentScore,
                                                                      timestamp,
                                                                      mouseReplay,
-                                                                     gameplayManager.CurrentMetadata.BaseMetadata
+                                                                     gameplayManager.CurrentMetadata.BaseMetadata,
+                                                                     gameplayManager.CurrentGameplayModifications
                                                                      );
 
         GamePersistenceManager.SaveGameplayStatisticRecordToFile(record);
@@ -140,7 +142,8 @@ public struct GameplayStatisticRecord
 
     public GameplayReplay GameplayReplay;
     public BaseChartMetadata BaseChartMetadata;
-    public GameplayStatisticRecord(int matchCount, int mismatchCount, int missCount, int bombCount, double finalAccuracy, double finalScore, string recordTimestamp, GameplayReplay gameplayReplay, BaseChartMetadata baseChartMetadata)
+    public GameplayModifications GameplayModifications;
+    public GameplayStatisticRecord(int matchCount, int mismatchCount, int missCount, int bombCount, double finalAccuracy, double finalScore, string recordTimestamp, GameplayReplay gameplayReplay, BaseChartMetadata baseChartMetadata, GameplayModifications gameplayModifications)
     {
         MatchCount = matchCount;
         MismatchCount = mismatchCount;
@@ -151,6 +154,7 @@ public struct GameplayStatisticRecord
         RecordTimestamp = recordTimestamp;
         GameplayReplay = gameplayReplay;
         BaseChartMetadata = baseChartMetadata;
+        GameplayModifications = gameplayModifications;
     }
 }
 

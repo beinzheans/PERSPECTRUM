@@ -278,16 +278,7 @@ public class ChartChooseManager : MonoBehaviour
             return;
         }
 
-        GameplayModifications? gameplayModifications = OnRequestGameplayModifications?.Invoke();
-
-        if (gameplayModifications == null)
-        {
-            GameManager.GameInstance.RequestReplayChartEvent(contents.AssociatedFullFilePath, record, ChartChooseModifications.k_DEFAULTGAMEPLAYMODIFICATIONS);
-        }
-        else
-        {
-            GameManager.GameInstance.RequestReplayChartEvent(contents.AssociatedFullFilePath, record, (GameplayModifications)gameplayModifications);
-        }
+        GameManager.GameInstance.RequestReplayChartEvent(contents.AssociatedFullFilePath, record);
     }
     public void InvokeOnChartButtonClickedEvent(ChartButtonBehaviorContents contents, int contentID)
     {

@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -340,6 +341,13 @@ public class GameplayManager : MonoBehaviour
             return;
         }
 
+        if (!MathHelper.IsGameplayModificationsValid(CurrentGameplayModifications))
+        {
+            CurrentGameplayModifications = ChartChooseModifications.k_DEFAULTGAMEPLAYMODIFICATIONS;
+            Debug.LogWarning($"Gameplay modifications is invalid, setting to default");
+            GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid Mods!", 1d);
+        }
+
         MaxHitboxCount = CurrentGameplayChart.GameplayObjects.Count(x =>
         {
             if (x is not VisualHitbox hitbox)
@@ -497,12 +505,12 @@ public class GameplayManager : MonoBehaviour
     /// This is called by <see cref="GameManager"/> when the gameplay scene loads.
     /// </summary>
     /// <param name="path"></param>
-    public async Task InvokeGameplayReplayStartedEvent(string path, GameplayStatisticRecord record, GameplayModifications gameplayModifications)
+    public async Task InvokeGameplayReplayStartedEvent(string path, GameplayStatisticRecord record)
     {
         IsInReplayMode = true;
         CurrentGameplayRecord = record;
 
-        await RequestGameplayStartedEvent(path, gameplayModifications);
+        await RequestGameplayStartedEvent(path, record.GameplayModifications);
     }
 
     public void InvokeGameplayObjectRendered(GameplayObject obj)
@@ -687,10 +695,12 @@ public struct GameplayModifications
         GameplayStartTime = gameplayStartTime;
     }
 
+    [DefaultValue(1d)]
     public double GameplaySpeed { get; private set; }
 
     /// <summary>
     /// When the gameplay will start. This is useful for practicing. Note this may lead to the replay NOT being saved if the note count does not sum to total notes.
     /// </summary>
+    [DefaultValue(0d)]
     public double GameplayStartTime { get; private set; }
 }

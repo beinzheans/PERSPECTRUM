@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -20,6 +21,7 @@ public class ChartChooseModifications : MonoBehaviour
     }
     private GameplayModifications ChartChooseInstance_OnRequestGameplayModifications()
     {
-        return new GameplayModifications(0.5d, 100d);
+        // here probably parse the inputs.
+        return new GameplayModifications(2d, 0);
     }
 }

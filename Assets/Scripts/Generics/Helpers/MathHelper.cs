@@ -845,4 +845,10 @@ public static class MathHelper
         result.Apply();
         return result;
     }
+
+    public static bool IsGameplayModificationsValid(in GameplayModifications modifications)
+    {
+        return modifications.GameplaySpeed > 0 &&
+               (modifications.GameplayStartTime > 0 || IsTwoDoublesEqualWithEpsilion(modifications.GameplayStartTime, 0d));
+    }
 }

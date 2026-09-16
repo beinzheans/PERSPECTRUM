@@ -342,9 +342,9 @@ public class GameManager : MonoBehaviour
         SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.RequestGameplayStartedEvent(path, gameplayModifications));
     }
 
-    public void RequestReplayChartEvent(string path, GameplayStatisticRecord gameplayRecord, GameplayModifications gameplayModifications)
+    public void RequestReplayChartEvent(string path, GameplayStatisticRecord gameplayRecord)
     {
-        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord, gameplayModifications));
+        SceneLoader.SceneLoaderInstance.LoadSceneByName(SceneLoader.k_GAMEPLAYINDEX, () => GameplayManager.GameplayInstance.InvokeGameplayReplayStartedEvent(path, gameplayRecord));
     }
 
     /// <summary>
