@@ -71,7 +71,7 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
 
     private void GameplayManager_OnGameplayTimeUpdated(double time)
     {
-        double maxTime = time + GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime + GameplayManager.k_POOLLOOKAHEADTIME;
+        double maxTime = time + (GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * gameplayManager.CurrentGameplayModifications.GameplaySpeed) + GameplayManager.k_POOLLOOKAHEADTIME;
 
         for (int i = minIndex; i < gameplayManager.CurrentGameplayChart.GameplayObjects.Length; i++)
         {

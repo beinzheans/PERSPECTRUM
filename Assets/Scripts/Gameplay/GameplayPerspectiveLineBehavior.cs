@@ -19,6 +19,8 @@ public class GameplayPerspectiveLineBehavior : MonoBehaviour
 
     private const double k_PERSPECTIVELINEPULSETIME = 0.25d;
     private double previousPulseTime = 0d;
+
+    private bool hasGameplayStarted = false;
     void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
@@ -71,6 +73,8 @@ public class GameplayPerspectiveLineBehavior : MonoBehaviour
 
     private void GameplayManager_OnGameplayStarted()
     {
+        hasGameplayStarted = true;
+
         previousPulseTime = 0d;
         propertyBlock.SetFloat(k_PERSPECTIVEJUDGEMENTTYPE, 1f); // set to default color
         SetMaterialPropertyBlock();
@@ -88,6 +92,11 @@ public class GameplayPerspectiveLineBehavior : MonoBehaviour
 
     void Update()
     {
+        if (!hasGameplayStarted)
+        {
+            return;
+        }
+
         for (int i = 0; i < 4; i++)
         {
             Vector3 borderWorldPoint = frontHitPlane.TransformPoint(gameplayManager.LocalBorderCorners[i]);

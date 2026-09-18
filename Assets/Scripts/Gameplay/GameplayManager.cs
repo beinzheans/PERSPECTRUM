@@ -165,18 +165,21 @@ public class GameplayManager : MonoBehaviour
     private void Start()
     {
         CreateGameplayReferencePoints();
+        GeneratePlayAreaMesh();
 
         CurrentActiveGameplayMarker = null;
-
-        gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
-        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
-        gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
-
-        GameplayCameraVanishingLocalPoint = GetCameraVanishingPoint();
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
-        GeneratePlayAreaMesh();
     }
 
+    private void SetGameplayClippingPlanes()
+    {
+        gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
+        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed * CurrentGameplayModifications.GameplaySpeed);
+        gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
+
+        RenderSettings.fogStartDistance = k_HITPLANEDEPTH;
+        RenderSettings.fogEndDistance = GameplayFarClipPlane;
+    }
 
     private void CreateGameplayReferencePoints()
     {
@@ -278,14 +281,10 @@ public class GameplayManager : MonoBehaviour
     }
     private void GameInstance_OnGameSettingsChanged()
     {
-        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
-        gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
-
-        RenderSettings.fogStartDistance = k_HITPLANEDEPTH;
-        RenderSettings.fogEndDistance = GameplayFarClipPlane;
-
         CreateGameplayReferencePoints();
         GeneratePlayAreaMesh();
+
+        SetGameplayClippingPlanes();
     }
 
     private void OnDestroy()
@@ -347,6 +346,8 @@ public class GameplayManager : MonoBehaviour
             Debug.LogWarning($"Gameplay modifications is invalid, setting to default");
             GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid Mods!", 1d);
         }
+
+        SetGameplayClippingPlanes();
 
         MaxHitboxCount = CurrentGameplayChart.GameplayObjects.Count(x =>
         {

@@ -15,10 +15,6 @@ public class ChartChooseModifications : MonoBehaviour
         ChartChooseManager.ChartChooseInstance.OnRequestGameplayModifications += ChartChooseInstance_OnRequestGameplayModifications;
     }
 
-    private void OnDestroy()
-    {
-        ChartChooseManager.ChartChooseInstance.OnRequestGameplayModifications -= ChartChooseInstance_OnRequestGameplayModifications;
-    }
     private GameplayModifications ChartChooseInstance_OnRequestGameplayModifications()
     {
         // here probably parse the inputs.

@@ -31,16 +31,8 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         playareaBorderMeshRenderer_back = playareaBorderMeshFilter_Back.GetComponent<MeshRenderer>();
         playareaBorderMeshRenderer_earlyHitPlane = playareaBorderMeshFilter_earlyHitPlane.GetComponent<MeshRenderer>();
 
-        playareaBorderMeshFilter_Front.transform.localPosition = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH);
-        playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
-        playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
-
-        playareaBorderMeshFilter_Back.sharedMesh = playareaBorderMeshFilter_earlyHitPlane.sharedMesh = playareaBorderMeshFilter_Front.sharedMesh = gameplayManager.PlayAreaBorderMesh;
-
-        gameplayManager.AssignGameplayBorderScale(Vector3.one);
-        gameplayManager.AssignGameplayDisplacementRotation(Vector3.zero, Quaternion.identity);
-
         GameManager.GameInstance.OnGameSettingsChanged += GameInstance_OnGameSettingsChanged;
+        gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnHitboxMatchedHit += GameplayManager_OnHitboxMatchedHit;
         gameplayManager.OnHitboxMismatchedHit += GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnHitboxMiss += GameplayManager_OnHitboxMiss;
@@ -49,9 +41,26 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
     }
 
+    private void SetPlayareaBorderPositions()
+    {
+        playareaBorderMeshFilter_Front.transform.localPosition = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH);
+        playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
+        playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
+    }
+
+    private void GameplayManager_OnGameplayStarted()
+    {
+        SetPlayareaBorderPositions();
+        playareaBorderMeshFilter_Back.sharedMesh = playareaBorderMeshFilter_earlyHitPlane.sharedMesh = playareaBorderMeshFilter_Front.sharedMesh = gameplayManager.PlayAreaBorderMesh;
+
+        gameplayManager.AssignGameplayBorderScale(Vector3.one);
+        gameplayManager.AssignGameplayDisplacementRotation(Vector3.zero, Quaternion.identity);
+    }
+
     private void OnDestroy()
     {
         GameManager.GameInstance.OnGameSettingsChanged -= GameInstance_OnGameSettingsChanged;
+        gameplayManager.OnGameplayStarted -= GameplayManager_OnGameplayStarted;
         gameplayManager.OnHitboxMatchedHit -= GameplayManager_OnHitboxMatchedHit;
         gameplayManager.OnHitboxMismatchedHit -= GameplayManager_OnHitboxMismatchedHit;
         gameplayManager.OnHitboxMiss -= GameplayManager_OnHitboxMiss;
@@ -62,8 +71,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     }
     private void GameInstance_OnGameSettingsChanged()
     {
-        playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
-        playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
+        SetPlayareaBorderPositions();
 
         playareaBorderMeshFilter_Back.sharedMesh = playareaBorderMeshFilter_earlyHitPlane.sharedMesh = playareaBorderMeshFilter_Front.sharedMesh = gameplayManager.PlayAreaBorderMesh;
     }
@@ -172,7 +180,6 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     {
         double pulseProgress = (time - previousPulseTime) / pulseInterval;
 
-        Debug.Log($"Pulse progress: {pulseProgress}");
         pulsePropertyBlock.SetFloat(k_SHADERPULSEPROGRESSID, (float)pulseProgress);
         playareaBorderMeshRenderer_front.SetPropertyBlock(pulsePropertyBlock);
         playareaBorderMeshRenderer_earlyHitPlane.SetPropertyBlock(pulsePropertyBlock);

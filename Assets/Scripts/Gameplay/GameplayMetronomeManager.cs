@@ -110,7 +110,7 @@ public class GameplayMetronomeManager : MonoBehaviour
         }
 
         currentBPM = initialMarker.BPM * gameplayManager.CurrentGameplayModifications.GameplaySpeed;
-        double offset = (initialMarker.RenderTime + GameplayManager.k_STARTTIMEOFFSET) / gameplayManager.CurrentGameplayModifications.GameplaySpeed;
+        double offset = (initialMarker.RenderTime / gameplayManager.CurrentGameplayModifications.GameplaySpeed + GameplayManager.k_STARTTIMEOFFSET) ;
         metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, 
                                                  offset + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 
                                                  TimerBehavior.PERSISTENT, 
