@@ -158,8 +158,8 @@ public class GameplayUIBehavior : MonoBehaviour
         gameplay_accuracyPercent.text = $"{gameplayManager.CurrentAccuracy * 100d:F2}%";
         gameplay_accuracySlider.value = (float)gameplayManager.CurrentAccuracy;
         gameplay_score.SetText(((int)math.round(gameplayManager.CurrentScore)).ToString(), k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
-        gameplay_progress.text = $"{gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount} | {gameplayManager.MaxHitboxCount}";
-        gameplay_progressSlider.value = (float)(gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount) / gameplayManager.MaxHitboxCount;
+        gameplay_progress.text = $"{gameplayManager.StartHitboxObjectCount + gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount} | {gameplayManager.MaxHitboxCount}";
+        gameplay_progressSlider.value = (float)(gameplayManager.StartHitboxObjectCount + gameplayManager.MatchHitCount + gameplayManager.MismatchHitCount + gameplayManager.MissCount) / gameplayManager.MaxHitboxCount;
         gameplay_progressSlider_Handle.PulseElasticSize(k_DEFAULTGAMEPLAYBOUNCESIZE, k_DEFAULTGAMEPLAYBOUNCETIME);
 
     }
@@ -210,6 +210,7 @@ public class GameplayUIBehavior : MonoBehaviour
         endscreenUI.SetActive(false);
         SetupGameplayUI();
         SetupStartGameplayUI();
+        UpdateGameplayStatistics();
     }
 
     private void GameplayManager_OnHitboxMiss(VisualHitbox obj)

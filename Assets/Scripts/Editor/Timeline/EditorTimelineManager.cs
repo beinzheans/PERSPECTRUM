@@ -51,14 +51,16 @@ public class EditorTimelineManager : MonoBehaviour
             return time;
         }
 
-        bool markerResult = GetActiveTimelineMarkerAtTime(time, out TimelineMarker marker);
+        List<(double time, double BPM)> allMarkers = editorManager.CurrentEditorChart.TimelineMarkers.Select(x => (x.RenderTime, x.BPM)).ToList();
+        bool markerResult = MathHelper.GetActiveTimelineMarkerAtTime(time, allMarkers, out int index);
 
         if (!markerResult)
         {
             return time; // nothing to snap
         }
 
-        bool beatResult = CalculateBeatIndexOfMarker(marker, out _, out _, out double timeOfFirstBeat);
+        (double time, double BPM) marker = allMarkers[index];
+        bool beatResult = MathHelper.CalculateBeatIndexOfMarker(marker, allMarkers, editorManager.NumberOfBeatSubdivisions, out _, out _, out double timeOfFirstBeat);
 
         if (!beatResult)
         {
@@ -70,43 +72,6 @@ public class EditorTimelineManager : MonoBehaviour
         int beatOffset = MathHelper.CommonSenseFloor((time - timeOfFirstBeat) / dt);
 
         return timeOfFirstBeat + (double)beatOffset * dt;
-    }
-
-    private bool FindNextMarker(TimelineMarker marker, out TimelineMarker nextMarker)
-    {
-        if (marker == null)
-        {
-            nextMarker = null;
-            return false;
-        }
-
-        int foundIndex = -1;
-        double filterTime = marker.RenderTime;
-        double closestMarkerTime = double.MaxValue;
-        List<TimelineMarker> markers = new List<TimelineMarker>(editorManager.CurrentEditorChart.TimelineMarkers);
-        for (int i = 0; i < markers.Count; i++)
-        {
-            if (markers[i].RenderTime <= filterTime)
-            {
-                continue;
-            }
-
-            if (markers[i].RenderTime < closestMarkerTime)
-            {
-                closestMarkerTime = markers[i].RenderTime;
-                foundIndex = i;
-            }
-        }
-
-        if (foundIndex == -1)
-        {
-            nextMarker = null;
-            return false;
-        }
-
-        nextMarker = markers[foundIndex];
-        return true;
-
     }
 
     private void InstantiateInitialMarkers()
@@ -152,8 +117,10 @@ public class EditorTimelineManager : MonoBehaviour
     private void GetNewActiveTimelineMarker(double time)
     {
         initialMarker = FindInitialMarker(); // try to find initial marker, since it is possible we deleted it this update
+        List<(double time, double BPM)> allMarkers = editorManager.CurrentEditorChart.TimelineMarkers.Select(x => (x.RenderTime, x.BPM)).ToList();
 
-        bool findResult = GetActiveTimelineMarkerAtTime(time, out TimelineMarker marker);
+        bool findResult = MathHelper.GetActiveTimelineMarkerAtTime(time, allMarkers, out int index);
+
         if (!findResult)
         {
             currentActiveTimelineMarker = null;
@@ -163,6 +130,8 @@ public class EditorTimelineManager : MonoBehaviour
             ClearBeatMarkers();
             return;
         }
+
+        TimelineMarker marker = editorManager.CurrentEditorChart.TimelineMarkers[index];
 
         if (marker != currentActiveTimelineMarker)
         {
@@ -185,35 +154,6 @@ public class EditorTimelineManager : MonoBehaviour
             RenderBeatMarker(i);
         }
     }
-    private bool GetActiveTimelineMarkerAtTime(double time, out TimelineMarker marker)
-    {
-        double filterTime = time;
-        double maxTimeWithinFilterTime = -1d;
-        int indexResult = -1;
-        List<TimelineMarker> markers = editorManager.CurrentEditorChart.TimelineMarkers;
-        for (int i = 0; i < markers.Count; i++)
-        {
-            if (markers[i].RenderTime > filterTime)
-            {
-                continue;
-            }
-
-            if (markers[i].RenderTime >= maxTimeWithinFilterTime)
-            {
-                maxTimeWithinFilterTime = markers[i].RenderTime;
-                indexResult = i;
-            }
-        }
-
-        if (indexResult == -1)
-        {
-            marker = null;
-            return false;
-        }
-
-        marker = markers[indexResult];
-        return true;
-    }
 
     private void UpdateTimelineBeats(double time)
     {
@@ -234,8 +174,11 @@ public class EditorTimelineManager : MonoBehaviour
 
         currentTimelineMinTime = time - 0.5d * timelineTimeLength;
         currentTimelineMaxTime = time + 0.5d * timelineTimeLength;
+        List<(double time, double BPM)> allMarkers = editorManager.CurrentEditorChart.TimelineMarkers.Select(x => (x.RenderTime, x.BPM)).ToList();
 
-        bool searchResult = CalculateBeatIndexOfMarker(currentActiveTimelineMarker, out int firstVisibleBeatIndex, out int lastBeat, out double timeOfFirstBeat);
+        (double time, double BPM) marker = (currentActiveTimelineMarker.RenderTime, currentActiveTimelineMarker.BPM);
+
+        bool searchResult = MathHelper.CalculateBeatIndexOfMarker(marker, allMarkers, editorManager.NumberOfBeatSubdivisions, out int firstVisibleBeatIndex, out int lastBeat, out double timeOfFirstBeat);
         if (!searchResult)
         {
             return;
@@ -293,72 +236,6 @@ public class EditorTimelineManager : MonoBehaviour
         {
             r.sizeDelta = bigMarkerSize;
         }
-    }
-
-    private bool CalculateBeatIndexOfMarker(TimelineMarker marker, out int firstBeat, out int lastBeat, out double timeOfFirstBeat)
-    {
-        if (editorManager.NumberOfBeatSubdivisions <= 0)
-        {
-            firstBeat = -1;
-            lastBeat = -1;
-            timeOfFirstBeat = -1d;
-            return false;
-        }
-
-        if (marker == initialMarker) // base case
-        {
-            firstBeat = 0;
-            timeOfFirstBeat = marker.RenderTime;
-
-            bool findNextResult = FindNextMarker(marker, out TimelineMarker nextMarker);
-            if (!findNextResult)
-            {
-                lastBeat = int.MaxValue;
-                return true;
-            }
-
-            double dt = 60d / marker.BPM / (double)editorManager.NumberOfBeatSubdivisions;
-
-            lastBeat = MathHelper.CommonSenseFloor((nextMarker.RenderTime - marker.RenderTime) / dt);
-            return true;
-        }
-        List<TimelineMarker> copy = editorManager.CurrentEditorChart.TimelineMarkers.OrderBy(x => x.RenderTime).ToList();
-
-        double accumulatedBeatIndex = 0d;
-        double lastBeatOffset = 0d;
-        bool shouldHaveLastBeat = true;
-
-        for (int i = 1; i < copy.Count; i++)
-        {
-            TimelineMarker currentMarker = copy[i];
-            TimelineMarker previousMarker = copy[i - 1];
-            double previous_dt = 60d / previousMarker.BPM / (double)editorManager.NumberOfBeatSubdivisions;
-
-            accumulatedBeatIndex += (currentMarker.RenderTime - previousMarker.RenderTime) / previous_dt;
-
-            if (currentMarker == marker)
-            {
-                if (i == copy.Count - 1) // do not compute last index if we are at the final marker
-                {
-                    shouldHaveLastBeat = false;
-                    break;
-                }
-
-                shouldHaveLastBeat = true;
-                TimelineMarker nextMarker = copy[i + 1];
-
-                double current_dt = 60d / currentMarker.BPM / (double)editorManager.NumberOfBeatSubdivisions;
-                lastBeatOffset = (nextMarker.RenderTime - currentMarker.RenderTime) / current_dt;
-
-                break;
-            }
-        }
-
-        double offset_dt = 60d / marker.BPM / (double)editorManager.NumberOfBeatSubdivisions;
-        firstBeat = MathHelper.CommonSenseCeil(accumulatedBeatIndex);
-        lastBeat = shouldHaveLastBeat ? MathHelper.CommonSenseFloor(accumulatedBeatIndex + lastBeatOffset) : int.MaxValue;
-        timeOfFirstBeat = marker.RenderTime + (firstBeat - accumulatedBeatIndex) * offset_dt;
-        return true;
     }
 }
 

@@ -30,8 +30,14 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
     private void Start()
     {
         gameplayManager = GameplayManager.GameplayInstance;
+        gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
         OnStartEvent();
+    }
+
+    private void GameplayManager_OnGameplayStarted()
+    {
+        minIndex = gameplayManager.StartGameplayObjectIndex;
     }
 
     private void GameplayManager_OnGameplayRestarted()
@@ -43,8 +49,6 @@ public abstract class GameplayObjectPoolManager<TObjectData, TBehavior> : MonoBe
             currentActiveObjects[i].IsRendered = false;
             UnrenderObject_ReturnToPool(currentActiveObjects[i]);
         }
-
-        minIndex = 0;
     }
 
     /// <summary>

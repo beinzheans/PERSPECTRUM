@@ -76,9 +76,13 @@ public class ChartChooseManager : MonoBehaviour
     public void InitializeChartButtonsFromFile()
     {
         GamePersistenceManager.ReadEditorChartsInGameStorage(out string[] allLocalPaths);
+        List<string> validSteamFiles = new();
 
-        string[] allSteamFolderPaths = SteamManager.SteamInstance.RequestChartsInLocalSteamStorage();
-        List<string> validSteamFiles = GetChartFilesFromSteamFolders(allSteamFolderPaths);
+        if (SteamManager.Initialized)
+        {
+            string[] allSteamFolderPaths = SteamManager.SteamInstance.RequestChartsInLocalSteamStorage();
+            validSteamFiles = GetChartFilesFromSteamFolders(allSteamFolderPaths);
+        }
 
         List<string> allFiles = new List<string>(allLocalPaths.Length + validSteamFiles.Count);
 

@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -83,6 +84,9 @@ public class GameplayManager : MonoBehaviour
     public Vector2 GameplayMousePosition { get; private set; }
     public double CurrentGameplayTime { get; private set; }
 
+    public int StartGameplayObjectIndex { get; private set; }
+    public int StartHitboxObjectCount { get; private set; }
+    public int StartGameplayMarkerIndex { get; private set; }
     /// <summary>
     /// The world position of where the bottom-left corner of the preview space is.
     /// </summary>
@@ -143,6 +147,7 @@ public class GameplayManager : MonoBehaviour
     public GameplayStatisticRecord CurrentGameplayRecord { get; private set; }
 
     public bool IsMetronomeDisabled;
+    public int MetronomeStartIndex { get; private set; }
     public double EndTime { get; private set; }
 
     public Mesh PlayAreaBorderMesh { get; private set; }
@@ -393,16 +398,19 @@ public class GameplayManager : MonoBehaviour
         StartChart();
     }
 
-    private Vector3 GetCameraVanishingPoint()
-    {
-        Vector2 screenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(new Vector2(0.5f, 0.5f), gameplayRectTransform);
-        return gameplayCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, GameplayFarClipPlane));
-    }
 
     private TimerStopwatchAction stopwatchAction;
+    
     private void StartChart()
     {
         EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime + k_TIMEOFFSET;
+        MathHelper.PerformBinarySearchOnGameplayChart<GameplayObject>(CurrentGameplayModifications.GameplayStartTime, CurrentGameplayChart.GameplayObjects, out int startGameplayIndex, out _);
+        MathHelper.PerformBinarySearchOnGameplayChart<VisualHitbox>(CurrentGameplayModifications.GameplayStartTime, CurrentGameplayChart.GameplayObjects, out int startHitboxIndex, out int hitboxCount, x => x.HitboxType != HitboxType.BOMB);
+
+        StartGameplayObjectIndex = startGameplayIndex;
+        StartHitboxObjectCount = hitboxCount;
+
+        SetInitialGameplayMarker();
 
         double offset = k_STARTTIMEOFFSET * CurrentGameplayModifications.GameplaySpeed + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d;
 
@@ -413,9 +421,23 @@ public class GameplayManager : MonoBehaviour
         InvokeGameplayStartedEvent();
     }
 
+    private void SetInitialGameplayMarker()
+    {
+        bool binarySearchResult = MathHelper.PerformBinarySearchOnGameplayChart<GameplayMarker>(CurrentGameplayModifications.GameplayStartTime, CurrentGameplayChart.GameplayObjects, out int startMarkerIndex, out _);
+        StartGameplayMarkerIndex = startMarkerIndex;
+
+        if (!binarySearchResult || StartGameplayMarkerIndex == -1)
+        {
+            Debug.LogWarning($"No gameplay markers found in the chart OR no gameplay markers exist before {CurrentGameplayModifications.GameplayStartTime}.");
+            CurrentActiveGameplayMarker = null;
+            MetronomeStartIndex = 0;
+            return;
+        }
+
+        CurrentActiveGameplayMarker = CurrentGameplayChart.GameplayObjects[StartGameplayMarkerIndex] as GameplayMarker;
+    }
     private void InvokeGameplayStartedEvent()
     {
-        CurrentActiveGameplayMarker = null;
         Debug.Log($"Started gameplay!");
         OnGameplayStarted?.Invoke();
     }
@@ -474,18 +496,34 @@ public class GameplayManager : MonoBehaviour
 
             Debug.Log($"Loaded chart version conflict is automatically resolved");
 
-            await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), audioBytes, imageBytes);
+            try
+            {
+                await StartGameplayFromJsonString(convertedChartJObject.ToString(), convertedmetadataJObject.ToString(), audioBytes, imageBytes);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Exception when starting gameplay from JSON! Exception: \n" +
+                                 $"{e.Message}\n" +
+                                 $"{e.StackTrace}");
+            }
             return;
         }
 
-        await StartGameplayFromJsonString(chartJson, metadataJson, audioBytes, imageBytes);
+        try
+        {
+            await StartGameplayFromJsonString(chartJson, metadataJson, audioBytes, imageBytes);
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Exception when starting gameplay from JSON! Exception: \n" +
+                             $"{e.Message}");
+        }
         return;
     }
 
     private async Task StartGameplayFromJsonString(string chartJson, string metadataJson, byte[] audioBytes, byte[] imageBytes)
     {
         (bool convertResult, EditorChart editorChart, AudioClip clip) = await GamePersistenceManager.ConvertFilesToEditorChart(chartJson, audioBytes);
-
         GamePersistenceManager.GetTexture2DFromBytes(imageBytes, out Texture2D texture);
 
         GamePersistenceManager.GetMetadataOfEditorChartFromJson(metadataJson, out EditorChartMetadata metadata);

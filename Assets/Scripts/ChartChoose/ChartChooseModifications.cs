@@ -18,6 +18,6 @@ public class ChartChooseModifications : MonoBehaviour
     private GameplayModifications ChartChooseInstance_OnRequestGameplayModifications()
     {
         // here probably parse the inputs.
-        return new GameplayModifications(2d, 0);
+        return new GameplayModifications(1d, 200d);
     }
 }

@@ -1,4 +1,6 @@
+using Steamworks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -249,37 +251,30 @@ public static class MathHelper
     {
         return math.abs(x - y) <= k_FLOATCOMPAREEPSILION;
     }
-    public static bool GetActiveTimelineMarkerAtTime(double time, List<TimelineMarker> allMarkers, out TimelineMarker resultMarker)
+    public static bool GetActiveTimelineMarkerAtTime(double time, List<(double time, double BPM)> allMarkers, out int index)
     {
         double filterTime = time;
         double maxTimeWithinFilterTime = -1d;
-        int indexResult = -1;
+        index = -1;
 
         for (int i = 0; i < allMarkers.Count; i++)
         {
-            if (allMarkers[i].RenderTime > filterTime)
+            if (allMarkers[i].time > filterTime)
             {
                 continue;
             }
 
-            if (allMarkers[i].RenderTime >= maxTimeWithinFilterTime)
+            if (allMarkers[i].time >= maxTimeWithinFilterTime)
             {
-                maxTimeWithinFilterTime = allMarkers[i].RenderTime;
-                indexResult = i;
+                maxTimeWithinFilterTime = allMarkers[i].time;
+                index = i;
             }
         }
 
-        if (indexResult == -1)
-        {
-            resultMarker = null;
-            return false;
-        }
-
-        resultMarker = allMarkers[indexResult];
-        return true;
+        return index != -1;
     }
 
-    public static bool CalculateBeatIndexOfMarker(TimelineMarker targetMarker, List<TimelineMarker> allMarkers, int numberOfSubdivisions, out int firstBeat, out int lastBeat, out double timeOfFirstBeat)
+    public static bool CalculateBeatIndexOfMarker((double time, double BPM) targetMarker, List<(double time, double BPM)> allMarkers, int numberOfSubdivisions, out int firstBeat, out int lastBeat, out double timeOfFirstBeat)
     {
         if (numberOfSubdivisions <= 0 || allMarkers.Count <= 0)
         {
@@ -289,11 +284,11 @@ public static class MathHelper
             return false;
         }
 
-        TimelineMarker[] sortedMarkers = allMarkers.OrderBy(x => x.RenderTime).ToArray();
-        if (targetMarker == sortedMarkers[0])
+        (double time, double BPM)[] sortedMarkers = allMarkers.OrderBy(x => x.time).ToArray();
+        if (targetMarker == sortedMarkers[0]) // trival case
         {
             firstBeat = 0;
-            timeOfFirstBeat = targetMarker.RenderTime;
+            timeOfFirstBeat = targetMarker.time;
 
             if (sortedMarkers.Length == 1) // no next marker
             {
@@ -303,7 +298,7 @@ public static class MathHelper
             {
                 double dt = 60d / targetMarker.BPM / (double)numberOfSubdivisions;
 
-                lastBeat = CommonSenseFloor((sortedMarkers[1].RenderTime - targetMarker.RenderTime) / dt);
+                lastBeat = CommonSenseFloor((sortedMarkers[1].time - targetMarker.time) / dt);
             }
 
             return true;
@@ -314,14 +309,14 @@ public static class MathHelper
         bool lastBeatExists = true;
         for (int i = 1; i < sortedMarkers.Length; i++)
         {
-            TimelineMarker currentMarker = sortedMarkers[i];
-            TimelineMarker lastMarker = sortedMarkers[i - 1];
+            (double time, double BPM) currentMarker = sortedMarkers[i];
+            (double time, double BPM) lastMarker = sortedMarkers[i - 1];
 
             double previous_dt = 60d / lastMarker.BPM / (double)numberOfSubdivisions;
 
-            accumlatedBeatIndex += (currentMarker.RenderTime - lastMarker.RenderTime) / previous_dt;
+            accumlatedBeatIndex += (currentMarker.time - lastMarker.time) / previous_dt;
 
-            if (currentMarker == targetMarker) // exit condition
+            if (currentMarker == targetMarker) // exit condition, iterate through our markers until we find the target
             {
                 if (i == sortedMarkers.Length - 1) // we are at final marker
                 {
@@ -329,11 +324,11 @@ public static class MathHelper
                 }
                 else
                 {
-                    TimelineMarker nextMarker = sortedMarkers[i + 1];
+                    (double time, double BPM) nextMarker = sortedMarkers[i + 1];
 
                     double current_dt = 60d / currentMarker.BPM / (double)numberOfSubdivisions;
                     lastBeatExists = true;
-                    lastBeatOffsetIndex = (nextMarker.RenderTime - currentMarker.RenderTime) / current_dt;
+                    lastBeatOffsetIndex = (nextMarker.time - currentMarker.time) / current_dt;
                 }
 
                 break;
@@ -343,19 +338,21 @@ public static class MathHelper
         double offset_dt = 60d / targetMarker.BPM / (double)numberOfSubdivisions;
         firstBeat = CommonSenseCeil(accumlatedBeatIndex);
         lastBeat = lastBeatExists ? int.MaxValue : CommonSenseFloor(accumlatedBeatIndex + lastBeatOffsetIndex);
-        timeOfFirstBeat = targetMarker.RenderTime + (firstBeat - accumlatedBeatIndex) * offset_dt;
+        timeOfFirstBeat = targetMarker.time + (firstBeat - accumlatedBeatIndex) * offset_dt;
         return true;
     }
 
-    public static bool GetBeatIndexAtTime(double time, List<TimelineMarker> markers, int numberOfSubdivisions, out int beatIndex)
+    public static bool GetBeatIndexAtTime(double time, List<(double time, double BPM)> markers, int numberOfSubdivisions, out int beatIndex)
     {
-        bool doesTimelineMarkerExist = GetActiveTimelineMarkerAtTime(time, markers, out TimelineMarker activeMarker);
+        bool doesTimelineMarkerExist = GetActiveTimelineMarkerAtTime(time, markers, out int index);
 
         if (!doesTimelineMarkerExist)
         {
             beatIndex = -1;
             return false;
         }
+
+        (double time, double BPM) activeMarker = markers[index];
 
         bool canCalculateBeatIndexOfMarker = CalculateBeatIndexOfMarker(activeMarker, markers, numberOfSubdivisions, out int firstBeat, out _, out double timeOfFirstBeat);
 
@@ -851,4 +848,48 @@ public static class MathHelper
         return modifications.GameplaySpeed > 0 &&
                (modifications.GameplayStartTime > 0 || IsTwoDoublesEqualWithEpsilion(modifications.GameplayStartTime, 0d));
     }
+
+
+    /// <summary>
+    /// Performs binary search on a supplied array of <see cref="GameplayObject"/>, and finds the last element that is before <paramref name="startTime"/> with a extra requirement.<br></br>
+    /// Returns a bool indicating successful search and also the index of the element of type <typeparamref name="T"/> that satisfies <paramref name="predicate"/> just before <paramref name="startTime"/> <br></br>
+    /// <paramref name="index"/> = -1 indicates that no other element exist before <paramref name="startTime"/> that satisfies our binary search requirement. <br></br>
+    /// This assumes that that <paramref name="gameplayObjectArray"/> is sorted, which it must be under normal circumstances, since it is sorted once when loaded into memory.
+    /// </summary>
+    /// <typeparam name="T">The type of <see cref="GameplayObject"/> you want to search against.</typeparam>
+    /// <param name="startTIme"></param>
+    /// <param name="gameplayObjectArray"></param>
+    /// <param name="index"></param>
+    public static bool PerformBinarySearchOnGameplayChart<T>(in double startTime, in GameplayObject[] gameplayObjectArray, out int index, out int count, Func<T, bool> predicate = null) where T : GameplayObject
+    {
+        T[] array = predicate == null ? gameplayObjectArray.OfType<T>().ToArray() : gameplayObjectArray.OfType<T>().Where(predicate).ToArray();
+
+        if (array.Length <= 0)
+        {
+            Debug.LogWarning($"No gameplay objects fulfill the filter request!");
+            index = -1;
+            count = 0;
+            return false;
+        }
+
+        int relativeIndex = Array.BinarySearch(array.Select(x => x.RenderTime).ToArray(), startTime);
+        int previousIndex = relativeIndex < 0 ? ~relativeIndex - 1 : relativeIndex;
+
+        if (previousIndex < 0)
+        {
+            Debug.Log($"No element satisfy binary search requirement.");
+            index = -1;
+            count = 0;
+            return true;
+        }
+
+        count = previousIndex;
+        // keep in mind relativeIndex is related to our treated array (which is a subset of our full array).
+        // since this relativeIndex must exist, so does it exist inside our full array (by subset logic)
+        GameplayObject target = array[previousIndex];
+        index = Array.BinarySearch(gameplayObjectArray, target, new GameplayObjectComparer());
+        Debug.Log($"Binary search result! Gameplay object at index {index} @ t = {gameplayObjectArray[index].RenderTime}");
+        return true;
+    }
+
 }

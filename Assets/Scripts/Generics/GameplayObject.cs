@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 public abstract class GameplayObject : IEquatable<GameplayObject>
 {

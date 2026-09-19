@@ -1,4 +1,7 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 /// <summary>
@@ -15,9 +18,8 @@ public class GameplayLogicManager : MonoBehaviour
     {
         gameplayManager = GameplayManager.GameplayInstance;
         inputActions = GameManager.GameInstance.InputActions;
+        gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayTimeUpdated += GameplayManager_OnGameplayTimeUpdated;
-        gameplayManager.OnGameplayRestarted += GameplayManager_OnGameplayRestarted;
-
         if (gameplayManager.IsInReplayMode)
         {
             return;
@@ -32,16 +34,16 @@ public class GameplayLogicManager : MonoBehaviour
 
     }
 
-    private void GameplayManager_OnGameplayRestarted()
+    private void GameplayManager_OnGameplayStarted()
     {
         currentActiveHitboxes = new();
-        currentObjectIndex = 0;
+        currentObjectIndex = gameplayManager.StartGameplayObjectIndex;
     }
 
     private void OnDestroy()
     {
+        gameplayManager.OnGameplayStarted -= GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayTimeUpdated -= GameplayManager_OnGameplayTimeUpdated;
-        gameplayManager.OnGameplayRestarted -= GameplayManager_OnGameplayRestarted;
 
         if (gameplayManager.IsInReplayMode)
         {
@@ -150,6 +152,7 @@ public class GameplayLogicManager : MonoBehaviour
 
         UpdateCurrentActiveHitboxList(time);
     }
+
     private void UpdateCurrentActiveHitboxList(double time)
     {
         double maxInteractTime = time + GameplayManager.k_EARLYTIMEFRAME + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d; // add on top of offset so predictive hitsounds will work
@@ -180,6 +183,7 @@ public class GameplayLogicManager : MonoBehaviour
             currentObjectIndex++;
         }
     }
+
 }
 public enum MouseActiveType
 {

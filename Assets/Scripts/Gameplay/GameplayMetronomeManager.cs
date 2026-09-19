@@ -81,23 +81,14 @@ public class GameplayMetronomeManager : MonoBehaviour
             return false;
         }
 
-        bool findResult = false;
-
-
-        for (int i = 0; i < gameplayManager.CurrentGameplayChart.GameplayObjects.Length; i++)
+        if (gameplayManager.StartGameplayMarkerIndex >= gameplayManager.CurrentGameplayChart.GameplayObjects.Length)
         {
-            GameplayObject gameplayObject = gameplayManager.CurrentGameplayChart.GameplayObjects[i];
-
-            if (gameplayObject is GameplayMarker marker)
-            {
-                initialMarker = marker;
-                findResult = true;
-                previousSearchIndex = i;
-                break;
-            }
+            return false;
         }
 
-        return findResult;
+        GameplayMarker marker = gameplayManager.CurrentGameplayChart.GameplayObjects[gameplayManager.StartGameplayMarkerIndex] as GameplayMarker;
+        Debug.Log($"Accessing gameplay chart at index {gameplayManager.StartGameplayMarkerIndex} (t = {gameplayManager.CurrentGameplayChart.GameplayObjects[gameplayManager.StartGameplayMarkerIndex].RenderTime})");
+        return true;
     }
 
     private void GameplayManager_OnGameplayStarted()
@@ -110,9 +101,13 @@ public class GameplayMetronomeManager : MonoBehaviour
         }
 
         currentBPM = initialMarker.BPM * gameplayManager.CurrentGameplayModifications.GameplaySpeed;
-        double offset = (initialMarker.RenderTime / gameplayManager.CurrentGameplayModifications.GameplaySpeed + GameplayManager.k_STARTTIMEOFFSET) ;
+        double offset = (initialMarker.RenderTime - gameplayManager.CurrentGameplayModifications.GameplayStartTime) / gameplayManager.CurrentGameplayModifications.GameplaySpeed;
+        if (offset < 0d) // this indicates that we start after this marker. Thus we MUST calcuate the beat index at this time based on this marker. Quite difficult..
+        {
+
+        }
         metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, 
-                                                 offset + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d, 
+                                                 offset + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d + GameplayManager.k_STARTTIMEOFFSET, 
                                                  TimerBehavior.PERSISTENT, 
                                                  60d / currentBPM, 0);
 
