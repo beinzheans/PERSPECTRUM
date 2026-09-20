@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 /// <summary>
 /// A class to handle a 4/4 sig. metronome pulses during gameplay, accounting for BPM changes defined by <see cref="GameplayMarker"/>. <br></br>
@@ -11,6 +14,7 @@ public class GameplayMetronomeManager : MonoBehaviour
     private GameplayMarker initialMarker;
     private GameplayMarker currentMarkerInGameplay;
     int previousSearchIndex = 0;
+    int metronomeBeatIndex;
 
     TimerIntervalAction metronomeTimer;
     private double currentBPM;
@@ -86,8 +90,7 @@ public class GameplayMetronomeManager : MonoBehaviour
             return false;
         }
 
-        GameplayMarker marker = gameplayManager.CurrentGameplayChart.GameplayObjects[gameplayManager.StartGameplayMarkerIndex] as GameplayMarker;
-        Debug.Log($"Accessing gameplay chart at index {gameplayManager.StartGameplayMarkerIndex} (t = {gameplayManager.CurrentGameplayChart.GameplayObjects[gameplayManager.StartGameplayMarkerIndex].RenderTime})");
+        initialMarker = gameplayManager.CurrentGameplayChart.GameplayObjects[gameplayManager.StartGameplayMarkerIndex] as GameplayMarker;
         return true;
     }
 
@@ -101,19 +104,56 @@ public class GameplayMetronomeManager : MonoBehaviour
         }
 
         currentBPM = initialMarker.BPM * gameplayManager.CurrentGameplayModifications.GameplaySpeed;
-        double offset = (initialMarker.RenderTime - gameplayManager.CurrentGameplayModifications.GameplayStartTime) / gameplayManager.CurrentGameplayModifications.GameplaySpeed;
-        if (offset < 0d) // this indicates that we start after this marker. Thus we MUST calcuate the beat index at this time based on this marker. Quite difficult..
+        double markerOffset = (initialMarker.RenderTime - gameplayManager.CurrentGameplayModifications.GameplayStartTime) / gameplayManager.CurrentGameplayModifications.GameplaySpeed;
+        double offset = 0d;
+        if (markerOffset < 0d) // this indicates that we start after this marker. Thus we MUST calcuate the beat index at this time based on this marker. Quite difficult..
         {
-
+            SetMetronomeInitialIndex(out double earlyOffset);
+            offset = earlyOffset / gameplayManager.CurrentGameplayModifications.GameplaySpeed;
         }
-        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime), () => { }, 
-                                                 offset + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d + GameplayManager.k_STARTTIMEOFFSET, 
-                                                 TimerBehavior.PERSISTENT, 
+        else
+        {
+            metronomeBeatIndex = 0; // we start before any markers.
+            offset = markerOffset;
+        }
+
+        Debug.Log($"Starting metronome at beat {metronomeBeatIndex}");
+        metronomeTimer = new TimerIntervalAction(this, (x) => gameplayManager.InvokeGameplayMetronomeFired(gameplayManager.CurrentGameplayTime, metronomeBeatIndex++), () => { },
+                                                 offset + GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d + GameplayManager.k_STARTTIMEOFFSET,
+                                                 TimerBehavior.PERSISTENT,
                                                  60d / currentBPM, 0);
 
         DSPTimerEngine.TimerInstance.AddActionToTimer(metronomeTimer);
     }
 
+    /// <summary>
+    /// Sets <see cref="metronomeBeatIndex"/> along with giving an offset to make sure it is synced with beat. <br></br>
+    /// This <paramref name="earlyOffset"/> describes the time offset to the <see cref="metronomeBeatIndex"/> from the starting time.
+    /// </summary>
+    /// <param name="earlyOffset"></param>
+    private void SetMetronomeInitialIndex(out double earlyOffset)
+    {
+        List<(double time, double BPM)> allMarkers = gameplayManager.CurrentGameplayChart.GameplayObjects.OfType<GameplayMarker>().Select(x => (x.RenderTime, x.BPM)).ToList();
+
+        (double time, double BPM) currentMarker = (initialMarker.RenderTime, initialMarker.BPM); // this must exist.
+
+        bool calculateResult = MathHelper.CalculateBeatIndexOfMarker(currentMarker, allMarkers, 1, out int firstBeat, out _, out double timeOfFirstBeat);
+
+        if (!calculateResult)
+        {
+            Debug.LogWarning($"Could not calculate the beat index at the start time, setting the metronome index to be 0.");
+            metronomeBeatIndex = 0;
+            earlyOffset = 0d;
+            return;
+        }
+
+        double dt = 60d / currentMarker.BPM;
+
+        double beatOffset_accumulated = (gameplayManager.CurrentGameplayModifications.GameplayStartTime - timeOfFirstBeat) / dt;
+        int beatOffset = MathHelper.CommonSenseFloor(beatOffset_accumulated);
+        earlyOffset = (beatOffset - beatOffset_accumulated) * dt;
+        metronomeBeatIndex = firstBeat + beatOffset;
+    }
     private void GameplayManager_OnGameplayTimeUpdated(double time)
     {
         AssignCurrentMarkerAndUpdate(time);

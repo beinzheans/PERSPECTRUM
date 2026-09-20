@@ -402,22 +402,6 @@ public static class MathHelper
 
     public static GameplayChart ConvertEditorChartToGameplayChart(EditorChart editorChart, AudioClip clip, Texture2D backgroundTexture)
     {
-        Comparison<GameplayObject> comparsion = (x, y) =>
-        {
-            if (x.RenderTime < y.RenderTime)
-            {
-                return 1;
-            }
-            else if (x.RenderTime > y.RenderTime)
-            {
-                return -1;
-            }
-            else
-            {
-                return 0;
-            }
-        };
-
         VisualHitbox[] hitboxes = new VisualHitbox[editorChart.Hitboxes.Count];
         ConvertCollectionToNewTypeAsArray(editorChart.Hitboxes, ref hitboxes);
 
@@ -867,7 +851,7 @@ public static class MathHelper
         if (array.Length <= 0)
         {
             Debug.LogWarning($"No gameplay objects fulfill the filter request!");
-            index = -1;
+            index = 0;
             count = 0;
             return false;
         }
@@ -887,9 +871,125 @@ public static class MathHelper
         // keep in mind relativeIndex is related to our treated array (which is a subset of our full array).
         // since this relativeIndex must exist, so does it exist inside our full array (by subset logic)
         GameplayObject target = array[previousIndex];
-        index = Array.BinarySearch(gameplayObjectArray, target, new GameplayObjectComparer());
-        Debug.Log($"Binary search result! Gameplay object at index {index} @ t = {gameplayObjectArray[index].RenderTime}");
-        return true;
+        BinarySearchForTargetOnGameplayChart(target, gameplayObjectArray, out int minIndex, out int maxIndex);
+
+        // account for multiple gameplay objects at this time, so we will just linear search for the first match with the correct type T.
+
+        bool hasFoundType = false;
+        index = -1;
+        for (int i = minIndex; i <= maxIndex; i++)
+        {
+            if (gameplayObjectArray[i] is T)
+            {
+                index = i;
+                hasFoundType = true;
+                break;
+            }
+        }
+
+        return hasFoundType;
+    }
+
+    /// <summary>
+    /// Performs binary search for a specific target <see cref="GameplayObject"/> on <paramref name="gameplayObjectArray"/>. <br></br>
+    /// Returns a lower and upper bound that indicate potential matches on the <paramref name="gameplayObjectArray"/>.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="gameplayObjectArray"></param>
+    /// <returns></returns>
+    public static void BinarySearchForTargetOnGameplayChart(GameplayObject target, in GameplayObject[] gameplayObjectArray, out int minIndex, out int maxIndex)
+    {
+        // the approach is simple. we will only search from the left and right directions to get our lower and upper bounds on the array specifically.
+        minIndex = Internal_PerformBinarySearchOnLeftSide(target, gameplayObjectArray, new GameplayObjectComparer());
+        maxIndex = Internal_PerformBinarySearchOnRightSide(target, gameplayObjectArray, new GameplayObjectComparer());
+    }
+
+    /// <summary>
+    /// Performs binary search but continues sweeping towards to left (smaller index) even after finding a match to find a lower bound.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="target"></param>
+    /// <param name="array"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    private static int Internal_PerformBinarySearchOnLeftSide<T>(T target, T[] array, IComparer comparer)
+    {
+        if (array.Length <= 0)
+        {
+            return -1;
+        }
+
+        int minIndex = array.Length;
+
+        int left = 0;
+        int right = array.Length - 1;
+
+        while (left <= right)
+        {
+            int middle = (left + right) / 2;
+
+            int compareResult = comparer.Compare(target, array[middle]);
+            
+            if (compareResult == 0)
+            {
+                minIndex = middle;
+                right = middle - 1;
+            }
+            else if (compareResult > 0)
+            {
+                left = middle + 1;
+            }
+            else
+            {
+                right = middle - 1;
+            }
+        }
+
+        return minIndex;
+    }
+
+    /// <summary>
+    /// Performs binary search but continues sweeping towards to right (larger index) even after finding a match to find an upper bound.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="target"></param>
+    /// <param name="array"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    private static int Internal_PerformBinarySearchOnRightSide<T>(T target, T[] array, IComparer comparer)
+    {
+        if (array.Length <= 0)
+        {
+            return -1;
+        }
+
+        int maxIndex = -1;
+
+        int left = 0;
+        int right = array.Length - 1;
+
+        while (left <= right)
+        {
+            int middle = (left + right) / 2;
+
+            int compareResult = comparer.Compare(target, array[middle]);
+
+            if (compareResult == 0)
+            {
+                maxIndex = middle;
+                left = middle + 1;
+            }
+            else if (compareResult > 0)
+            {
+                left = middle + 1;
+            }
+            else
+            {
+                right = middle - 1;
+            }
+        }
+
+        return maxIndex;
     }
 
 }

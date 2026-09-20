@@ -187,7 +187,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
 
     }
 
-    private void GameplayManager_OnGameplayMetronomeFired(double fireTime)
+    private void GameplayManager_OnGameplayMetronomeFired(double fireTime, int metronomeBeat)
     {
         if (gameplayManager.CurrentActiveGameplayMarker == null)
         {

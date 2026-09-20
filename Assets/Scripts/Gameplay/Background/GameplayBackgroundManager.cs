@@ -30,8 +30,6 @@ public class GameplayBackgroundManager : MonoBehaviour
 
     private GameplayManager gameplayManager;
 
-    int metronomeLoopIndex = 0;
-
     TimerStopwatchAction pulseAction;
 
     private bool isUsingCustomBackground = false;
@@ -65,14 +63,14 @@ public class GameplayBackgroundManager : MonoBehaviour
 
     private const int k_CAMERABACKGROUNDPULSEBEAT = 4;
 
-    private void GameplayManager_OnGameplayMetronomeFired(double obj)
+    private void GameplayManager_OnGameplayMetronomeFired(double obj, int metronomeBeat)
     {
         if (gameplayManager.CurrentActiveGameplayMarker == null)
         {
             return;
         }
 
-        if (metronomeLoopIndex == 0)
+        if (metronomeBeat % k_CAMERABACKGROUNDPULSEBEAT == 0)
         {
             float darkenAmount = GetDarkenAmountBasedOnSettings();
             float pulseAmount = -math.remap(0f, 1f, 0f, 0.2f, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
@@ -82,8 +80,6 @@ public class GameplayBackgroundManager : MonoBehaviour
             pulseAction = new TimerStopwatchAction(this, (x) => PulseBackground(obj), () => { }, 0d, TimerBehavior.TEMPORARY, GetPulseLength(), false);
             DSPTimerEngine.TimerInstance.AddActionToTimer(pulseAction);
         }
-
-        metronomeLoopIndex = (metronomeLoopIndex + 1) % k_CAMERABACKGROUNDPULSEBEAT;
     }
 
     private void PulseBackground(double previousPulseTime)
@@ -112,7 +108,6 @@ public class GameplayBackgroundManager : MonoBehaviour
     private void GameplayManager_OnGameplayRestarted()
     {
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(pulseAction);
-        metronomeLoopIndex = 0;
     }
 
     private void GameInstance_OnGameSettingsChanged()

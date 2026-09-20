@@ -158,7 +158,7 @@ public class GameplayManager : MonoBehaviour
 
     public GameplayMarker CurrentActiveGameplayMarker { get; private set; }
     public event Action<GameplayMarker> OnGameplayMarkerUpdated;
-    public event Action<double> OnGameplayMetronomeFired;
+    public event Action<double, int> OnGameplayMetronomeFired;
     private const float k_NEARCLIPPLANESCALE = 0.9f;
     private const float k_FARCLIPPLANESCALE = 1.25f;
     public Vector3 CurrentPlayAreaBorderScale { get; private set; }
@@ -405,9 +405,9 @@ public class GameplayManager : MonoBehaviour
     {
         EndTime = CurrentGameplayChart.GameplayObjects[CurrentGameplayChart.GameplayObjects.Length - 1].RenderTime + k_TIMEOFFSET;
         MathHelper.PerformBinarySearchOnGameplayChart<GameplayObject>(CurrentGameplayModifications.GameplayStartTime, CurrentGameplayChart.GameplayObjects, out int startGameplayIndex, out _);
-        MathHelper.PerformBinarySearchOnGameplayChart<VisualHitbox>(CurrentGameplayModifications.GameplayStartTime, CurrentGameplayChart.GameplayObjects, out int startHitboxIndex, out int hitboxCount, x => x.HitboxType != HitboxType.BOMB);
+        MathHelper.PerformBinarySearchOnGameplayChart<VisualHitbox>(CurrentGameplayModifications.GameplayStartTime, CurrentGameplayChart.GameplayObjects, out _, out int hitboxCount, x => x.HitboxType != HitboxType.BOMB);
 
-        StartGameplayObjectIndex = startGameplayIndex;
+        StartGameplayObjectIndex = startGameplayIndex == -1 ? 0 : startGameplayIndex;
         StartHitboxObjectCount = hitboxCount;
 
         SetInitialGameplayMarker();
@@ -424,17 +424,46 @@ public class GameplayManager : MonoBehaviour
     private void SetInitialGameplayMarker()
     {
         bool binarySearchResult = MathHelper.PerformBinarySearchOnGameplayChart<GameplayMarker>(CurrentGameplayModifications.GameplayStartTime, CurrentGameplayChart.GameplayObjects, out int startMarkerIndex, out _);
-        StartGameplayMarkerIndex = startMarkerIndex;
 
-        if (!binarySearchResult || StartGameplayMarkerIndex == -1)
+        if (!binarySearchResult)
         {
-            Debug.LogWarning($"No gameplay markers found in the chart OR no gameplay markers exist before {CurrentGameplayModifications.GameplayStartTime}.");
+            Debug.LogWarning($"No gameplay markers found in the chart.");
             CurrentActiveGameplayMarker = null;
             MetronomeStartIndex = 0;
             return;
         }
 
+        if (startMarkerIndex == -1)
+        {
+            Debug.Log($"No gameplay marker exist before the start time. Setting the index to be the first gameplay marker we find.");
+            int firstIndex = GetIndexOfFirstGameplayMarker();
+
+            if (firstIndex == -1)
+            {
+                Debug.LogWarning($"Can not find the first gameplay marker!");
+            }
+
+            StartGameplayMarkerIndex = firstIndex;
+        }
+        else
+        {
+            StartGameplayMarkerIndex = startMarkerIndex;
+        }
+
         CurrentActiveGameplayMarker = CurrentGameplayChart.GameplayObjects[StartGameplayMarkerIndex] as GameplayMarker;
+    }
+
+    private int GetIndexOfFirstGameplayMarker()
+    {
+        for (int i = 0; i < CurrentGameplayChart.GameplayObjects.Length; i++)
+        {
+            if (CurrentGameplayChart.GameplayObjects[i] is GameplayMarker)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
     private void InvokeGameplayStartedEvent()
     {
@@ -645,9 +674,9 @@ public class GameplayManager : MonoBehaviour
         GameManager.GameInstance.InvokeInformationDisplayNeeded(newMarker.DisplayMessage, newMarker.DisplayTime);
     }
 
-    public void InvokeGameplayMetronomeFired(double fireTime)
+    public void InvokeGameplayMetronomeFired(double fireTime, int metronomeBeat)
     {
-        OnGameplayMetronomeFired?.Invoke(fireTime);
+        OnGameplayMetronomeFired?.Invoke(fireTime, metronomeBeat);
     }
 
     public void SetGameMouseState(Vector2 position, MouseActiveType mouseType)
