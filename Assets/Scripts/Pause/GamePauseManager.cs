@@ -6,18 +6,10 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 /// <summary>
 /// A class to handle pause logic <br></br>
-/// Note the settings tab is generated once during start-up using <see cref="BasePauseModule"/>. That way, we don't need to make the scene messy.
+/// Note the settings tab is generated once during start-up using <see cref="BaseDataModule"/>. That way, we don't need to make the scene messy.
 /// </summary>
-public class GamePauseManager : MonoBehaviour
+public class GamePauseManager : BaseUIPopupContent
 {
-    [SerializeField] private BasePauseModule[] pauseModules = new BasePauseModule[0];
-    /// <summary>
-    /// Prefab for the buttons above the pause menu, we spawn them dynamically (using a layout group)
-    /// </summary>
-    [SerializeField] private Button PauseModuleButtonPrefab;
-
-    private Button[] pauseModuleButtons;
-
     [SerializeField] private Button ReturnMainMenuButton;
     [SerializeField] private Button ContinueGameButton;
 
@@ -27,8 +19,6 @@ public class GamePauseManager : MonoBehaviour
     private bool isInPauseMenu;
     private bool originalMouseStatus;
 
-    [SerializeField] private RectTransform pauseModuleButtonRectTransform;
-
     public const string k_PAUSEMENUDEFAULTDESCRIPTION = "Hover over a setting to see it's description!\n" +
                                                         "There may be more settings if you scroll down.";
     public const string k_PAUSEMENUNODESCRIPTIONPROVIDED = "No description provided.";
@@ -36,12 +26,12 @@ public class GamePauseManager : MonoBehaviour
     private Callback<GameOverlayActivated_t> STEAM_gameOverlapCallback;
 
     private bool isBlockPauseMenu;
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         gameManager = GameManager.GameInstance;
         isInPauseMenu = false;
         PauseDescriptionText.text = k_PAUSEMENUDEFAULTDESCRIPTION;
-        SetupPauseModules();
         gameManager.PauseCanvas.gameObject.SetActive(false);
         gameManager.InputActions.Gameplay.EscapeMenuInput.performed += EscapeMenuInput_performed;
         gameManager.OnPauseMenuDescriptionChanged += GameManager_OnPauseMenuDescriptionChanged;
@@ -130,39 +120,10 @@ public class GamePauseManager : MonoBehaviour
         PauseDescriptionText.text = obj;
     }
 
-    private void SetupPauseModules()
+    protected override void OnDestroy()
     {
-        pauseModuleButtons = new Button[pauseModules.Length];
-        for (int i = 0; i < pauseModules.Length; i++)
-        {
-            int index = i;
-            pauseModuleButtons[index] = Instantiate(PauseModuleButtonPrefab, pauseModuleButtonRectTransform, false);
-            pauseModuleButtons[index].GetComponentInChildren<TMP_Text>().text = pauseModules[index].ModuleName; // this will be fine, we do it once only!
-            pauseModuleButtons[index].onClick.AddListener(() => OnPauseModuleButtonClicked(index));
-        }
+        base.OnDestroy();
 
-        OnPauseModuleButtonClicked(0); // by default set the first module to be active first
-    }
-
-    private void OnPauseModuleButtonClicked(int index)
-    {
-        for (int i = 0; i < pauseModules.Length; i++)
-        {
-            pauseModules[i].DeactiviateModule(); // remove all listeners, since it could be stale.
-
-            if (i == index)
-            {
-                pauseModules[index].InitializeModule();
-                pauseModuleButtons[i].image.color = Color.yellow;
-            }
-            else
-            {
-                pauseModuleButtons[i].image.color = Color.white;
-            }
-        }
-    }
-    private void OnDestroy()
-    {
         RemoveListeners();
 
         GameManager.GameInstance.InputActions.Gameplay.EscapeMenuInput.performed -= EscapeMenuInput_performed;
@@ -204,7 +165,7 @@ public class GamePauseManager : MonoBehaviour
         gameManager.PauseCanvas.gameObject.SetActive(true);
 
         AddListeners();
-        OnPauseModuleButtonClicked(0); // force it back to first module
+        SwitchActiveDataModuleAtIndex(0); // force it back to first module
         gameManager.InvokeGamePauseMenuEnable();
         GameVirtualCursor.GameVirtualCursorInstance.ShowVirtualMouse();
     }

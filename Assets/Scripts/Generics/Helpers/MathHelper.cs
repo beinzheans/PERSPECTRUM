@@ -991,5 +991,4 @@ public static class MathHelper
 
         return maxIndex;
     }
-
 }

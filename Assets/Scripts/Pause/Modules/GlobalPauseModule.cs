@@ -1,4 +1,4 @@
-public class GlobalPauseModule : BasePauseModule
+public class GlobalPauseModule : BaseDataModule
 {
     private const int k_OFFSETGROUPINDEX = 0;
     private const int k_PREDICTIVEHITSOUNDGROUPINDEX = 1;
@@ -13,15 +13,15 @@ public class GlobalPauseModule : BasePauseModule
 
     protected override void OnModuleInitialized()
     {
-        pauseMenuGroups[k_OFFSETGROUPINDEX].SetGroupAction_InputField((x) =>
+        moduleDataGroups[k_OFFSETGROUPINDEX].SetGroupAction_InputField((x) =>
         {
             if (double.TryParse(x, out double ms))
             {
-                GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.AudioOffsetMs, ms);
+                GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.AudioOffsetMs, ms);
             }
         }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs.ToString("F2"));
 
-        pauseMenuGroups[k_OFFSETGROUPINDEX].SetGroupAction_Button(() =>
+        moduleDataGroups[k_OFFSETGROUPINDEX].SetGroupAction_Button(() =>
         {
             ConfirmAction action = new ConfirmAction(() =>
             {
@@ -36,27 +36,27 @@ public class GlobalPauseModule : BasePauseModule
             GameManager.GameInstance.InvokeConfirmActionNeeded(action);
         });
 
-        pauseMenuGroups[k_PREDICTIVEHITSOUNDGROUPINDEX].SetGroupAction_Toggle((x) =>
+        moduleDataGroups[k_PREDICTIVEHITSOUNDGROUPINDEX].SetGroupAction_Toggle((x) =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, x);
         }, GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds);
 
-        pauseMenuGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
+        moduleDataGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
 
-        pauseMenuGroups[k_SONGVOLUMEGROUPINDEX].SetGroupAction_Slider((x) =>
+        moduleDataGroups[k_SONGVOLUMEGROUPINDEX].SetGroupAction_Slider((x) =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.SongVolume, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.SongVolume, x);
         }, GameManager.GameInstance.GlobalSettings.SongVolume);
 
 
-        pauseMenuGroups[k_HITSOUNDVOLUMEGROUPINDEX].SetGroupAction_Slider((x) =>
+        moduleDataGroups[k_HITSOUNDVOLUMEGROUPINDEX].SetGroupAction_Slider((x) =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.HitsoundVolume, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.HitsoundVolume, x);
         }, GameManager.GameInstance.GlobalSettings.HitsoundVolume);
 
-        pauseMenuGroups[k_UIVOLUMEGROUPINDEX].SetGroupAction_Slider(x =>
+        moduleDataGroups[k_UIVOLUMEGROUPINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.UIVolume, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.UIVolume, x);
         }, GameManager.GameInstance.GlobalSettings.UIVolume);
     }
 }

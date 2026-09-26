@@ -1,4 +1,4 @@
-public class EditorPauseModule : BasePauseModule
+public class EditorPauseModule : BaseDataModule
 {
     private const int k_LOOKAHEADTIMEINDEX = 0;
     private const int k_SHIFTSCROLLTIMEINTERVAL = 1;
@@ -10,7 +10,7 @@ public class EditorPauseModule : BasePauseModule
 
     protected override void OnModuleInitialized()
     {
-        pauseMenuGroups[k_LOOKAHEADTIMEINDEX].SetGroupAction_InputField(x =>
+        moduleDataGroups[k_LOOKAHEADTIMEINDEX].SetGroupAction_InputField(x =>
         {
             bool parseResult = double.TryParse(x, out double time);
             if (!parseResult)
@@ -23,10 +23,10 @@ public class EditorPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime, time);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime, time);
         }, GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime.ToString("F2"));
 
-        pauseMenuGroups[k_SHIFTSCROLLTIMEINTERVAL].SetGroupAction_InputField(x =>
+        moduleDataGroups[k_SHIFTSCROLLTIMEINTERVAL].SetGroupAction_InputField(x =>
         {
             bool parseResult = double.TryParse(x, out double time);
             if (!parseResult)
@@ -39,7 +39,7 @@ public class EditorPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.EditorSettings.BigScrollTimeInterval, time);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.EditorSettings.BigScrollTimeInterval, time);
         }, GameManager.GameInstance.GlobalSettings.EditorSettings.BigScrollTimeInterval.ToString("F2"));
 
     }

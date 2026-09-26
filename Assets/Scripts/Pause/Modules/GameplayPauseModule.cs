@@ -1,4 +1,4 @@
-public class GameplayPauseModule : BasePauseModule
+public class GameplayPauseModule : BaseDataModule
 {
     private const int k_GAMESCROLLSPEEDGROUPINDEX = 0;
     private const int k_LOOKAHEADGROUPINDEX = 1;
@@ -13,7 +13,7 @@ public class GameplayPauseModule : BasePauseModule
 
     protected override void OnModuleInitialized()
     {
-        pauseMenuGroups[k_GAMESCROLLSPEEDGROUPINDEX].SetGroupAction_InputField(x =>
+        moduleDataGroups[k_GAMESCROLLSPEEDGROUPINDEX].SetGroupAction_InputField(x =>
         {
             bool parseResult = double.TryParse(x, out double speed);
             if (!parseResult)
@@ -26,10 +26,10 @@ public class GameplayPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed, speed);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed, speed);
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed.ToString("F2"));
 
-        pauseMenuGroups[k_LOOKAHEADGROUPINDEX].SetGroupAction_InputField(x =>
+        moduleDataGroups[k_LOOKAHEADGROUPINDEX].SetGroupAction_InputField(x =>
         {
             bool parseResult = double.TryParse(x, out double time);
             if (!parseResult)
@@ -42,34 +42,34 @@ public class GameplayPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime, time);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime, time);
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime.ToString("F2"));
 
-        pauseMenuGroups[k_BACKGROUNDENABLEINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground, x),
+        moduleDataGroups[k_BACKGROUNDENABLEINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground, x),
             GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground);
 
-        pauseMenuGroups[k_BACKGROUNDBLURINDEX].SetGroupAction_Slider(x =>
+        moduleDataGroups[k_BACKGROUNDBLURINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount, x);
-            pauseMenuGroups[k_BACKGROUNDBLURINDEX].SetGroupDisplayText(x.ToString("F2"));
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount, x);
+            moduleDataGroups[k_BACKGROUNDBLURINDEX].SetGroupDisplayText(x.ToString("F2"));
         }, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount);
 
-        pauseMenuGroups[k_BACKGROUNDBLURINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount.ToString("F2"));
+        moduleDataGroups[k_BACKGROUNDBLURINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount.ToString("F2"));
 
-        pauseMenuGroups[k_BACKGROUNDDARKENINDEX].SetGroupAction_Slider(x =>
+        moduleDataGroups[k_BACKGROUNDDARKENINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount, x);
-            pauseMenuGroups[k_BACKGROUNDDARKENINDEX].SetGroupDisplayText(x.ToString("F2"));
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount, x);
+            moduleDataGroups[k_BACKGROUNDDARKENINDEX].SetGroupDisplayText(x.ToString("F2"));
         }, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
 
-        pauseMenuGroups[k_BACKGROUNDDARKENINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount.ToString("F2"));
+        moduleDataGroups[k_BACKGROUNDDARKENINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount.ToString("F2"));
 
-        pauseMenuGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupAction_Slider(x =>
+        moduleDataGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength, x);
-            pauseMenuGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupDisplayText(x.ToString("F2"));
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength, x);
+            moduleDataGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupDisplayText(x.ToString("F2"));
         }, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
 
-        pauseMenuGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength.ToString("F2"));
+        moduleDataGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupDisplayText(GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength.ToString("F2"));
     }
 }

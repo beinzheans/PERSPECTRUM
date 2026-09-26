@@ -3,7 +3,7 @@ using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 
-public class GraphicsPauseModule : BasePauseModule
+public class GraphicsPauseModule : BaseDataModule
 {
     // todo: make this access URP, change:
     // resolution
@@ -29,19 +29,19 @@ public class GraphicsPauseModule : BasePauseModule
     {
         allPossibleResolutions = GetAllScreenResolutions();
 
-        pauseMenuGroups[k_RESOLUTIONINDEX].SetGroupAction_Dropdown(GetStringRepresentationOfScreenResolution(allPossibleResolutions),
+        moduleDataGroups[k_RESOLUTIONINDEX].SetGroupAction_Dropdown(GetStringRepresentationOfScreenResolution(allPossibleResolutions),
             x =>
             {
-                GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.CurrentResolution, allPossibleResolutions[x]);
+                GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.CurrentResolution, allPossibleResolutions[x]);
             },
             GetStringRepresentationOfCurrentScreenResolution());
 
-        pauseMenuGroups[k_FULLSCREENINDEX].SetGroupAction_Toggle(x =>
+        moduleDataGroups[k_FULLSCREENINDEX].SetGroupAction_Toggle(x =>
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseFullScreen, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseFullScreen, x);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseFullScreen);
 
-        pauseMenuGroups[k_ANTIALIASINGINDEX].SetGroupAction_Dropdown(x =>
+        moduleDataGroups[k_ANTIALIASINGINDEX].SetGroupAction_Dropdown(x =>
         {
             AntiAliasingMSAA antiAliasing;
             switch (x)
@@ -63,19 +63,19 @@ public class GraphicsPauseModule : BasePauseModule
                     break;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.AntiAliasingMSAA, antiAliasing);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.AntiAliasingMSAA, antiAliasing);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.AntiAliasingMSAA);
 
-        pauseMenuGroups[k_RENDERSCALEINDEX].SetGroupAction_Slider(x =>
+        moduleDataGroups[k_RENDERSCALEINDEX].SetGroupAction_Slider(x =>
         {
             float value = math.remap(0f, 1f, 0.5f, 1f, x);
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale, value);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale, value);
         }, math.remap(0.5f, 1f, 0f, 1f, GameManager.GameInstance.GlobalSettings.GraphicSettings.RenderScale));
 
-        pauseMenuGroups[k_VSYNCINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync, x), GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync);
+        moduleDataGroups[k_VSYNCINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync, x), GameManager.GameInstance.GlobalSettings.GraphicSettings.IsUseVsync);
 
-        pauseMenuGroups[k_FRAMELIMITINDEX].SetGroupAction_InputField(x =>
+        moduleDataGroups[k_FRAMELIMITINDEX].SetGroupAction_InputField(x =>
         {
             bool parseResult = int.TryParse(x, out int result);
 
@@ -84,7 +84,7 @@ public class GraphicsPauseModule : BasePauseModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit, result);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit, result);
         }, GameManager.GameInstance.GlobalSettings.GraphicSettings.FrameRateLimit.ToString());
     }
     private List<Vector2Int> GetAllScreenResolutions()

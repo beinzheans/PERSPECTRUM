@@ -28,9 +28,8 @@ public class ChartChooseManager : MonoBehaviour
     public event Action<ChartSortOrder> OnSortOrderChanged;
 
     public int CurrentSelectChartContentID { get; private set; }
-
-    public event Func<GameplayModifications> OnRequestGameplayModifications;
-
+    public static readonly GameplayModifications k_DEFAULTGAMEPLAYMODIFICATIONS = new GameplayModifications(1d, 0d);
+    public GameplayModifications CurrentChartChooseModifcations { get; private set; } = k_DEFAULTGAMEPLAYMODIFICATIONS;
     private void Awake()
     {
         ChartChooseInstance = this;
@@ -254,16 +253,7 @@ public class ChartChooseManager : MonoBehaviour
             return;
         }
 
-        GameplayModifications? gameplayModifications = OnRequestGameplayModifications?.Invoke();
-
-        if (gameplayModifications == null)
-        {
-            GameManager.GameInstance.RequestPlayChartEvent(contents.AssociatedFullFilePath, ChartChooseModifications.k_DEFAULTGAMEPLAYMODIFICATIONS);
-        }
-        else
-        {
-            GameManager.GameInstance.RequestPlayChartEvent(contents.AssociatedFullFilePath, (GameplayModifications)gameplayModifications);
-        }
+        GameManager.GameInstance.RequestPlayChartEvent(contents.AssociatedFullFilePath, CurrentChartChooseModifcations);
     }
 
     public void RequestReplayChart(GameplayStatisticRecord record)

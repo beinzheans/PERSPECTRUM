@@ -39,7 +39,7 @@ public class VisualHitboxRenderBehavior : GameplayObjectRenderBehavior<VisualHit
         Vector2 screenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.NormalizedPosition, GameplayManager.GameplayInstance.GameplayRectTransform);
 
         Vector3 spawnPoint = GameplayManager.GameplayInstance.GameplayCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, GameplayManager.k_HITPLANEDEPTH));
-        float zTimeDisplacement = (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+        float zTimeDisplacement = (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameplayManager.GameplayInstance.EffectiveGameplaySpeed);
 
         Vector2 screenSize = MathHelper.GetPixelSizeOfNormalizedSizeVector(AssociatedGameplayObject.NormalizedSize * Vector2.one, GameplayManager.GameplayInstance.GameplayRectTransform);
         Vector3 worldSize = screenSize * GameplayManager.GameplayInstance.WorldToScreenSizeRatioOfPreview * GameManager.aspectRatioConversionScale;

@@ -1,42 +1,44 @@
+using System;
 using UnityEngine;
 
 /// <summary>
-/// A class to represent the base module of the pause section. <br></br>
-/// Each module will define what settings can be changed.
+/// A class to represent the base module of a <see cref="BaseUIPopupContent"/>. <br></br>
+/// Each module will define what settings can be changed, defined by <see cref="BaseModuleData"/>.
 /// </summary>
-public abstract class BasePauseModule : MonoBehaviour
+public abstract class BaseDataModule : MonoBehaviour
 {
     /// <summary>
-    /// An array storing the data for this pause module. Note the ordering matters.
+    /// An array storing the data for this data module. Note the ordering matters.
     /// </summary>
-    [SerializeField] protected PauseMenuGroupData[] pauseMenuGroupInfo = new PauseMenuGroupData[0];
+    [SerializeField] protected BaseModuleData[] moduleDataGroupInfo = new BaseModuleData[0];
     [SerializeField] protected string moduleName;
     public string ModuleName { get => moduleName; }
     /// <summary>
     /// The prefab that defines the group of this module.
     /// </summary>
-    [SerializeField] private PauseMenuGroupObject pauseMenuGroupPrefab;
+    [SerializeField] private ModuleDataGroupObject moduleDataGroupPrefab;
 
     /// <summary>
     /// The transform where the group will be displayed.
     /// </summary>
     [SerializeField] private RectTransform groupContentRectTransform;
-    protected PauseMenuGroupObject[] pauseMenuGroups;
+    protected ModuleDataGroupObject[] moduleDataGroups;
 
     private bool isModuleActive;
+
     private void Awake()
     {
-        InstantiatePauseGroups();
+        InstantiateDataGroups();
         OnModuleAwake();
     }
-    private void InstantiatePauseGroups()
+    private void InstantiateDataGroups()
     {
-        pauseMenuGroups = new PauseMenuGroupObject[pauseMenuGroupInfo.Length];
-        for (int i = 0; i < pauseMenuGroupInfo.Length; i++)
+        moduleDataGroups = new ModuleDataGroupObject[moduleDataGroupInfo.Length];
+        for (int i = 0; i < moduleDataGroupInfo.Length; i++)
         {
-            pauseMenuGroups[i] = Instantiate(pauseMenuGroupPrefab, groupContentRectTransform, false);
-            pauseMenuGroups[i].SetGroupData(pauseMenuGroupInfo[i]);
-            pauseMenuGroups[i].gameObject.SetActive(false);
+            moduleDataGroups[i] = Instantiate(moduleDataGroupPrefab, groupContentRectTransform, false);
+            moduleDataGroups[i].SetGroupData(moduleDataGroupInfo[i]);
+            moduleDataGroups[i].gameObject.SetActive(false);
         }
     }
 
@@ -52,9 +54,9 @@ public abstract class BasePauseModule : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < pauseMenuGroupInfo.Length; i++)
+        for (int i = 0; i < moduleDataGroupInfo.Length; i++)
         {
-            pauseMenuGroups[i].gameObject.SetActive(true);
+            moduleDataGroups[i].gameObject.SetActive(true);
         }
 
         isModuleActive = true;
@@ -73,10 +75,10 @@ public abstract class BasePauseModule : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < pauseMenuGroupInfo.Length; i++)
+        for (int i = 0; i < moduleDataGroupInfo.Length; i++)
         {
-            pauseMenuGroups[i].RemoveAllListeners();
-            pauseMenuGroups[i].gameObject.SetActive(false);
+            moduleDataGroups[i].RemoveAllListeners();
+            moduleDataGroups[i].gameObject.SetActive(false);
         }
 
         isModuleActive = false;

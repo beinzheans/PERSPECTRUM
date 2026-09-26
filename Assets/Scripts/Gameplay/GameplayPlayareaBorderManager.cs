@@ -44,7 +44,7 @@ public class GameplayPlayareaBorderManager : MonoBehaviour
     private void SetPlayareaBorderPositions()
     {
         playareaBorderMeshFilter_Front.transform.localPosition = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH);
-        playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
+        playareaBorderMeshFilter_earlyHitPlane.transform.localPosition = new Vector3(0f, 0f, (float)(GameplayManager.k_HITPLANEDEPTH + GameplayManager.k_EARLYTIMEFRAME * gameplayManager.EffectiveGameplaySpeed));
         playareaBorderMeshFilter_Back.transform.localPosition = new Vector3(0f, 0f, gameplayManager.GameplayFarClipPlane);
     }
 

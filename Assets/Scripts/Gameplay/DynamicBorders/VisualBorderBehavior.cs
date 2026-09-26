@@ -36,7 +36,7 @@ public class VisualBorderBehavior : GameplayObjectRenderBehavior<VisualBorderObj
 
     private void SetPosition()
     {
-        Vector3 zTimeDisplacement = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH + (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed));
+        Vector3 zTimeDisplacement = new Vector3(0f, 0f, GameplayManager.k_HITPLANEDEPTH + (float)((AssociatedGameplayObject.RenderTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameplayManager.GameplayInstance.EffectiveGameplaySpeed));
 
         transform.localScale = GameplayManager.GameplayInstance.CurrentPlayAreaBorderScale;
         transform.SetPositionAndRotation(GameplayManager.GameplayInstance.GameplayCamera.transform.position + zTimeDisplacement + GameplayManager.GameplayInstance.CurrentPlayAreaDisplacement, GameplayManager.GameplayInstance.CurrentPlayAreaRotation);

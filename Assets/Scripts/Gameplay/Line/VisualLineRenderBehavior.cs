@@ -20,8 +20,8 @@ public class VisualLineRenderBehavior : GameplayObjectRenderBehavior<VisualLine>
         Vector2 fromScreenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.InitialPosition, GameplayManager.GameplayInstance.GameplayRectTransform);
         Vector2 toScreenPoint = MathHelper.GetScreenPointFromNormalizedPointInsideReferenceUI(AssociatedGameplayObject.TerminalPosition, GameplayManager.GameplayInstance.GameplayRectTransform);
 
-        float fromZDisplacement = (float)((AssociatedGameplayObject.InitialTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
-        float toZDisplacement = (float)((AssociatedGameplayObject.TerminalTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed);
+        float fromZDisplacement = (float)((AssociatedGameplayObject.InitialTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameplayManager.GameplayInstance.EffectiveGameplaySpeed);
+        float toZDisplacement = (float)((AssociatedGameplayObject.TerminalTime - GameplayManager.GameplayInstance.CurrentGameplayTime) * GameplayManager.GameplayInstance.EffectiveGameplaySpeed);
 
         Vector3 fromWorldPoint = GameplayManager.GameplayInstance.GameplayCamera.ScreenToWorldPoint(new Vector3(fromScreenPoint.x, fromScreenPoint.y, GameplayManager.k_HITPLANEDEPTH)) + new Vector3(0f, 0f, fromZDisplacement);
         Vector3 toWorldPoint = GameplayManager.GameplayInstance.GameplayCamera.ScreenToWorldPoint(new Vector3(toScreenPoint.x, toScreenPoint.y, GameplayManager.k_HITPLANEDEPTH)) + new Vector3(0f, 0f, toZDisplacement);

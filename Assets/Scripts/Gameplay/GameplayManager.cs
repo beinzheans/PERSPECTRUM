@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -167,6 +168,8 @@ public class GameplayManager : MonoBehaviour
     public Vector3[] LocalBorderCorners { get; private set; } = new Vector3[4]; // 0 is bottom-left corner, increment clockwise
 
     public GameplayModifications CurrentGameplayModifications { get; private set; }
+
+    public double EffectiveGameplaySpeed { get; private set; }
     private void Start()
     {
         CreateGameplayReferencePoints();
@@ -178,8 +181,9 @@ public class GameplayManager : MonoBehaviour
 
     private void SetGameplayClippingPlanes()
     {
+        EffectiveGameplaySpeed = GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed / CurrentGameplayModifications.GameplaySpeed;
         gameplayCamera.nearClipPlane = k_HITPLANEDEPTH * k_NEARCLIPPLANESCALE;
-        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed * CurrentGameplayModifications.GameplaySpeed);
+        GameplayFarClipPlane = k_HITPLANEDEPTH + (float)(GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime * EffectiveGameplaySpeed);
         gameplayCamera.farClipPlane = GameplayFarClipPlane * k_FARCLIPPLANESCALE;
 
         RenderSettings.fogStartDistance = k_HITPLANEDEPTH;
@@ -333,7 +337,7 @@ public class GameplayManager : MonoBehaviour
             return;
         }
 
-        gameplayCamera.transform.Translate((float)(scaledDt * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed) * Vector3.forward);
+        gameplayCamera.transform.Translate((float)(dt * GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed) * Vector3.forward);
         OnGameplayTimeUpdated?.Invoke(CurrentGameplayTime);
     }
 
@@ -347,7 +351,7 @@ public class GameplayManager : MonoBehaviour
 
         if (!MathHelper.IsGameplayModificationsValid(CurrentGameplayModifications))
         {
-            CurrentGameplayModifications = ChartChooseModifications.k_DEFAULTGAMEPLAYMODIFICATIONS;
+            CurrentGameplayModifications = ChartChooseManager.k_DEFAULTGAMEPLAYMODIFICATIONS;
             Debug.LogWarning($"Gameplay modifications is invalid, setting to default");
             GameManager.GameInstance.InvokeInformationDisplayNeeded("Invalid Mods!", 1d);
         }
@@ -638,7 +642,7 @@ public class GameplayManager : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         if (MatchHitCount + MismatchHitCount + MissCount == MaxHitboxCount && CurrentPath == GameManager.GameInstance.k_TUTORIALFILEPATHSTRING)
         {
-            GameManager.GameInstance.GlobalSettings.EditSettings(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial, true);
+            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial, true);
         }
 
         OnGameplayEnded?.Invoke();
@@ -755,7 +759,7 @@ public enum GameplayResultRank
 // replays should also indicate that the gameplay was modified. Replays will also need to remember the gameplay modifications at that specific play as well!
 
 [Serializable]
-public struct GameplayModifications
+public class GameplayModifications : BaseEditableClass
 {
     public GameplayModifications(double gameplaySpeed, double gameplayStartTime)
     {
@@ -771,4 +775,9 @@ public struct GameplayModifications
     /// </summary>
     [DefaultValue(0d)]
     public double GameplayStartTime { get; private set; }
+
+    public override void OnEdit<TValue>(Expression<Func<TValue>> editAction, TValue newValue)
+    {
+        base.OnEdit(editAction, newValue);
+    }
 }

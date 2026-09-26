@@ -7,11 +7,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// A class to represent a group of the pause section within <see cref="BasePauseModule"/>.
+/// A class to interact with a given <see cref="BaseModuleData"/> within <see cref="BaseDataModule"/>. <br></br>
+/// By default, this module contains all possible combinations of <see cref="BaseModuleDataType"/>.
 /// </summary>
-public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class ModuleDataGroupObject : MonoBehaviour
 {
-    public PauseMenuGroupData PauseMenuGroupData { get; private set; }
+    public BaseModuleData ModuleData { get; private set; }
     private bool hasAssignedGroupData = false;
     [SerializeField] private TMP_Text groupLabel;
     [SerializeField] private TMP_InputField groupInputField;
@@ -27,11 +28,11 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
     [SerializeField] private Button groupButton;
 
     [SerializeField] private TMP_Text groupValueDisplay;
-    public void SetGroupData(PauseMenuGroupData groupData)
+    public void SetGroupData(BaseModuleData groupData)
     {
-        PauseMenuGroupData = groupData;
+        ModuleData = groupData;
         hasAssignedGroupData = true;
-        groupLabel.text = PauseMenuGroupData.GroupLabel;
+        groupLabel.text = ModuleData.GroupLabel;
 
         groupInputField.gameObject.SetActive(false);
         groupSlider.gameObject.SetActive(false);
@@ -49,7 +50,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
             return;
         }
 
-        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.INPUT_FIELD))
+        if (ModuleData.GroupType.HasFlag(BaseModuleDataType.INPUT_FIELD))
         {
             groupInputField.gameObject.SetActive(true);
             groupInputField.SetTextWithoutNotify(inputFieldValue);
@@ -69,7 +70,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
             return;
         }
 
-        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.SLIDER))
+        if (ModuleData.GroupType.HasFlag(BaseModuleDataType.SLIDER))
         {
             groupSlider.gameObject.SetActive(true);
             groupSlider.SetValueWithoutNotify(sliderValue);
@@ -85,7 +86,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
             return;
         }
 
-        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.TOGGLE_BUTTON))
+        if (ModuleData.GroupType.HasFlag(BaseModuleDataType.TOGGLE_BUTTON))
         {
             groupToggle.gameObject.SetActive(true);
             groupToggle.SetIsOnWithoutNotify(toggleValue);
@@ -108,7 +109,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
             return;
         }
 
-        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.DROP_DOWN))
+        if (ModuleData.GroupType.HasFlag(BaseModuleDataType.DROP_DOWN))
         {
             groupDropdown.ClearOptions();
             groupDropdown.gameObject.SetActive(true);
@@ -146,7 +147,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
             return;
         }
 
-        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.DROP_DOWN))
+        if (ModuleData.GroupType.HasFlag(BaseModuleDataType.DROP_DOWN))
         {
             groupDropdown.ClearOptions();
             groupDropdown.gameObject.SetActive(true);
@@ -174,7 +175,7 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
             return;
         }
 
-        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.CLICK_BUTTON))
+        if (ModuleData.GroupType.HasFlag(BaseModuleDataType.CLICK_BUTTON))
         {
             groupButton.gameObject.SetActive(true);
             groupButton.onClick.AddListener(() => groupButtonAction?.Invoke());
@@ -189,29 +190,12 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
             return;
         }
 
-        if (PauseMenuGroupData.GroupType.HasFlag(PauseMenuGroupType.TEXT_DISPLAY))
+        if (ModuleData.GroupType.HasFlag(BaseModuleDataType.TEXT_DISPLAY))
         {
             groupValueDisplay.gameObject.SetActive(true);
             groupValueDisplay.text = displayText;
         }
 
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (!string.IsNullOrWhiteSpace(PauseMenuGroupData.GroupDescription))
-        {
-            GameManager.GameInstance.InvokeGamePauseDescriptionChanged(PauseMenuGroupData.GroupDescription);
-        }
-        else
-        {
-            GameManager.GameInstance.InvokeGamePauseDescriptionChanged(GamePauseManager.k_PAUSEMENUNODESCRIPTIONPROVIDED);
-        }
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        GameManager.GameInstance.InvokeGamePauseDescriptionChanged(GamePauseManager.k_PAUSEMENUDEFAULTDESCRIPTION);
     }
 
     public void RemoveAllListeners()
@@ -223,18 +207,18 @@ public class PauseMenuGroupObject : MonoBehaviour, IPointerEnterHandler, IPointe
     }
 }
 /// <summary>
-/// A struct to represent the data of a group of the pause section within <see cref="BasePauseModule"/>.
+/// A struct to represent the data of a group of data within <see cref="BaseDataModule"/>.
 /// </summary>
 
 [Serializable]
-public struct PauseMenuGroupData : IEquatable<PauseMenuGroupData>
+public struct BaseModuleData : IEquatable<BaseModuleData>
 {
     [SerializeField] private string groupLabel;
 
     public string GroupLabel { get => groupLabel; }
 
-    [SerializeField] private PauseMenuGroupType groupType;
-    public PauseMenuGroupType GroupType { get => groupType; }
+    [SerializeField] private BaseModuleDataType groupType;
+    public BaseModuleDataType GroupType { get => groupType; }
 
     [TextArea]
     [SerializeField] private string groupDescription;
@@ -243,10 +227,10 @@ public struct PauseMenuGroupData : IEquatable<PauseMenuGroupData>
 
     public override bool Equals(object obj)
     {
-        return obj is PauseMenuGroupData data && Equals(data);
+        return obj is BaseModuleData data && Equals(data);
     }
 
-    public bool Equals(PauseMenuGroupData other)
+    public bool Equals(BaseModuleData other)
     {
         return GroupLabel == other.GroupLabel &&
                GroupType == other.GroupType &&
@@ -260,10 +244,10 @@ public struct PauseMenuGroupData : IEquatable<PauseMenuGroupData>
 }
 
 /// <summary>
-/// An enum (flag) to represent what kind of type <see cref="PauseMenuGroupData"/> is.
+/// An enum (flag) to represent what kind of type <see cref="BaseModuleData"/> is.
 /// </summary>
 [Flags]
-public enum PauseMenuGroupType
+public enum BaseModuleDataType
 {
     NONE = 0,
     /// <summary>
