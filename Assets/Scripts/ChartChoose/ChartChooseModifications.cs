@@ -7,4 +7,11 @@ using UnityEngine;
 public class ChartChooseModifications : UICollapsablePanel
 {
     private GameplayModifications currentGameplayModifications;
+
+    protected override void Start()
+    {
+        base.Start();
+
+
+    }
 }

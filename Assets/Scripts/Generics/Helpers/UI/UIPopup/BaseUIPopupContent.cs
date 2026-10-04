@@ -41,11 +41,12 @@ public class BaseUIPopupContent : MonoBehaviour
             return;
         }
 
+        spawnedDataModuleButtons = new Button[dataModules.Length];
+
         switch (popupType)
         {
             case UIPopupType.DISPLAY_MODULE_NAME:
             default:
-                spawnedDataModuleButtons = new Button[dataModules.Length];
                 for (int i = 0; i < dataModules.Length; i++)
                 {
                     int index = i;
@@ -102,6 +103,11 @@ public class BaseUIPopupContent : MonoBehaviour
             dataModules[i].DeactiviateModule();
 
             if (popupType == UIPopupType.DO_NOT_DISPLAY_MODULES)
+            {
+                continue;
+            }
+
+            if (spawnedDataModuleButtons == null)
             {
                 continue;
             }

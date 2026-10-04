@@ -64,7 +64,7 @@ public class EditorHitboxToolManager : EditorToolManager
                     continue;
                 }
 
-                hitbox.OnEdit<EditorHitbox, HitboxType>(x => x.HitboxType, hitboxType);
+                hitbox.OnEdit(x => x.HitboxType, hitboxType);
             }
         };
 
@@ -78,7 +78,7 @@ public class EditorHitboxToolManager : EditorToolManager
                     continue;
                 }
 
-                hitbox.OnEdit<EditorHitbox, HitboxType>(x => x.HitboxType, originalTypes[index]);
+                hitbox.OnEdit(x => x.HitboxType, originalTypes[index]);
                 index++;
             }
         };

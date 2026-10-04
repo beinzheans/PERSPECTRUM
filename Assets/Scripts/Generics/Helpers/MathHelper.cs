@@ -1,9 +1,12 @@
+using Newtonsoft.Json.Linq;
 using Steamworks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Unity.Mathematics;
 using UnityEngine;
@@ -990,5 +993,50 @@ public static class MathHelper
         }
 
         return maxIndex;
+    }
+
+
+    public static void OnEdit<T, TValue>(this T editable, Expression<Func<T, TValue>> editAction, TValue newValue) where T : IEditable
+    {
+        if (editAction.Body is not MemberExpression expression)
+        {
+            return;
+        }
+
+        if (expression.Member is not PropertyInfo property)
+        {
+            return;
+        }
+
+        Expression<Func<T, object>> lambda = Expression.Lambda<Func<T, object>>(Expression.Convert(expression.Expression, typeof(object)), editAction.Parameters);
+        object targetInstance = lambda.Compile()(editable);
+
+        property.SetValue(targetInstance, newValue);
+        editable.OnEditCallback();
+    }
+
+    public static void OnEdit_Struct<T, TValue>(this ref T editable, Expression<Func<T, TValue>> editAction, TValue newValue) where T : struct, IEditable
+    {
+        if (editAction.Body is not MemberExpression expression)
+        {
+            return;
+        }
+
+        if (expression.Member is not PropertyInfo property)
+        {
+            return;
+        }
+
+        Expression<Func<T, object>> lambda = Expression.Lambda<Func<T, object>>(Expression.Convert(expression.Expression, typeof(object)), editAction.Parameters);
+        object targetInstance = lambda.Compile()(editable);
+        property.SetValue(targetInstance, newValue);
+
+        if (targetInstance is not T)
+        {
+            return;
+        }
+
+        editable = (T)targetInstance;
+        editable.OnEditCallback();
     }
 }

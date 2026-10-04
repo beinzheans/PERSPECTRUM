@@ -73,22 +73,6 @@ public class EditorDynamicObject : EditorObject, IPlaceDeleteable, IEditable
         return;
     }
 
-    public void OnEdit<TClass, TValue>(Expression<Func<TClass, TValue>> editAction, TValue newValue)
-    {
-        if (editAction.Body is not MemberExpression expression)
-        {
-            return;
-        }
-
-        if (expression.Member is not PropertyInfo property)
-        {
-            return;
-        }
-
-        property.SetValue(this, newValue);
-        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
-    }
-
     /// <summary>
     /// Gets the position of the editor object if possible. Returns false if can not define what a position means for this object.
     /// </summary>
@@ -98,5 +82,10 @@ public class EditorDynamicObject : EditorObject, IPlaceDeleteable, IEditable
     {
         position = Vector2.zero;
         return false;
+    }
+
+    public void OnEditCallback()
+    {
+        EditorManager.EditorInstance.InvokeEditEditableEvent(this);
     }
 }

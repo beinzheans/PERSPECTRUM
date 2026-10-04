@@ -381,9 +381,9 @@ RectTransform:
   m_Father: {fileID: 8822686966467099601}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -17, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1705138437330907744
 CanvasRenderer:
@@ -589,7 +589,7 @@ RectTransform:
   m_Father: {fileID: 7807557097751709609}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 19.999992}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -1195,6 +1195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d46d15c49235eb94ab24e126db048733, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UIParticleSystem: {fileID: 0}
 --- !u!1 &3164218851303134886
 GameObject:
   m_ObjectHideFlags: 0
@@ -2839,17 +2840,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a614bda2086066e49a730093e7b01192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseModules:
+  dataModules:
   - {fileID: 7595476794094567935}
-  - {fileID: 3350255572044207881}
   - {fileID: 4681279834613601856}
+  - {fileID: 3350255572044207881}
   - {fileID: 3025693897579689320}
   - {fileID: 7574112646392885113}
-  PauseModuleButtonPrefab: {fileID: 6477961016243264160, guid: 4eef9e8d46060d9449d643da2cc574f7, type: 3}
+  dataModuleButtonPrefab: {fileID: 6477961016243264160, guid: 4eef9e8d46060d9449d643da2cc574f7, type: 3}
+  dataModuleButtonRectTransform: {fileID: 6172055659042515810}
+  popupType: 0
   ReturnMainMenuButton: {fileID: 8564770790731057655}
   ContinueGameButton: {fileID: 1200345312564892106}
   PauseDescriptionText: {fileID: 8368447577341498153}
-  pauseModuleButtonRectTransform: {fileID: 6172055659042515810}
 --- !u!114 &7595476794094567935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2862,16 +2864,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bef162da1c80b3b408e5f3fc01ccb767, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseMenuGroupInfo:
+  moduleDataGroupInfo:
   - groupLabel: Audio Offset (ms)
     groupType: 17
     groupDescription: 'Adjusts the offset for better synchronisation.
 
       To calibrate,
       enter the offset calibration screen by pressing the button.'
-  - groupLabel: Use Prescheduled Hitsounds
+  - groupLabel: Prescheduled Hitsounds
     groupType: 4
-    groupDescription: 'Whether or not prescheduled hitsounds are used. This will
+    groupDescription: 'Whether or not prescheduled hitsounds are used.  This will
       play hitsounds as if you are playing perfectly.
 
       Turn this setting on
@@ -2881,8 +2883,7 @@ MonoBehaviour:
     groupDescription: 'Shows the FPS of the game in the bottom-right corner.
 
       You
-      can hover over the FPS counter to hide it temporarily (Only works outside of
-      pause menu).'
+      can hover over the FPS counter to hide it temporarily'
   - groupLabel: Song Volume
     groupType: 2
     groupDescription: 
@@ -2893,7 +2894,7 @@ MonoBehaviour:
     groupType: 2
     groupDescription: 
   moduleName: Global
-  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  moduleDataGroupPrefab: {fileID: 1616349473694892464, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
 --- !u!114 &4681279834613601856
 MonoBehaviour:
@@ -2907,37 +2908,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc0f448bf7d75e34cad29b7fd1429e0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseMenuGroupInfo:
+  moduleDataGroupInfo:
   - groupLabel: Approach Speed
     groupType: 1
-    groupDescription: 'Controls the speed at which notes approach.
-
-      Increase
-      speed if notes are too dense but at the cost of making notes harder to track.'
+    groupDescription: "Controls the speed at which notes approach. \nIncrease speed
+      if notes are too dense, at the cost of making notes harder to track."
   - groupLabel: Lookahead Time
     groupType: 1
-    groupDescription: 'Controls how far in time we lookahead for notes to be visible.
-
-      Set
-      this to a comfortable value, where you have enough time to react without cluttering
-      the screen.
-
-
-'
-  - groupLabel: Use Custom Backgrounds
+    groupDescription: "Controls how far in time for notes to be visible. \nSet this
+      to a comfortable value, where you have enough time to react without cluttering
+      the screen."
+  - groupLabel: Custom Backgrounds
     groupType: 4
-    groupDescription: Whether or not custom backgrounds are enabled.
+    groupDescription: 
   - groupLabel: Background Blur
-    groupType: 34
-    groupDescription: How much the background is blurred.
+    groupType: 2
+    groupDescription: 
   - groupLabel: Background Darken
-    groupType: 34
-    groupDescription: How much to darken the background.
+    groupType: 2
+    groupDescription: 
   - groupLabel: Background Pulse Strength
-    groupType: 34
-    groupDescription: How strong the background pulses are.
+    groupType: 2
+    groupDescription: 'Controls the brightness of background pulses.
+
+      Set this
+      to a value where it is comfortable, especially for those with epilesy.'
   moduleName: Gameplay
-  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  moduleDataGroupPrefab: {fileID: 1616349473694892464, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
 --- !u!114 &3025693897579689320
 MonoBehaviour:
@@ -2951,15 +2948,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e20fec6008dcf13408109c8b25958db8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseMenuGroupInfo:
+  moduleDataGroupInfo:
   - groupLabel: Lookahead Time
     groupType: 1
     groupDescription: Controls how far in time the Editor will preview notes.
-  - groupLabel: Editor Shift-Scroll Interval
+  - groupLabel: Shift-scroll Interval
     groupType: 1
-    groupDescription: How much the Editor scrolls when Shift-Scroll is performed.
+    groupDescription: Controls the amount the time the Editor will scroll for when
+      shift-scroll is performed.
   moduleName: Editor
-  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  moduleDataGroupPrefab: {fileID: 1616349473694892464, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
 --- !u!114 &7574112646392885113
 MonoBehaviour:
@@ -2973,7 +2971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b89dbc796af2b654895808f014f273b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseMenuGroupInfo:
+  moduleDataGroupInfo:
   - groupLabel: Resolution
     groupType: 8
     groupDescription: Changes the resolution of the game. Note that the gameplay
@@ -2981,18 +2979,18 @@ MonoBehaviour:
   - groupLabel: Fullscreen Mode
     groupType: 4
     groupDescription: 
-  - groupLabel: MSAA (Anti-Aliasing) Samples
+  - groupLabel: MSAA Samples (Anti-aliasing)
     groupType: 8
     groupDescription: How many samples MSAA will use for anti-aliasing. Use this
-      to smooth out jagged lines at the cost of performance.
+      to smooth out jagged lines at the cost of performance
   - groupLabel: Render Scale
     groupType: 2
-    groupDescription: How much the current resolution is scaled up for rendering.
-      Set this to a lower value for a lower render resolution for better performance.
+    groupDescription: How many samples MSAA will use for anti-aliasing. Use this
+      to smooth out jagged lines at the cost of performance
   - groupLabel: VSync
     groupType: 4
     groupDescription: Whether or not VSync (Vertical Sync) is used. This will limit
-      the game to run at the monitor's refresh rate.
+      the game to run at the monitor's refresh rate
   - groupLabel: Frame Limit
     groupType: 1
     groupDescription: 'A custom framerate limit.
@@ -3003,7 +3001,7 @@ MonoBehaviour:
       Set
       this to zero (or negative integer) for no custom limit.'
   moduleName: Graphics
-  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  moduleDataGroupPrefab: {fileID: 1616349473694892464, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
 --- !u!114 &3350255572044207881
 MonoBehaviour:
@@ -3017,7 +3015,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d40f5958c29c1cc4c81579f9870e5e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseMenuGroupInfo:
+  moduleDataGroupInfo:
   - groupLabel: Cursor Move Method
     groupType: 8
     groupDescription: 'Controls the method used to move the game cursor.
@@ -3026,15 +3024,17 @@ MonoBehaviour:
       moves the game cursor by the raw input of your device.
 
       Absolute moves
-      the game cursor to the position of your device.'
+      the game cursor to the position of your device.
+
+      Use Absolute mode for
+      touchscreen inputs.'
   - groupLabel: Cursor Sensitivity Scale
     groupType: 34
     groupDescription: 'Adjusts the game cursor sensitivity by scaling. This has no
       effect when Cursor Move Method is set to Absolute.
 
       Note using fullscreen
-      on a non-native resolution will require different sensitivity. To fix, use
-      Windowed mode.'
+      on a non-native resolution may change sensitivity.'
   - groupLabel: Invert X
     groupType: 4
     groupDescription: 'Inverts the cursor movement on the X-axis (left and right).
@@ -3043,21 +3043,19 @@ MonoBehaviour:
       has no effect if Cursor Move Method is set to Absolute.'
   - groupLabel: Invert Y
     groupType: 4
-    groupDescription: 'Inverts the cursor movement on the Y-axis (up and down).
-
-      This
-      has no effect if Cursor Move Method is set to Absolute.'
+    groupDescription: "Inverts the cursor movement on the Y-axis (up and down). \nThis
+      has no effect if Cursor Move Method is set to Absolute."
   - groupLabel: Rebind Red Key
     groupType: 48
-    groupDescription: Set the current keybind to become Red (Hitbox Type A).
+    groupDescription: Set the current keybind to become Red (Hitbox Type A)
   - groupLabel: Rebind Blue Key
     groupType: 48
-    groupDescription: Set the current keybind to become Blue (Hitbox Type B).
+    groupDescription: Set the current keybind to become Blue (Hitbox Type B)
   - groupLabel: Rebind Restart Key
     groupType: 48
     groupDescription: Set the current keybind to restart during gameplay.
   moduleName: Controls
-  pauseMenuGroupPrefab: {fileID: 7675434567367093276, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
+  moduleDataGroupPrefab: {fileID: 1616349473694892464, guid: 13e7f516926cf794eb86a93239b53e65, type: 3}
   groupContentRectTransform: {fileID: 2617089836302549600}
 --- !u!1 &5638263883382110480
 GameObject:

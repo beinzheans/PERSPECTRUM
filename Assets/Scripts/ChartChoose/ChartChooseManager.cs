@@ -29,7 +29,7 @@ public class ChartChooseManager : MonoBehaviour
 
     public int CurrentSelectChartContentID { get; private set; }
     public static readonly GameplayModifications k_DEFAULTGAMEPLAYMODIFICATIONS = new GameplayModifications(1d, 0d);
-    public GameplayModifications CurrentChartChooseModifcations { get; private set; } = k_DEFAULTGAMEPLAYMODIFICATIONS;
+    public GameplayModifications CurrentChartChooseModifcations { get; private set; }
     private void Awake()
     {
         ChartChooseInstance = this;
@@ -37,6 +37,7 @@ public class ChartChooseManager : MonoBehaviour
 
     private void Start()
     {
+        CurrentChartChooseModifcations = k_DEFAULTGAMEPLAYMODIFICATIONS;
         SteamManager.SteamInstance.OnChartInstalledInSteamStorage += SteamInstance_OnChartInstalledInSteamStorage;
         SteamManager.SteamInstance.OnSteamWorkshopUnsubscribed += SteamInstance_OnChartDeletedInSteamStorage;
     }
@@ -253,6 +254,7 @@ public class ChartChooseManager : MonoBehaviour
             return;
         }
 
+        Debug.Log($"Mods (Chart choose): {CurrentChartChooseModifcations.GameplaySpeed}");
         GameManager.GameInstance.RequestPlayChartEvent(contents.AssociatedFullFilePath, CurrentChartChooseModifcations);
     }
 
@@ -292,5 +294,10 @@ public class ChartChooseManager : MonoBehaviour
     public void InvokeOnChartOrderingOptionEvent(ChartSortOrder sortOrder)
     {
         OnSortOrderChanged?.Invoke(sortOrder);
+    }
+
+    public void SetGameplayModificationByCopy(GameplayModifications gameplayModifications)
+    {
+        CurrentChartChooseModifcations = gameplayModifications;
     }
 }

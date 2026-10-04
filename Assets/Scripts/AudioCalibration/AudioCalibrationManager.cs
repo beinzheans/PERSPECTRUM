@@ -30,7 +30,7 @@ public class AudioCalibrationManager : MonoBehaviour
         gameplayManager.OnGameplayStarted += GameplayManager_OnGameplayStarted;
         gameplayManager.OnGameplayEnded += GameplayManager_OnGameplayEnded;
         offsetSlider.value = (float)(GameManager.GameInstance.GlobalSettings.AudioOffsetMs / 1000d);
-        offsetSlider.onValueChanged.AddListener((x) => { GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.AudioOffsetMs, (double)(1000f * x)); UpdateOffsetText(); });
+        offsetSlider.onValueChanged.AddListener((x) => { GameManager.GameInstance.GlobalSettings.OnEdit(x => x.AudioOffsetMs, (double)(1000f * x)); UpdateOffsetText(); });
         ShowPopupDialogBeforeStartingGameplay(chartFilePath);
         UpdateOffsetText();
     }
@@ -45,7 +45,7 @@ public class AudioCalibrationManager : MonoBehaviour
             TimerIntervalAction dialog_two = new TimerIntervalAction(this, x => GameManager.GameInstance.InvokeInformationDisplayNeeded("Use the slider below to adjust your offset. For a specific value, type it in the Settings menu.", 5d), () => { }, 6d, TimerBehavior.PERSISTENT, 0d);
             TimerIntervalAction dialog_three = new TimerIntervalAction(this, x => GameManager.GameInstance.InvokeInformationDisplayNeeded("Leave this screen using the Settings menu by pressing ESC.", 5d), () => { }, 12d, TimerBehavior.PERSISTENT, 0d);
             TimerIntervalAction startAction = new TimerIntervalAction(this, async x => await gameplayManager.RequestGameplayStartedEvent(filePath, ChartChooseManager.k_DEFAULTGAMEPLAYMODIFICATIONS),
-                () => GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasAdjustedOffset, true),
+                () => GameManager.GameInstance.GlobalSettings.OnEdit(x => x.GameEvents.HasAdjustedOffset, true),
                 18d, TimerBehavior.PERSISTENT, 0d);
 
             DSPTimerEngine.TimerInstance.AddActionToTimer(dialog_one);

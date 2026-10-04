@@ -4,6 +4,7 @@ public class GameplayModsModule : BaseDataModule
 {
     private const int k_GAMEPLAYSPEEDMOD = 0;
     private const int k_GAMEPLAYSTARTTIMEMOD = 1;
+    private GameplayModifications currentGameplayModifications = ChartChooseManager.k_DEFAULTGAMEPLAYMODIFICATIONS;
     protected override void OnModuleAwake()
     {
         return;
@@ -20,7 +21,7 @@ public class GameplayModsModule : BaseDataModule
                 return;
             }
 
-            ChartChooseManager.ChartChooseInstance.CurrentChartChooseModifcations.OnEdit(() => ChartChooseManager.ChartChooseInstance.CurrentChartChooseModifcations.GameplaySpeed, result);
+            currentGameplayModifications.OnEdit_Struct(x => x.GameplaySpeed, result);
         }, ChartChooseManager.ChartChooseInstance.CurrentChartChooseModifcations.GameplaySpeed.ToString("F2"));
 
         moduleDataGroups[k_GAMEPLAYSTARTTIMEMOD].SetGroupAction_InputField(x =>
@@ -32,7 +33,7 @@ public class GameplayModsModule : BaseDataModule
                 return;
             }
 
-            ChartChooseManager.ChartChooseInstance.CurrentChartChooseModifcations.OnEdit(() => ChartChooseManager.ChartChooseInstance.CurrentChartChooseModifcations.GameplayStartTime, result);
+            currentGameplayModifications.OnEdit_Struct(x => x.GameplayStartTime, result);
         }, ChartChooseManager.ChartChooseInstance.CurrentChartChooseModifcations.GameplayStartTime.ToString("F2"));
     }
 }

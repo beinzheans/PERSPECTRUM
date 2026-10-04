@@ -28,6 +28,7 @@ public class ModuleDataGroupObject : MonoBehaviour
     [SerializeField] private Button groupButton;
 
     [SerializeField] private TMP_Text groupValueDisplay;
+
     public void SetGroupData(BaseModuleData groupData)
     {
         ModuleData = groupData;
@@ -92,8 +93,8 @@ public class ModuleDataGroupObject : MonoBehaviour
             groupToggle.SetIsOnWithoutNotify(toggleValue);
             groupToggle.onValueChanged.AddListener(x => groupToggleAction?.Invoke(x));
         }
-    }
 
+    }
     /// <summary>
     /// Sets the dropdown menu given a generic enum type. <br></br>
     /// Keep in mind that the dropdown uses 0 index while <typeparamref name="T"/> may not.
@@ -130,7 +131,6 @@ public class ModuleDataGroupObject : MonoBehaviour
             groupDropdown.onValueChanged.AddListener(x => groupDropdownAction?.Invoke(x));
 
         }
-
     }
 
     /// <summary>
@@ -197,7 +197,6 @@ public class ModuleDataGroupObject : MonoBehaviour
         }
 
     }
-
     public void RemoveAllListeners()
     {
         groupInputField.onEndEdit.RemoveAllListeners();

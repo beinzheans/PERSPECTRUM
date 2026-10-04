@@ -78,7 +78,14 @@ public abstract class BaseDataModule : MonoBehaviour
         for (int i = 0; i < moduleDataGroupInfo.Length; i++)
         {
             moduleDataGroups[i].RemoveAllListeners();
-            moduleDataGroups[i].gameObject.SetActive(false);
+            try
+            {
+                moduleDataGroups[i].gameObject.SetActive(false);
+            }
+            catch
+            {
+                Debug.Log($"Module group at index {i} already destroyed", gameObject);
+            }
         }
 
         isModuleActive = false;

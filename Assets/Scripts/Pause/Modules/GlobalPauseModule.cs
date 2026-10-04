@@ -17,7 +17,7 @@ public class GlobalPauseModule : BaseDataModule
         {
             if (double.TryParse(x, out double ms))
             {
-                GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.AudioOffsetMs, ms);
+                GameManager.GameInstance.GlobalSettings.OnEdit(x => x.AudioOffsetMs, ms);
             }
         }, GameManager.GameInstance.GlobalSettings.AudioOffsetMs.ToString("F2"));
 
@@ -38,25 +38,25 @@ public class GlobalPauseModule : BaseDataModule
 
         moduleDataGroups[k_PREDICTIVEHITSOUNDGROUPINDEX].SetGroupAction_Toggle((x) =>
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.UsePrescheduledHitsounds, x);
         }, GameManager.GameInstance.GlobalSettings.UsePrescheduledHitsounds);
 
-        moduleDataGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
+        moduleDataGroups[k_SHOWFPSGROUPINDEX].SetGroupAction_Toggle((x) => GameManager.GameInstance.GlobalSettings.OnEdit(x => x.ShowFPSCounter, x), GameManager.GameInstance.GlobalSettings.ShowFPSCounter);
 
         moduleDataGroups[k_SONGVOLUMEGROUPINDEX].SetGroupAction_Slider((x) =>
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.SongVolume, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.SongVolume, x);
         }, GameManager.GameInstance.GlobalSettings.SongVolume);
 
 
         moduleDataGroups[k_HITSOUNDVOLUMEGROUPINDEX].SetGroupAction_Slider((x) =>
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.HitsoundVolume, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.HitsoundVolume, x);
         }, GameManager.GameInstance.GlobalSettings.HitsoundVolume);
 
         moduleDataGroups[k_UIVOLUMEGROUPINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.UIVolume, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.UIVolume, x);
         }, GameManager.GameInstance.GlobalSettings.UIVolume);
     }
 }

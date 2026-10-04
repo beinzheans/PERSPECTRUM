@@ -403,12 +403,12 @@ public class GameManager : MonoBehaviour
     {
         string json = InputActions.SaveBindingOverridesAsJson();
 
-        GlobalSettings.OnEdit(() => GlobalSettings.KeybindJson, json);
+        GlobalSettings.OnEdit(x => x.KeybindJson, json);
     }
 }
 
 [Serializable]
-public class GlobalSettings : BaseEditableClass
+public class GlobalSettings : IEditable
 {
     [DefaultValue(0f)]
     public double AudioOffsetMs { get; private set; }
@@ -474,9 +474,8 @@ public class GlobalSettings : BaseEditableClass
         GameEvents = gameEvents;
     }
 
-    public override void OnEdit<TValue>(Expression<Func<TValue>> editAction, TValue newValue)
+    public void OnEditCallback()
     {
-        base.OnEdit(editAction, newValue);
         GameManager.GameInstance.InvokeGameSettingsChanged();
     }
 }

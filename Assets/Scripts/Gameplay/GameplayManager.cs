@@ -489,6 +489,7 @@ public class GameplayManager : MonoBehaviour
     {
         CurrentPath = path;
         CurrentGameplayModifications = gameplayModifications;
+
         GamePersistenceManager.LoadChartFile(path, out string chartJson, out string metadataJson, out byte[] audioBytes, out byte[] imageBytes);
 
         if (string.IsNullOrWhiteSpace(chartJson) || string.IsNullOrWhiteSpace(metadataJson))
@@ -642,7 +643,7 @@ public class GameplayManager : MonoBehaviour
         DSPTimerEngine.TimerInstance.RemoveActionFromTimer(stopwatchAction);
         if (MatchHitCount + MismatchHitCount + MissCount == MaxHitboxCount && CurrentPath == GameManager.GameInstance.k_TUTORIALFILEPATHSTRING)
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameEvents.HasPlayedTutorial, true);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.GameEvents.HasPlayedTutorial, true);
         }
 
         OnGameplayEnded?.Invoke();
@@ -759,7 +760,7 @@ public enum GameplayResultRank
 // replays should also indicate that the gameplay was modified. Replays will also need to remember the gameplay modifications at that specific play as well!
 
 [Serializable]
-public class GameplayModifications : BaseEditableClass
+public struct GameplayModifications : IEditable
 {
     public GameplayModifications(double gameplaySpeed, double gameplayStartTime)
     {
@@ -776,8 +777,13 @@ public class GameplayModifications : BaseEditableClass
     [DefaultValue(0d)]
     public double GameplayStartTime { get; private set; }
 
-    public override void OnEdit<TValue>(Expression<Func<TValue>> editAction, TValue newValue)
+    public void OnEditCallback()
     {
-        base.OnEdit(editAction, newValue);
+        if (ChartChooseManager.ChartChooseInstance == null)
+        {
+            return;
+        }
+
+        ChartChooseManager.ChartChooseInstance.SetGameplayModificationByCopy(this);
     }
 }

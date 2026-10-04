@@ -26,7 +26,7 @@ public class GameplayPauseModule : BaseDataModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed, speed);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.GameSettings.GameScrollSpeed, speed);
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameScrollSpeed.ToString("F2"));
 
         moduleDataGroups[k_LOOKAHEADGROUPINDEX].SetGroupAction_InputField(x =>
@@ -42,15 +42,15 @@ public class GameplayPauseModule : BaseDataModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime, time);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.GameSettings.GameLookaheadTime, time);
         }, GameManager.GameInstance.GlobalSettings.GameSettings.GameLookaheadTime.ToString("F2"));
 
-        moduleDataGroups[k_BACKGROUNDENABLEINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground, x),
+        moduleDataGroups[k_BACKGROUNDENABLEINDEX].SetGroupAction_Toggle(x => GameManager.GameInstance.GlobalSettings.OnEdit(y => y.GameSettings.UseCustomBackground, x),
             GameManager.GameInstance.GlobalSettings.GameSettings.UseCustomBackground);
 
         moduleDataGroups[k_BACKGROUNDBLURINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(y => y.GameSettings.BackgroundBlurAmount, x);
             moduleDataGroups[k_BACKGROUNDBLURINDEX].SetGroupDisplayText(x.ToString("F2"));
         }, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundBlurAmount);
 
@@ -58,7 +58,7 @@ public class GameplayPauseModule : BaseDataModule
 
         moduleDataGroups[k_BACKGROUNDDARKENINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(y => y.GameSettings.BackgroundDarkenAmount, x);
             moduleDataGroups[k_BACKGROUNDDARKENINDEX].SetGroupDisplayText(x.ToString("F2"));
         }, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundDarkenAmount);
 
@@ -66,7 +66,7 @@ public class GameplayPauseModule : BaseDataModule
 
         moduleDataGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupAction_Slider(x =>
         {
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength, x);
+            GameManager.GameInstance.GlobalSettings.OnEdit(y => y.GameSettings.BackgroundPulseStrength, x);
             moduleDataGroups[k_BACKGROUNDPULSESTRENGTHINDEX].SetGroupDisplayText(x.ToString("F2"));
         }, GameManager.GameInstance.GlobalSettings.GameSettings.BackgroundPulseStrength);
 

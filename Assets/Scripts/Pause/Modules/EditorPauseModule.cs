@@ -23,7 +23,7 @@ public class EditorPauseModule : BaseDataModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime, time);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.EditorSettings.EditorLookaheadTime, time);
         }, GameManager.GameInstance.GlobalSettings.EditorSettings.EditorLookaheadTime.ToString("F2"));
 
         moduleDataGroups[k_SHIFTSCROLLTIMEINTERVAL].SetGroupAction_InputField(x =>
@@ -39,7 +39,7 @@ public class EditorPauseModule : BaseDataModule
                 return;
             }
 
-            GameManager.GameInstance.GlobalSettings.OnEdit(() => GameManager.GameInstance.GlobalSettings.EditorSettings.BigScrollTimeInterval, time);
+            GameManager.GameInstance.GlobalSettings.OnEdit(x => x.EditorSettings.BigScrollTimeInterval, time);
         }, GameManager.GameInstance.GlobalSettings.EditorSettings.BigScrollTimeInterval.ToString("F2"));
 
     }
